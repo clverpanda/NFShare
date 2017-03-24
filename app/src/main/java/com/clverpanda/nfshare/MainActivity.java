@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity
         mSendText = (EditText) findViewById(R.id.nfc_text_send);
         String message = mSendText.getText().toString();
         NdefMessage msg = new NdefMessage(NdefRecord.createMime(
-                "text/plain", message.getBytes()),
+                "application/com.clverpanda.nfshare", message.getBytes()),
                 NdefRecord.createApplicationRecord("com.clverpanda.nfshare"));
         return msg;
     }
