@@ -1,6 +1,13 @@
 package com.clverpanda.nfshare;
 
+import android.content.Intent;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -12,9 +19,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        NfcAdapter.CreateNdefMessageCallback,
+        NfcAdapter.OnNdefPushCompleteCallback {
+    private static final int MESSAGE_SENT = 1;
+
+    NfcAdapter mNfcAdapter;
+    EditText mSendText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +56,42 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mNfcAdapter == null) {
+            Toast.makeText(this, "不支持NFC", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            mNfcAdapter.setNdefPushMessageCallback(this, this);
+            mNfcAdapter.setOnNdefPushCompleteCallback(this, this);
+        }
     }
+
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent event) {
+        mSendText = (EditText) findViewById(R.id.nfc_text_send);
+        String message = mSendText.getText().toString();
+        NdefMessage msg = new NdefMessage(NdefRecord.createMime(
+                "text/plain", message.getBytes()),
+                NdefRecord.createApplicationRecord("com.clverpanda.nfshare"));
+        return msg;
+    }
+
+    @Override
+    public void onNdefPushComplete(NfcEvent arg0) {
+        mHandler.obtainMessage(MESSAGE_SENT).sendToTarget();
+    }
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MESSAGE_SENT:
+                    Toast.makeText(getApplicationContext(), "NFC消息已经发送!", Toast.LENGTH_LONG).show();
+                    break;
+            }
+        }
+    };
 
     @Override
     public void onBackPressed() {
@@ -97,5 +148,15 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        setIntent(intent);
+    }
+
+    public void toReceive(View view) {
+        Intent intent = new Intent(this, ReceiveActivity.class);
+        startActivity(intent);
     }
 }
