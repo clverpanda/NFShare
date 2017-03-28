@@ -6,4 +6,15 @@
 
     <string name="action_settings">Settings</string>
     <string name="title_activity_receive">Receive</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+    <string name="drawer_item_content">内容分享</string>
+    <string name="drawer_item_resource">资源分享</string>
+    <string name="drawer_item_devices">已知设备</string>
+    <string name="drawer_item_tasks">任务列表</string>
+    <string name="drawer_item_settings">设置</string>
+
+
 </resources>
