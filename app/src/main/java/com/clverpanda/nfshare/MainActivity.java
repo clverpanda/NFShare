@@ -30,7 +30,7 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        NfcAdapter.CreateNdefMessageCallback,
+//        NfcAdapter.CreateNdefMessageCallback,
         NfcAdapter.OnNdefPushCompleteCallback{
     private static final int MESSAGE_SENT = 1;
 
@@ -74,26 +74,26 @@ public class MainActivity extends AppCompatActivity
 
 
         //NFC
-        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        if (mNfcAdapter == null) {
-            Toast.makeText(this, "不支持NFC", Toast.LENGTH_SHORT).show();
-        }
-        else
-        {
-            mNfcAdapter.setNdefPushMessageCallback(this, this);
-            mNfcAdapter.setOnNdefPushCompleteCallback(this, this);
-        }
+//        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+//        if (mNfcAdapter == null) {
+//            Toast.makeText(this, "不支持NFC", Toast.LENGTH_SHORT).show();
+//        }
+//        else
+//        {
+//            mNfcAdapter.setNdefPushMessageCallback(this, this);
+//            mNfcAdapter.setOnNdefPushCompleteCallback(this, this);
+//        }
     }
 
-    @Override
-    public NdefMessage createNdefMessage(NfcEvent event) {
-        mSendText = (EditText) findViewById(R.id.nfc_text_send);
-        String message = mSendText.getText().toString();
-        NdefMessage msg = new NdefMessage(NdefRecord.createMime(
-                "application/com.clverpanda.nfshare", message.getBytes()),
-                NdefRecord.createApplicationRecord("com.clverpanda.nfshare"));
-        return msg;
-    }
+//    @Override
+//    public NdefMessage createNdefMessage(NfcEvent event) {
+//        mSendText = (EditText) findViewById(R.id.nfc_text_send);
+//        String message = mSendText.getText().toString();
+//        NdefMessage msg = new NdefMessage(NdefRecord.createMime(
+//                "application/com.clverpanda.nfshare", message.getBytes()),
+//                NdefRecord.createApplicationRecord("com.clverpanda.nfshare"));
+//        return msg;
+//    }
 
     @Override
     public void onNdefPushComplete(NfcEvent arg0) {
