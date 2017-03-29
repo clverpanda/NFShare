@@ -1,7 +1,6 @@
 package com.clverpanda.nfshare;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -9,6 +8,8 @@ import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,23 +22,32 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.clverpanda.nfshare.Fragments.TabsFrag;
+import com.clverpanda.nfshare.Fragments.ContentFrag;
+import com.clverpanda.nfshare.Fragments.ResourceFrag;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         NfcAdapter.CreateNdefMessageCallback,
-        NfcAdapter.OnNdefPushCompleteCallback,
-        TabsFrag.OnFragmentInteractionListener{
+        NfcAdapter.OnNdefPushCompleteCallback{
     private static final int MESSAGE_SENT = 1;
+
+    @BindView(R.id.main_toolbar)
+    Toolbar toolbar;
+
 
     NfcAdapter mNfcAdapter;
     EditText mSendText;
+    FragmentManager mFm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
+
         setSupportActionBar(toolbar);
 
 
@@ -50,15 +60,17 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-//        //Fragment
-//        if (findViewById(R.id.content_fragment) != null) {
-//            if (savedInstanceState != null) {
-//                return;
-//            }
-//
-//            getSupportFragmentManager().beginTransaction()
-//                    .add(R.id.content_fragment, TabsFrag.newInstance("ContentShare")).commit();
-//        }
+        mFm = getSupportFragmentManager();
+
+        //Fragment
+        if (findViewById(R.id.fragment_container) != null) {
+            if (savedInstanceState != null) {
+                return;
+            }
+
+            mFm.beginTransaction().add(R.id.fragment_container, new ContentFrag()).commit();
+            toolbar.setTitle(R.string.drawer_item_content);
+        }
 
 
         //NFC
@@ -133,13 +145,21 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_content) {
-            // Handle the camera action
-        } else if (id == R.id.nav_resource) {
-
+        if (id == R.id.nav_content)
+        {
+            FragmentTransaction ft = mFm.beginTransaction();
+            ft.replace(R.id.fragment_container, new ContentFrag());
+            ft.commit();
+            toolbar.setTitle(R.string.drawer_item_content);
+        }
+        else if (id == R.id.nav_resource)
+        {
+            FragmentTransaction ft = mFm.beginTransaction();
+            ft.replace(R.id.fragment_container, new ResourceFrag());
+            ft.commit();
+            toolbar.setTitle(R.string.drawer_item_resource);
         } else if (id == R.id.nav_devices) {
 
         } else if (id == R.id.nav_tasks) {
@@ -158,11 +178,6 @@ public class MainActivity extends AppCompatActivity
         setIntent(intent);
     }
 
-    @Override
-    public void onContentShareInteraction(Uri uri)
-    {
-
-    }
 
     public void toReceive(View view) {
         Intent intent = new Intent(this, ReceiveActivity.class);
