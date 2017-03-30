@@ -29,31 +29,43 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0"
-            app:srcCompat="@drawable/ic_blank_app" />
+            app:srcCompat="@drawable/ic_blank_app"
+            android:contentDescription="@string/app_name" />
 
         <TextView
             android:id="@+id/app_share_name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="24dp"
             android:layout_marginTop="8dp"
+            android:maxLines="1"
             android:text="TextView"
             android:textColor="@color/primary_text"
             android:textSize="18sp"
             app:layout_constraintLeft_toRightOf="@+id/app_share_icon"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/checkBox"
+            android:layout_marginRight="24dp"
+            app:layout_constraintHorizontal_bias="0.0"
+            android:ellipsize="end"/>
 
-        <TextView
+        <com.clverpanda.nfshare.Widget.AlwaysMarqueeTextView
             android:id="@+id/app_share_pkg"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
+            android:layout_marginBottom="-1dp"
             android:layout_marginLeft="24dp"
+            android:maxLines="1"
             android:text="TextView"
             android:textColor="@color/secondary_text"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="@+id/app_share_icon"
-            app:layout_constraintLeft_toRightOf="@+id/app_share_icon" />
+            app:layout_constraintLeft_toRightOf="@+id/app_share_icon"
+            app:layout_constraintRight_toLeftOf="@+id/checkBox"
+            android:layout_marginRight="24dp"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:singleLine="true"/>
 
         <CheckBox
             android:id="@+id/checkBox"
