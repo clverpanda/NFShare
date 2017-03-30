@@ -11,6 +11,9 @@ import com.clverpanda.nfshare.R;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by miaol on 2017/3/29 0029.
  */
@@ -36,7 +39,8 @@ public class AppRecyclerAdapter extends RecyclerView.Adapter<AppRecyclerAdapter.
     @Override
     public void onBindViewHolder(AppViewHolder holder, final int position) {
 
-        holder.tv.setText( mDatas.get(position));
+        holder.tvAppName.setText(mDatas.get(position));
+        holder.tvAppPkg.setText(mDatas.get(position));
     }
 
     //重写onCreateViewHolder方法，返回一个自定义的ViewHolder
@@ -50,11 +54,14 @@ public class AppRecyclerAdapter extends RecyclerView.Adapter<AppRecyclerAdapter.
 
     class AppViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tv;
+        @BindView(R.id.app_share_name)
+        TextView tvAppName;
+        @BindView(R.id.app_share_pkg)
+        TextView tvAppPkg;
 
         AppViewHolder(View view) {
             super(view);
-            tv = (TextView) view.findViewById(R.id.item_app_share);
+            ButterKnife.bind(this, view);
         }
 
     }
