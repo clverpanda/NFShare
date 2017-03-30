@@ -1,6 +1,7 @@
 package com.clverpanda.nfshare.ContentShare;
 
 
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -11,7 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.clverpanda.nfshare.Model.AppInfo;
 import com.clverpanda.nfshare.R;
+import com.clverpanda.nfshare.Util.AppInfoGetter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +30,7 @@ public class AppShareFrag extends Fragment {
     @BindView(R.id.app_recyclerView)
     RecyclerView recyclerView;
 
-    private List<String> mDatas;
+    private List<AppInfo> mDatas;
     private AppRecyclerAdapter recycleAdapter;
 
 
@@ -50,6 +53,7 @@ public class AppShareFrag extends Fragment {
         if (getArguments() != null) {
             mPage = getArguments().getInt(ARG_PAGE);
         }
+        initData();
     }
 
     @Override
@@ -58,8 +62,7 @@ public class AppShareFrag extends Fragment {
         View view = inflater.inflate(R.layout.content_app_share, container, false);
         ButterKnife.bind(this, view);
 
-        initData();
-        recycleAdapter= new AppRecyclerAdapter(getContext() , mDatas );
+        recycleAdapter= new AppRecyclerAdapter(getContext() , mDatas);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         //设置布局管理器
         recyclerView.setLayoutManager(layoutManager);
@@ -69,14 +72,13 @@ public class AppShareFrag extends Fragment {
         recyclerView.setAdapter( recycleAdapter);
         //设置增加或删除条目的动画
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+
         return view;
     }
 
-    private void initData() {
-        mDatas = new ArrayList<>();
-        for ( int i=0; i < 40; i++) {
-            mDatas.add( "item"+i);
-        }
+    private void initData()
+    {
+        mDatas = AppInfoGetter.getInstance(getContext()).getInstalledApps();
     }
 
 }
