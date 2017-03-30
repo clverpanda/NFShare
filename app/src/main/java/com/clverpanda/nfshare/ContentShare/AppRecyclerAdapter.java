@@ -43,7 +43,7 @@ public class AppRecyclerAdapter extends RecyclerView.Adapter<AppRecyclerAdapter.
     @Override
     public AppViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        View view = inflater.inflate(R.layout.item_home,parent, false);
+        View view = inflater.inflate(R.layout.item_app_share, parent, false);
         AppViewHolder holder= new AppViewHolder(view);
         return holder;
     }
@@ -54,7 +54,7 @@ public class AppRecyclerAdapter extends RecyclerView.Adapter<AppRecyclerAdapter.
 
         AppViewHolder(View view) {
             super(view);
-            tv = (TextView) view.findViewById(R.id.tv_item);
+            tv = (TextView) view.findViewById(R.id.item_app_share);
         }
 
     }
