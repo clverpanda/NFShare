@@ -31,6 +31,8 @@ public class ContentFrag extends Fragment {
     protected TabLayout tabLayout;
     @BindView(R.id.content_layout)
     protected CoordinatorLayout coordinatorLayout;
+    @BindView(R.id.content_toolbar)
+    protected Toolbar toolbar;
 
 
 
@@ -45,9 +47,17 @@ public class ContentFrag extends Fragment {
     {
         View view = inflater.inflate(R.layout.fragment_content, container, false);
         ButterKnife.bind(this, view);
-        coordinatorLayout.removeView(tabLayout);
-        AppBarLayout mainAppBar = (AppBarLayout) getActivity().findViewById(R.id.appbar);
-        mainAppBar.addView(tabLayout);
+
+        AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
+        parentActivity.setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) parentActivity.findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                parentActivity, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        toolbar.setTitle(R.string.drawer_item_content);
         viewPager.setAdapter(new ContentPagerAdapter(getChildFragmentManager(), getContext()));
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setTabMode(TabLayout.MODE_FIXED);
@@ -58,8 +68,6 @@ public class ContentFrag extends Fragment {
     public void onDestroyView()
     {
         super.onDestroyView();
-        AppBarLayout mainAppBar = (AppBarLayout) getActivity().findViewById(R.id.appbar);
-        mainAppBar.removeView(tabLayout);
     }
 
 }

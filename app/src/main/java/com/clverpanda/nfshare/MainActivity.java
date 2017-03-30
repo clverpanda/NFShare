@@ -34,9 +34,6 @@ public class MainActivity extends AppCompatActivity
         NfcAdapter.OnNdefPushCompleteCallback{
     private static final int MESSAGE_SENT = 1;
 
-    @BindView(R.id.main_toolbar)
-    Toolbar toolbar;
-
 
     NfcAdapter mNfcAdapter;
     EditText mSendText;
@@ -48,14 +45,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        setSupportActionBar(toolbar);
-
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -69,7 +58,6 @@ public class MainActivity extends AppCompatActivity
             }
 
             mFm.beginTransaction().add(R.id.fragment_container, new ContentFrag()).commit();
-            toolbar.setTitle(R.string.drawer_item_content);
         }
 
 
@@ -152,14 +140,12 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction ft = mFm.beginTransaction();
             ft.replace(R.id.fragment_container, new ContentFrag());
             ft.commit();
-            toolbar.setTitle(R.string.drawer_item_content);
         }
         else if (id == R.id.nav_resource)
         {
             FragmentTransaction ft = mFm.beginTransaction();
             ft.replace(R.id.fragment_container, new ResourceFrag());
             ft.commit();
-            toolbar.setTitle(R.string.drawer_item_resource);
         } else if (id == R.id.nav_devices) {
 
         } else if (id == R.id.nav_tasks) {
