@@ -25,4 +25,4 @@
 
 
 ## 样例
-![image](https://github.com/clverpanda/NFShare/blob/master/sample/sample_app_share.png) 
+<img src="https://github.com/clverpanda/NFShare/blob/master/sample/sample_app_share.png" width = "300" alt="图片名称" align=center />
