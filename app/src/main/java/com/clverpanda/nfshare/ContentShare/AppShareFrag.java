@@ -13,9 +13,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.clverpanda.nfshare.Model.AppInfo;
 import com.clverpanda.nfshare.R;
+import com.clverpanda.nfshare.Tasks.AsyncResponse;
+import com.clverpanda.nfshare.Tasks.LoadAppListAsyncTask;
 import com.clverpanda.nfshare.Util.AppInfoGetter;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
@@ -29,18 +32,18 @@ import butterknife.ButterKnife;
 public class AppShareFrag extends Fragment
 {
     public static final String ARG_PAGE = "ARG_PAGE";
-    public static final int APP_LIST_LOADED = 1;
     private int mPage;
+    private static boolean IsFirst = true;
+
+    private static List<AppInfo> mData;
 
 
+    private Shimmer shimmer;
     @BindView(R.id.app_recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.text_loading)
     ShimmerTextView shimmerTextView;
 
-    private List<AppInfo> mDatas;
-    private AppRecyclerAdapter recycleAdapter;
-    private Shimmer shimmer;
 
     public AppShareFrag() {
         // Required empty public constructor
@@ -74,48 +77,37 @@ public class AppShareFrag extends Fragment
         layoutManager.setOrientation(OrientationHelper.VERTICAL);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        //载入动画
-        shimmer = new Shimmer();
-        shimmer.start(shimmerTextView);
+        if (IsFirst)
+        {
+            //载入动画
+            shimmer = new Shimmer();
+            shimmer.start(shimmerTextView);
 
-        loadAppList();
+            LoadAppListAsyncTask appListAsyncTask = new LoadAppListAsyncTask(getContext(),
+                    recyclerView, shimmer, shimmerTextView);
+            appListAsyncTask.setOnAsyncResponse(new AsyncResponse<List<AppInfo>>() {
+                @Override
+                public void onDataReceivedSuccess(List<AppInfo> listData) {
+                    mData = listData;
+                    IsFirst = false;
+                }
+
+                @Override
+                public void onDataReceivedFailed() {
+                    mData = null;
+                    Toast.makeText(getContext(), "获取APP数据失败！", Toast.LENGTH_SHORT).show();
+                }
+            });
+            appListAsyncTask.execute();
+        }
+        else
+        {
+            recyclerView.setAdapter(new AppRecyclerAdapter(getContext(), mData));
+            shimmerTextView.setVisibility(View.GONE);
+        }
         return view;
     }
 
-    final Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg)
-        {
-            switch (msg.what)
-            {
-                case APP_LIST_LOADED:
-                    shimmer.cancel();
-                    shimmerTextView.setVisibility(View.GONE);
-                    recycleAdapter= new AppRecyclerAdapter(getContext(), mDatas);
-                    recyclerView.setAdapter(recycleAdapter);
-                    break;
-            }
-        }
-    };
-    private void loadAppList()
-    {
-        Thread thread = new Thread() {
-            @Override
-            public void run()
-            {
-                initData();
-                Message msg = handler.obtainMessage();
-                msg.what = APP_LIST_LOADED;
-                msg.obj = mDatas;
-                handler.sendMessage(msg);
-            }
-        };
-        thread.start();
-    }
 
-    private void initData()
-    {
-        mDatas = AppInfoGetter.getInstance(getContext()).getInstalledApps();
-    }
 
 }
