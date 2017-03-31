@@ -25,4 +25,4 @@
 
 
 ## 样例
-![image](https://github.com/clverpanda/NFShare/sample/sample_app_share.png) 
+![image](https://github.com/clverpanda/NFShare/tree/master/sample/sample_app_share.png) 
