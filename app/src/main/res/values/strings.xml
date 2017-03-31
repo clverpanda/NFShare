@@ -15,6 +15,7 @@
     <string name="drawer_item_devices">已知设备</string>
     <string name="drawer_item_tasks">任务列表</string>
     <string name="drawer_item_settings">设置</string>
+    <string name="loading">加载中...</string>
 
 
 </resources>

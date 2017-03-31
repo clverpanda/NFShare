@@ -1,8 +1,10 @@
 package com.clverpanda.nfshare.ContentShare;
 
 
-import android.content.pm.PackageManager;
+
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,24 +17,30 @@ import android.view.ViewGroup;
 import com.clverpanda.nfshare.Model.AppInfo;
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.Util.AppInfoGetter;
+import com.romainpiel.shimmer.Shimmer;
+import com.romainpiel.shimmer.ShimmerTextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-public class AppShareFrag extends Fragment {
+public class AppShareFrag extends Fragment
+{
     public static final String ARG_PAGE = "ARG_PAGE";
+    public static final int APP_LIST_LOADED = 1;
     private int mPage;
+
 
     @BindView(R.id.app_recyclerView)
     RecyclerView recyclerView;
+    @BindView(R.id.text_loading)
+    ShimmerTextView shimmerTextView;
 
     private List<AppInfo> mDatas;
     private AppRecyclerAdapter recycleAdapter;
-
+    private Shimmer shimmer;
 
     public AppShareFrag() {
         // Required empty public constructor
@@ -53,7 +61,6 @@ public class AppShareFrag extends Fragment {
         if (getArguments() != null) {
             mPage = getArguments().getInt(ARG_PAGE);
         }
-        initData();
     }
 
     @Override
@@ -62,18 +69,48 @@ public class AppShareFrag extends Fragment {
         View view = inflater.inflate(R.layout.content_app_share, container, false);
         ButterKnife.bind(this, view);
 
-        recycleAdapter= new AppRecyclerAdapter(getContext() , mDatas);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        //设置布局管理器
         recyclerView.setLayoutManager(layoutManager);
-        //设置为垂直布局，这也是默认的
         layoutManager.setOrientation(OrientationHelper.VERTICAL);
-        //设置Adapter
-        recyclerView.setAdapter( recycleAdapter);
-        //设置增加或删除条目的动画
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
+        //载入动画
+        shimmer = new Shimmer();
+        shimmer.start(shimmerTextView);
+
+        loadAppList();
         return view;
+    }
+
+    final Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg)
+        {
+            switch (msg.what)
+            {
+                case APP_LIST_LOADED:
+                    shimmer.cancel();
+                    shimmerTextView.setVisibility(View.GONE);
+                    recycleAdapter= new AppRecyclerAdapter(getContext(), mDatas);
+                    recyclerView.setAdapter(recycleAdapter);
+                    break;
+            }
+        }
+    };
+    private void loadAppList()
+    {
+        Thread thread = new Thread() {
+            @Override
+            public void run()
+            {
+                initData();
+                Message msg = handler.obtainMessage();
+                msg.what = APP_LIST_LOADED;
+                msg.obj = mDatas;
+                handler.sendMessage(msg);
+            }
+        };
+        thread.start();
     }
 
     private void initData()

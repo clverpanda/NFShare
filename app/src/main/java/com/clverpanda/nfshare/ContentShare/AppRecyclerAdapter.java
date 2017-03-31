@@ -28,9 +28,9 @@ public class AppRecyclerAdapter extends RecyclerView.Adapter<AppRecyclerAdapter.
     private LayoutInflater inflater;
 
     public AppRecyclerAdapter(Context context, List<AppInfo> datas){
-        this.mContext=context;
-        this.mDatas=datas;
-        inflater=LayoutInflater.from(mContext);
+        this.mContext = context;
+        this.mDatas = datas;
+        inflater = LayoutInflater.from(mContext);
     }
 
     @Override
