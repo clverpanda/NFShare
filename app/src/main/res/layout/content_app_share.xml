@@ -40,7 +40,7 @@
         app:layout_constraintTop_toTopOf="@+id/app_recyclerView"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintVertical_bias="0.45"
+        app:layout_constraintVertical_bias="0.35000002"
         android:layout_marginTop="8dp" />
 
 

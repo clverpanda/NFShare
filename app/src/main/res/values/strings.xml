@@ -16,6 +16,7 @@
     <string name="drawer_item_tasks">任务列表</string>
     <string name="drawer_item_settings">设置</string>
     <string name="loading">加载中...</string>
+    <string name="no_contact_permission">没有通讯录权限！</string>
 
 
 </resources>
