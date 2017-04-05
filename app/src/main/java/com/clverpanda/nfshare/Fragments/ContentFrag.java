@@ -104,7 +104,12 @@ public class ContentFrag extends Fragment
                 }
                 else if (viewPager.getCurrentItem() == 1)
                 {
-
+                    ContactShareFrag frag = (ContactShareFrag) pagerAdapter.getCurrentFragment();
+                    List<ContactInfo> selectedData = frag.getSelectedItems();
+                    NFCTransferData nfcData = new NFCTransferData(DataType.CONTACT, JSON.toJSONString(selectedData));
+                    Intent startIntent = new Intent(getContext(), NFCSendActivity.class);
+                    startIntent.putExtra(NFCSendActivity.DATA_INFO, JSON.toJSONString(nfcData));
+                    startActivity(startIntent);
                 }
             }
         });

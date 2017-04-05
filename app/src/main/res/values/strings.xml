@@ -17,6 +17,7 @@
     <string name="drawer_item_settings">设置</string>
     <string name="loading">加载中...</string>
     <string name="no_contact_permission">没有通讯录权限！</string>
+    <string name="nfc_notify">请将另一台手机靠近NFC感应区域</string>
 
 
 </resources>

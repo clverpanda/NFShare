@@ -21,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.clverpanda.nfshare.Model.AppInfo;
+import com.clverpanda.nfshare.Model.AppInfoTransfer;
 import com.clverpanda.nfshare.Model.ContactInfo;
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.Tasks.AsyncResponse;
@@ -28,7 +30,9 @@ import com.clverpanda.nfshare.Tasks.LoadContactListAsyncTask;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -161,6 +165,21 @@ public class ContactShareFrag extends Fragment {
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    public List<ContactInfo> getSelectedItems()
+    {
+        List<ContactInfo> result = new ArrayList<>();
+        ContactRecyclerAdapter dataAdapter = (ContactRecyclerAdapter) recyclerView.getAdapter();
+        Map<Integer, Boolean> selectMap = dataAdapter.getSelectMap();
+        for (Map.Entry<Integer, Boolean> entry : selectMap.entrySet())
+        {
+            if (entry.getValue())
+            {
+                result.add(dataAdapter.getItem(entry.getKey()));
+            }
+        }
+        return result;
     }
 
 }

@@ -5,13 +5,18 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.clverpanda.nfshare.Model.AppInfo;
 import com.clverpanda.nfshare.Model.ContactInfo;
 import com.clverpanda.nfshare.R;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,12 +31,21 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
     private List<ContactInfo> mDatas;
     private Context mContext;
     private LayoutInflater inflater;
+    private Map<Integer, Boolean> selectMap = new HashMap<>();
+
 
     public ContactRecyclerAdapter(Context context, List<ContactInfo> datas)
     {
         this.mContext = context;
         this.mDatas = datas;
+        initSelectMap();
         inflater = LayoutInflater.from(mContext);
+    }
+
+    private void initSelectMap()
+    {
+        for (int i = 0; i < mDatas.size(); i++)
+            selectMap.put(i, false);
     }
 
     @Override
@@ -41,12 +55,20 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
     }
 
     @Override
-    public void onBindViewHolder(ContactViewHolder holder, final int position)
+    public void onBindViewHolder(final ContactViewHolder holder, final int position)
     {
         ContactInfo theInfo = mDatas.get(position);
 
         holder.tvContactName.setText(theInfo.getName());
         holder.tvContactNumber.setText(theInfo.getNumber());
+        holder.cbxContact.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                selectMap.put(holder.getAdapterPosition(), b);
+            }
+        });
+        if (selectMap.get(position) == null)
+            selectMap.put(position, false);
     }
 
     @Override
@@ -65,12 +87,23 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
         TextView tvContactNumber;
         @BindView(R.id.contact_share_img)
         ImageView imgContactImg;
+        @BindView(R.id.contact_share_checkBox)
+        CheckBox cbxContact;
 
         ContactViewHolder(View view)
         {
             super(view);
             ButterKnife.bind(this, view);
         }
+    }
 
+    public Map<Integer, Boolean> getSelectMap()
+    {
+        return selectMap;
+    }
+
+    public ContactInfo getItem(int position)
+    {
+        return mDatas.get(position);
     }
 }
