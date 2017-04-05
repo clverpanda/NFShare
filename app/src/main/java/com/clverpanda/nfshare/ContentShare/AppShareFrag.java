@@ -5,6 +5,7 @@ package com.clverpanda.nfshare.ContentShare;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.BoolRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.clverpanda.nfshare.Model.AppInfo;
+import com.clverpanda.nfshare.Model.AppInfoTransfer;
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.Tasks.AsyncResponse;
 import com.clverpanda.nfshare.Tasks.LoadAppListAsyncTask;
@@ -23,7 +25,9 @@ import com.clverpanda.nfshare.Util.AppInfoGetter;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,7 +40,6 @@ public class AppShareFrag extends Fragment
     private static boolean IsFirst = true;
 
     private static List<AppInfo> mData;
-
 
     private Shimmer shimmer;
     @BindView(R.id.app_recyclerView)
@@ -106,6 +109,24 @@ public class AppShareFrag extends Fragment
             shimmerTextView.setVisibility(View.GONE);
         }
         return view;
+    }
+
+    public List<AppInfoTransfer> getSelectedItems()
+    {
+        List<AppInfoTransfer> result = new ArrayList<>();
+        AppRecyclerAdapter dataAdapter = (AppRecyclerAdapter) recyclerView.getAdapter();
+        Map<Integer, Boolean> selectMap = dataAdapter.getSelectMap();
+        for (Map.Entry<Integer, Boolean> entry : selectMap.entrySet())
+        {
+            if (entry.getValue())
+            {
+                AppInfo appInfo = dataAdapter.getItem(entry.getKey());
+                AppInfoTransfer appInfoTransfer = new AppInfoTransfer(appInfo.getAppName(),
+                        appInfo.getPkgName(), appInfo.getAppVersion());
+                result.add(appInfoTransfer);
+            }
+        }
+        return result;
     }
 
 
