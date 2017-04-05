@@ -9,7 +9,6 @@ public class ContactInfo
 {
     private String name;
     private String number;
-    private String sortKey;
     private int id;
 
     public String getName() {
@@ -26,14 +25,6 @@ public class ContactInfo
 
     public void setNumber(String number) {
         this.number = number;
-    }
-
-    public String getSortKey() {
-        return sortKey;
-    }
-
-    public void setSortKey(String sortKey) {
-        this.sortKey = sortKey;
     }
 
     public int getId() {

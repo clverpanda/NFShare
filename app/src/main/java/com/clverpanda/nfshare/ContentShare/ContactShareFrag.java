@@ -3,8 +3,6 @@ package com.clverpanda.nfshare.ContentShare;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -22,11 +20,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.clverpanda.nfshare.MainActivity;
+
 import com.clverpanda.nfshare.Model.ContactInfo;
 import com.clverpanda.nfshare.R;
+import com.clverpanda.nfshare.Tasks.AsyncResponse;
+import com.clverpanda.nfshare.Tasks.LoadContactListAsyncTask;
+import com.romainpiel.shimmer.Shimmer;
+import com.romainpiel.shimmer.ShimmerTextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -41,12 +42,17 @@ public class ContactShareFrag extends Fragment {
 
     private String mParam1;
     private String mParam2;
-    private List<ContactInfo> mData;
+
+    private static List<ContactInfo> mData;
+    private Shimmer shimmer;
+
 
     @BindView(R.id.no_permission)
     TextView textView;
     @BindView(R.id.contact_recyclerView)
     RecyclerView recyclerView;
+    @BindView(R.id.text_loading)
+    ShimmerTextView shimmerTextView;
 
 
     public ContactShareFrag() {
@@ -77,12 +83,26 @@ public class ContactShareFrag extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.content_contact_share, container, false);
         ButterKnife.bind(this, view);
-        if (IsFirst) {
-            mData = new ArrayList<>();
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(layoutManager);
+        layoutManager.setOrientation(OrientationHelper.VERTICAL);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        if (IsFirst)
+        {
+            //载入动画
+            shimmer = new Shimmer();
+            shimmer.start(shimmerTextView);
+
             initialData();
-            textView.setVisibility(View.GONE);
             IsFirst = false;
         }
+        else {
+            recyclerView.setAdapter(new ContactRecyclerAdapter(getContext(), mData));
+            shimmerTextView.setVisibility(View.GONE);
+        }
+
         return view;
     }
 
@@ -99,47 +119,34 @@ public class ContactShareFrag extends Fragment {
         {
             if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CONTACTS)
                     != PackageManager.PERMISSION_GRANTED)
-            {
                 requestPermissions(new String[] {Manifest.permission.READ_CONTACTS}, REQUEST_CODE_ASK_CONTACT);
-            }
             else
-            {
-                getData();
-                LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-                recyclerView.setLayoutManager(layoutManager);
-                layoutManager.setOrientation(OrientationHelper.VERTICAL);
-                recyclerView.setAdapter(new ContactRecyclerAdapter(getContext(), mData));
-                recyclerView.setItemAnimator(new DefaultItemAnimator());
-            }
+                startAsyncContactLoad();
         }
+        else
+            startAsyncContactLoad();
     }
 
-    private void getData()
+    private void startAsyncContactLoad()
     {
-        Uri contactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
-        Cursor cursor = getContext().getContentResolver().query(contactUri,
-                new String[]{"display_name", "sort_key", "contact_id","data1"},
-                null, null, "sort_key");
-        try
-        {
-            String contactName;
-            String contactNumber;
-
-            while (cursor.moveToNext())
-            {
-                ContactInfo contactInfo = new ContactInfo();
-                contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                contactNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                contactInfo.setName(contactName);
-                contactInfo.setNumber(contactNumber);
-                mData.add(contactInfo);
+        LoadContactListAsyncTask contactListAsyncTask = new LoadContactListAsyncTask(getContext(),
+                recyclerView, shimmer, shimmerTextView);
+        contactListAsyncTask.setOnAsyncResponse(new AsyncResponse<List<ContactInfo>>() {
+            @Override
+            public void onDataReceivedSuccess(List<ContactInfo> listData) {
+                mData = listData;
+                IsFirst = false;
             }
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            cursor.close();
-        }
+
+            @Override
+            public void onDataReceivedFailed() {
+                mData = null;
+                Toast.makeText(getContext(), "获取通讯录数据失败！", Toast.LENGTH_SHORT).show();
+            }
+        });
+        contactListAsyncTask.execute();
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
@@ -147,13 +154,9 @@ public class ContactShareFrag extends Fragment {
         switch (requestCode) {
             case REQUEST_CODE_ASK_CONTACT:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
-                    textView.setText("已获得权限！");
-                }
+                    startAsyncContactLoad();
                 else
-                {
-                    textView.setText("申请权限失败！");
-                }
+                    textView.setVisibility(View.VISIBLE);
                 break;
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
