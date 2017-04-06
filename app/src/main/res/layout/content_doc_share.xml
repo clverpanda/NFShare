@@ -1,14 +1,59 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.clverpanda.nfshare.ResourceShare.DocShareFrag">
 
+
+    <Button
+        android:id="@+id/test_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始下载"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="92dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <Button
+        android:id="@+id/test_button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="查询状态"
+        android:layout_marginTop="30dp"
+        app:layout_constraintTop_toBottomOf="@+id/test_button"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="@+id/test_button"
+        android:layout_marginRight="0dp"
+        app:layout_constraintRight_toRightOf="@+id/test_button"
+        app:layout_constraintHorizontal_bias="1.0" />
+
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:id="@+id/test_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:layout_marginTop="42dp"
+        app:layout_constraintTop_toBottomOf="@+id/test_button2"
+        android:layout_marginLeft="0dp"
+        app:layout_constraintLeft_toLeftOf="@+id/test_button2"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="@+id/test_button2"
+        app:layout_constraintHorizontal_bias="0.681" />
 
-
-
-</FrameLayout>
+    <TextView
+        android:id="@+id/test_textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:layout_marginTop="40dp"
+        app:layout_constraintTop_toBottomOf="@+id/test_textView"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="@+id/test_textView"
+        android:layout_marginRight="0dp"
+        app:layout_constraintRight_toRightOf="@+id/test_textView"
+        app:layout_constraintHorizontal_bias="1.0" />
+</android.support.constraint.ConstraintLayout>
