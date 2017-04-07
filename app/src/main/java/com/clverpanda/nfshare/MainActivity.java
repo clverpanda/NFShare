@@ -8,6 +8,7 @@ import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 import com.clverpanda.nfshare.Fragments.ContentFrag;
 import com.clverpanda.nfshare.Fragments.ResourceFrag;
+import com.clverpanda.nfshare.Fragments.TasksFrag;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,6 +35,8 @@ public class MainActivity extends AppCompatActivity
 {
 
     FragmentManager mFm;
+    NfcAdapter mNfcAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +59,28 @@ public class MainActivity extends AppCompatActivity
             mFm.beginTransaction().add(R.id.fragment_container, new ContentFrag()).commit();
         }
 
-
+        //NFC
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mNfcAdapter == null) {
+            Toast.makeText(this, "不支持NFC", Toast.LENGTH_SHORT).show();
+        }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
+            processIntent(getIntent());
+        }
+    }
+
+
+    void processIntent(Intent intent)
+    {
+        Parcelable[] rawMsgs = intent.getParcelableArrayExtra(
+                NfcAdapter.EXTRA_NDEF_MESSAGES);
+        NdefMessage msg = (NdefMessage) rawMsgs[0];
+    }
 
 
     @Override
@@ -110,8 +133,11 @@ public class MainActivity extends AppCompatActivity
             ft.commit();
         } else if (id == R.id.nav_devices) {
 
-        } else if (id == R.id.nav_tasks) {
-
+        } else if (id == R.id.nav_tasks)
+        {
+            FragmentTransaction ft = mFm.beginTransaction();
+            ft.replace(R.id.fragment_container, new TasksFrag());
+            ft.commit();
         } else if (id == R.id.nav_share) {
 
         }
@@ -124,12 +150,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onNewIntent(Intent intent) {
         setIntent(intent);
-    }
-
-
-    public void toReceive(View view) {
-        Intent intent = new Intent(this, ReceiveActivity.class);
-        startActivity(intent);
     }
 
 
