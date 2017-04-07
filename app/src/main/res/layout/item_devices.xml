@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardview_devices"
+    app:cardCornerRadius="1dp"
+    app:cardBackgroundColor="@color/icons"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
+    android:layout_marginLeft="12dp"
+    android:layout_marginRight="12dp"
+    android:layout_height="60dp"
+    android:layout_width="match_parent">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <ImageView
+            android:id="@+id/devices_imageView"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="36dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.6"
+            app:srcCompat="@drawable/ic_phone" />
+
+        <TextView
+            android:id="@+id/devices_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="36dp"
+            android:text="TextView"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toRightOf="@+id/devices_imageView"
+            app:layout_constraintTop_toTopOf="@+id/devices_imageView"
+            android:layout_marginTop="0dp" />
+
+        <TextView
+            android:id="@+id/devices_mac"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="0dp"
+            android:text="TextView"
+            android:textColor="@color/secondary_text"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/devices_imageView"
+            app:layout_constraintLeft_toLeftOf="@+id/devices_name" />
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.v7.widget.CardView>

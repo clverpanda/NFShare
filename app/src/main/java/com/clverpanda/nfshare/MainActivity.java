@@ -24,6 +24,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.clverpanda.nfshare.Fragments.ContentFrag;
+import com.clverpanda.nfshare.Fragments.DevicesFrag;
 import com.clverpanda.nfshare.Fragments.ResourceFrag;
 import com.clverpanda.nfshare.Fragments.TasksFrag;
 
@@ -131,9 +132,13 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction ft = mFm.beginTransaction();
             ft.replace(R.id.fragment_container, new ResourceFrag());
             ft.commit();
-        } else if (id == R.id.nav_devices) {
-
-        } else if (id == R.id.nav_tasks)
+        } else if (id == R.id.nav_devices)
+        {
+            FragmentTransaction ft = mFm.beginTransaction();
+            ft.replace(R.id.fragment_container, new DevicesFrag());
+            ft.commit();
+        }
+        else if (id == R.id.nav_tasks)
         {
             FragmentTransaction ft = mFm.beginTransaction();
             ft.replace(R.id.fragment_container, new TasksFrag());
