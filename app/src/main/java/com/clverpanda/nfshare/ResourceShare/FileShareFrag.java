@@ -3,41 +3,40 @@ package com.clverpanda.nfshare.ResourceShare;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
+import com.clverpanda.nfshare.Model.DeviceInfo;
+import com.clverpanda.nfshare.Model.TaskInfo;
 import com.clverpanda.nfshare.R;
+import com.clverpanda.nfshare.Util.Database.DeviceDbHelper;
+import com.clverpanda.nfshare.Util.Database.TasksDbHelper;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FileShareFrag#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+
 public class FileShareFrag extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    @BindView(R.id.test_db_button)
+    Button button;
 
 
     public FileShareFrag() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FileShareFrag.
-     */
-    // TODO: Rename and change types and number of parameters
     public static FileShareFrag newInstance(String param1, String param2) {
         FileShareFrag fragment = new FileShareFrag();
         Bundle args = new Bundle();
@@ -57,10 +56,29 @@ public class FileShareFrag extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.content_file_share, container, false);
+        View view = inflater.inflate(R.layout.content_file_share, container, false);
+        ButterKnife.bind(this, view);
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                DeviceDbHelper deviceDB = new DeviceDbHelper(getContext());
+                DeviceInfo deviceInfo = new DeviceInfo("clverpanda的测试机", "3C-77-E6-66-AC-2F", "");
+                deviceDB.addDeviceInfo(deviceInfo);
+                TasksDbHelper tasksDB = new TasksDbHelper(getContext());
+                TaskInfo taskInfo = new TaskInfo("测试任务", "123123", 1, 1, 0);
+                tasksDB.addTaskInfo(taskInfo);
+                List<TaskInfo> taskInfos = tasksDB.getAllTaskInfo();
+                for (TaskInfo task : taskInfos)
+                {
+                    Log.d("aha", "onClick: " + task.getName());
+                }
+            }
+        });
+        return view;
     }
 
 }
