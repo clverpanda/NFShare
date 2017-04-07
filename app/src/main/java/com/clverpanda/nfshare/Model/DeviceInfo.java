@@ -19,6 +19,12 @@ public class DeviceInfo
         PublicKey = publicKey;
     }
 
+    public DeviceInfo(String name, String wifiMac, String publicKey) {
+        Name = name;
+        WifiMac = wifiMac;
+        PublicKey = publicKey;
+    }
+
     public int getId() {
         return Id;
     }
