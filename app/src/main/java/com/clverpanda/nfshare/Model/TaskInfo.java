@@ -28,6 +28,14 @@ public class TaskInfo
         ReceiveTime = receiveTime;
     }
 
+    public TaskInfo(String name, String description, int type, int from, int isDone) {
+        Name = name;
+        Description = description;
+        Type = type;
+        From = from;
+        IsDone = isDone;
+    }
+
     public int getId() {
         return Id;
     }
