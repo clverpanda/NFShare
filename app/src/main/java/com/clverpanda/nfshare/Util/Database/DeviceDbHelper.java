@@ -26,11 +26,19 @@ public class DeviceDbHelper extends SQLiteOpenHelper
     private static final String KEY_NAME = "Name";
     private static final String KEY_WIFIMAC = "WifiMac";
     private static final String KEY_PUBLICKEY = "PublicKey";
-    private static final String createSql = "CREATE TABLE Devices ( " +
+    static final String createSql = "CREATE TABLE Devices ( " +
                                             "Id INTEGER primary key autoincrement, " +
                                             "Name text, " +
                                             "WifiMac text, " +
                                             "PublicKey text);";
+    static final String createSql2 = "CREATE TABLE Tasks ( " +
+            "Id INTEGER primary key autoincrement, " +
+            "Name text, " +
+            "Description text, " +
+            "Type INTEGER, " +
+            "FromId INTEGER, " +
+            "IsDone INTEGER, " +
+            "ReceiveTime DATETIME DEFAULT CURRENT_TIMESTAMP);";
     public DeviceDbHelper(Context context)
     {
         super(context, DATABASE_NAME, null, VERSION);
@@ -46,12 +54,13 @@ public class DeviceDbHelper extends SQLiteOpenHelper
     @Override
     public void onCreate(SQLiteDatabase db)
     {
-
         db.execSQL(createSql);
+        db.execSQL(createSql2);
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
+    {}
 
     public void addDeviceInfo(DeviceInfo deviceInfo)
     {

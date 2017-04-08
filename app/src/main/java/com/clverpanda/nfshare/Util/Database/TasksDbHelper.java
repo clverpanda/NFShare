@@ -25,17 +25,10 @@ public class TasksDbHelper extends SQLiteOpenHelper
     private static final String KEY_NAME = "Name";
     private static final String KEY_DESCRIPTION = "Description";
     private static final String KEY_TYPE = "Type";
-    private static final String KEY_FROM = "From";
+    private static final String KEY_FROMID = "FromId";
     private static final String KEY_ISDONE = "IsDone";
     private static final String KEY_RECEIVETIME = "ReceiveTime";
-    private static final String createSql = "CREATE TABLE Tasks ( " +
-                                            "Id INTEGER primary key autoincrement, " +
-                                            "Name text, " +
-                                            "Description text, " +
-                                            "Type INTEGER, " +
-                                            "From INTEGER, " +
-                                            "IsDone INTEGER, " +
-                                            "ReceiveTime DATETIME DEFAULT CURRENT_TIMESTAMP);";
+
     public TasksDbHelper(Context context)
     {
         super(context, DATABASE_NAME, null, VERSION);
@@ -51,11 +44,13 @@ public class TasksDbHelper extends SQLiteOpenHelper
     @Override
     public void onCreate(SQLiteDatabase db)
     {
-        db.execSQL(createSql);
+        db.execSQL(DeviceDbHelper.createSql);
+        db.execSQL(DeviceDbHelper.createSql2);
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
+    {}
 
     public void addTaskInfo(TaskInfo taskInfo)
     {
@@ -65,7 +60,7 @@ public class TasksDbHelper extends SQLiteOpenHelper
         values.put(KEY_NAME, taskInfo.getName());
         values.put(KEY_DESCRIPTION, taskInfo.getDescription());
         values.put(KEY_TYPE, taskInfo.getType());
-        values.put(KEY_FROM, taskInfo.getFrom());
+        values.put(KEY_FROMID, taskInfo.getFrom());
         values.put(KEY_ISDONE, taskInfo.getIsDone());
         db.insert(TABLE_NAME, null, values);
         db.close();
@@ -74,8 +69,8 @@ public class TasksDbHelper extends SQLiteOpenHelper
     public TaskInfo getTaskInfo(int Id)
     {
         SQLiteDatabase db = this.getReadableDatabase();
-        String selectQuery = "SELECT Id, Name, Description, Type, From, IsDone, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
-                "WHERE Id=" + Id;
+        String selectQuery = "SELECT Id, Name, Description, Type, FromId, IsDone, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
+                " WHERE Id=" + Id;
         Cursor cursor = db.rawQuery(selectQuery, null);
         TaskInfo tasksInfo = null;
         if (cursor.moveToFirst())
@@ -93,8 +88,8 @@ public class TasksDbHelper extends SQLiteOpenHelper
     public List<TaskInfo> getAllTaskInfo()
     {
         List<TaskInfo> taskInfoList = new ArrayList<>();
-        String selectQuery = "SELECT Id, Name, Description, Type, From, IsDone, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
-                "ORDER BY Id DESC";
+        String selectQuery = "SELECT Id, Name, Description, Type, FromId, IsDone, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
+                " ORDER BY Id DESC";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst())
