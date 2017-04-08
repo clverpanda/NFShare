@@ -69,7 +69,7 @@ public class FileShareFrag extends Fragment {
                 DeviceInfo deviceInfo = new DeviceInfo("clverpanda的测试机", "3C-77-E6-66-AC-2F", "");
                 deviceDB.addDeviceInfo(deviceInfo);
                 TasksDbHelper tasksDB = new TasksDbHelper(getContext());
-                TaskInfo taskInfo = new TaskInfo("测试任务", "123123", 1, 1, 0);
+                TaskInfo taskInfo = new TaskInfo("测试任务", "123123", 1, "clverpanda的手机", 1);
                 tasksDB.addTaskInfo(taskInfo);
                 List<TaskInfo> taskInfos = tasksDB.getAllTaskInfo();
                 for (TaskInfo task : taskInfos)

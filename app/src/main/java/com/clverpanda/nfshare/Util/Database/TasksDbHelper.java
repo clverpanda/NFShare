@@ -25,7 +25,7 @@ public class TasksDbHelper extends SQLiteOpenHelper
     private static final String KEY_NAME = "Name";
     private static final String KEY_DESCRIPTION = "Description";
     private static final String KEY_TYPE = "Type";
-    private static final String KEY_FROMID = "FromId";
+    private static final String KEY_FROMDEVICE = "FromDevice";
     private static final String KEY_ISDONE = "IsDone";
     private static final String KEY_RECEIVETIME = "ReceiveTime";
 
@@ -60,7 +60,7 @@ public class TasksDbHelper extends SQLiteOpenHelper
         values.put(KEY_NAME, taskInfo.getName());
         values.put(KEY_DESCRIPTION, taskInfo.getDescription());
         values.put(KEY_TYPE, taskInfo.getType());
-        values.put(KEY_FROMID, taskInfo.getFrom());
+        values.put(KEY_FROMDEVICE, taskInfo.getFrom());
         values.put(KEY_ISDONE, taskInfo.getIsDone());
         db.insert(TABLE_NAME, null, values);
         db.close();
@@ -69,14 +69,14 @@ public class TasksDbHelper extends SQLiteOpenHelper
     public TaskInfo getTaskInfo(int Id)
     {
         SQLiteDatabase db = this.getReadableDatabase();
-        String selectQuery = "SELECT Id, Name, Description, Type, FromId, IsDone, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
+        String selectQuery = "SELECT Id, Name, Description, Type, FromDevice, IsDone, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
                 " WHERE Id=" + Id;
         Cursor cursor = db.rawQuery(selectQuery, null);
         TaskInfo tasksInfo = null;
         if (cursor.moveToFirst())
         {
             tasksInfo = new TaskInfo(cursor.getInt(0), cursor.getString(1),
-                    cursor.getString(2), cursor.getInt(3), cursor.getInt(4),
+                    cursor.getString(2), cursor.getInt(3), cursor.getString(4),
                     cursor.getInt(5), cursor.getString(6));
         }
         cursor.close();
@@ -84,19 +84,16 @@ public class TasksDbHelper extends SQLiteOpenHelper
         return tasksInfo;
     }
 
-
-    public List<TaskInfo> getAllTaskInfo()
+    public List<TaskInfo> queryRawSQL(String selectQuery)
     {
         List<TaskInfo> taskInfoList = new ArrayList<>();
-        String selectQuery = "SELECT Id, Name, Description, Type, FromId, IsDone, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
-                " ORDER BY Id DESC";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst())
         {
             do {
                 TaskInfo tasksInfo = new TaskInfo(cursor.getInt(0), cursor.getString(1),
-                        cursor.getString(2), cursor.getInt(3), cursor.getInt(4),
+                        cursor.getString(2), cursor.getInt(3), cursor.getString(4),
                         cursor.getInt(5), cursor.getString(6));
                 taskInfoList.add(tasksInfo);
             }
@@ -105,6 +102,29 @@ public class TasksDbHelper extends SQLiteOpenHelper
         cursor.close();
         db.close();
         return taskInfoList;
+    }
+
+    public List<TaskInfo> getAllTaskInfo()
+    {
+        String selectQuery = "SELECT Id, Name, Description, Type, FromDevice, IsDone, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
+                " ORDER BY Id DESC";
+        return queryRawSQL(selectQuery);
+    }
+
+    public List<TaskInfo> getAllDoneTaskInfo()
+    {
+        String selectQuery = "SELECT Id, Name, Description, Type, FromDevice, IsDone, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
+                " WHERE IsDone=1" +
+                " ORDER BY Id DESC";
+        return queryRawSQL(selectQuery);
+    }
+
+    public List<TaskInfo> getAllRunningTaskInfo()
+    {
+        String selectQuery = "SELECT Id, Name, Description, Type, FromDevice, IsDone, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
+                " WHERE IsDone=0" +
+                " ORDER BY Id DESC";
+        return queryRawSQL(selectQuery);
     }
 
 

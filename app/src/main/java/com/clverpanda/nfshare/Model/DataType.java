@@ -32,4 +32,23 @@ public enum DataType
     public void setIndex(int index) {
         this.index = index;
     }
+
+    public static String getName(int index)
+    {
+        switch (index)
+        {
+            case 1:
+                return DataType.PLAIN.getName();
+            case 2:
+                return DataType.APP.getName();
+            case 3:
+                return DataType.CONTACT.getName();
+            case 4:
+                return DataType.FILE.getName();
+            case 5:
+                return DataType.STREAM.getName();
+            default:
+                return "未知类型";
+        }
+    }
 }

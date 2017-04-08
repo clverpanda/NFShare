@@ -14,11 +14,19 @@ public class TaskInfo
     private String Name;
     private String Description;
     private int Type;
-    private int From;
+    private String From;
     private int IsDone;
     private String ReceiveTime;
 
-    public TaskInfo(int id, String name, String description, int type, int from, int isDone, String receiveTime) {
+    public TaskInfo(String name, String description, int type, String from, int isDone) {
+        Name = name;
+        Description = description;
+        Type = type;
+        From = from;
+        IsDone = isDone;
+    }
+
+    public TaskInfo(int id, String name, String description, int type, String from, int isDone, String receiveTime) {
         Id = id;
         Name = name;
         Description = description;
@@ -26,14 +34,6 @@ public class TaskInfo
         From = from;
         IsDone = isDone;
         ReceiveTime = receiveTime;
-    }
-
-    public TaskInfo(String name, String description, int type, int from, int isDone) {
-        Name = name;
-        Description = description;
-        Type = type;
-        From = from;
-        IsDone = isDone;
     }
 
     public int getId() {
@@ -68,11 +68,11 @@ public class TaskInfo
         Type = type;
     }
 
-    public int getFrom() {
+    public String getFrom() {
         return From;
     }
 
-    public void setFrom(int from) {
+    public void setFrom(String from) {
         From = from;
     }
 

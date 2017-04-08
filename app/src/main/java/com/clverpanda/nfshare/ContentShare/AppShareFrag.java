@@ -2,6 +2,7 @@ package com.clverpanda.nfshare.ContentShare;
 
 
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -101,7 +102,7 @@ public class AppShareFrag extends Fragment
                     Toast.makeText(getContext(), "获取APP数据失败！", Toast.LENGTH_SHORT).show();
                 }
             });
-            appListAsyncTask.execute();
+            appListAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
         else
         {

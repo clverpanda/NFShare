@@ -3,6 +3,7 @@ package com.clverpanda.nfshare.ContentShare;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -148,7 +149,7 @@ public class ContactShareFrag extends Fragment {
                 Toast.makeText(getContext(), "获取通讯录数据失败！", Toast.LENGTH_SHORT).show();
             }
         });
-        contactListAsyncTask.execute();
+        contactListAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
 
