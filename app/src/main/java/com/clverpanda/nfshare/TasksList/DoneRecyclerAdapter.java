@@ -1,6 +1,8 @@
 package com.clverpanda.nfshare.TasksList;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,6 +52,28 @@ public class DoneRecyclerAdapter extends RecyclerView.Adapter<DoneRecyclerAdapte
         holder.tvTaskName.setText(theInfo.getName());
         holder.tvTaskTime.setText(theInfo.getReceiveTime());
         holder.tvTaskType.setText(DataType.getName(theInfo.getType()));
+        Drawable typeIcon;
+        switch (theInfo.getType())
+        {
+            case 1:
+                typeIcon = ContextCompat.getDrawable(mContext, R.drawable.ic_plain_text);
+                holder.imgTaskType.setImageDrawable(typeIcon);
+                break;
+            case 3:
+                typeIcon = ContextCompat.getDrawable(mContext, R.drawable.ic_contact);
+                holder.imgTaskType.setImageDrawable(typeIcon);
+                break;
+            case 4:
+                typeIcon = ContextCompat.getDrawable(mContext, R.drawable.ic_file);
+                holder.imgTaskType.setImageDrawable(typeIcon);
+                break;
+            case 5:
+                typeIcon = ContextCompat.getDrawable(mContext, R.drawable.ic_stream);
+                holder.imgTaskType.setImageDrawable(typeIcon);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
