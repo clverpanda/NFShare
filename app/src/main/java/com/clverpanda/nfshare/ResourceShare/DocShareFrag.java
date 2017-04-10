@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.clverpanda.nfshare.R;
+import com.clverpanda.nfshare.Util.DeviceInfoGetter;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
 import com.liulishuo.filedownloader.FileDownloadQueueSet;
@@ -104,7 +105,7 @@ public class DocShareFrag extends Fragment {
             @Override
             public void onClick(View view)
             {
-
+                textView2.setText(DeviceInfoGetter.getInstance().getMacAddr());
             }
         });
         return view;

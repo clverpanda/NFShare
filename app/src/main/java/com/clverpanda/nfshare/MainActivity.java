@@ -52,13 +52,7 @@ public class MainActivity extends AppCompatActivity
         mFm = getSupportFragmentManager();
 
         //Fragment
-        if (findViewById(R.id.fragment_container) != null) {
-            if (savedInstanceState != null) {
-                return;
-            }
-
-            mFm.beginTransaction().add(R.id.fragment_container, new ContentFrag()).commit();
-        }
+        mFm.beginTransaction().replace(R.id.fragment_container, new ContentFrag()).commit();
 
         //NFC
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -67,11 +61,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+
     @Override
     public void onResume() {
         super.onResume();
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
             processIntent(getIntent());
+            mFm.beginTransaction().replace(R.id.fragment_container, new TasksFrag()).commit();
         }
     }
 

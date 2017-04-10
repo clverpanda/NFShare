@@ -1,6 +1,11 @@
 package com.clverpanda.nfshare.ResourceShare;
 
 
+import android.content.Context;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WpsInfo;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -65,23 +70,7 @@ public class FileShareFrag extends Fragment {
             @Override
             public void onClick(View v)
             {
-                DeviceDbHelper deviceDB = new DeviceDbHelper(getContext());
-                DeviceInfo deviceInfo = new DeviceInfo("clverpanda的测试机", "3C-77-E6-66-AC-2F", "");
-                deviceDB.addDeviceInfo(deviceInfo);
-                TasksDbHelper tasksDB = new TasksDbHelper(getContext());
-                TaskInfo taskInfo = new TaskInfo("测试任务1", "123123", 2, "clverpanda的手机", 1);
-                TaskInfo taskInfo1 = new TaskInfo("测试任务2", "123123", 3, "clverpanda的手机", 1);
-                TaskInfo taskInfo2 = new TaskInfo("测试任务3", "123123", 4, "clverpanda的手机", 1);
-                TaskInfo taskInfo3 = new TaskInfo("测试任务4", "123123", 5, "clverpanda的手机", 1);
-                tasksDB.addTaskInfo(taskInfo);
-                tasksDB.addTaskInfo(taskInfo1);
-                tasksDB.addTaskInfo(taskInfo2);
-                tasksDB.addTaskInfo(taskInfo3);
-                List<TaskInfo> taskInfos = tasksDB.getAllTaskInfo();
-                for (TaskInfo task : taskInfos)
-                {
-                    Log.d("aha", "onClick: " + task.getName());
-                }
+
             }
         });
         return view;
