@@ -1,6 +1,11 @@
 package com.clverpanda.nfshare.Util;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.os.Build;
+import android.provider.Settings;
+
+import com.clverpanda.nfshare.Model.DeviceInfo;
 
 import java.net.NetworkInterface;
 import java.util.Collections;
@@ -14,15 +19,25 @@ import java.util.List;
 public class DeviceInfoGetter
 {
     private static DeviceInfoGetter deviceInfoGetter;
+    private ContentResolver contentResolver;
 
-    private DeviceInfoGetter() {}
+    private DeviceInfoGetter(Context context)
+    {
+        contentResolver = context.getContentResolver();
+    }
 
-    public static DeviceInfoGetter getInstance()
+    public static DeviceInfoGetter getInstance(Context context)
     {
         if (deviceInfoGetter == null)
-            deviceInfoGetter = new DeviceInfoGetter();
+            deviceInfoGetter = new DeviceInfoGetter(context);
         return deviceInfoGetter;
     }
+
+    public DeviceInfo getDeviceInfo()
+    {
+        return new DeviceInfo(getDeviceName(), getMacAddr(), "");
+    }
+
 
     public String getMacAddr() {
         try {
@@ -48,5 +63,13 @@ public class DeviceInfoGetter
         } catch (Exception ex) {
         }
         return "02:00:00:00:00:00";
+    }
+
+    public String getDeviceName()
+    {
+        String result = Settings.Secure.getString(contentResolver, "bluetooth_name");
+        if (result == null)
+            result = Build.MODEL;
+        return result;
     }
 }

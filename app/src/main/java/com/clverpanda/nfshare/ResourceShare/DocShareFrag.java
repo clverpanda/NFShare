@@ -3,16 +3,24 @@ package com.clverpanda.nfshare.ResourceShare;
 
 import android.Manifest;
 import android.app.DownloadManager;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pInfo;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,7 +113,8 @@ public class DocShareFrag extends Fragment {
             @Override
             public void onClick(View view)
             {
-                textView2.setText(DeviceInfoGetter.getInstance().getMacAddr());
+                textView2.setText(DeviceInfoGetter.getInstance(getContext()).getMacAddr());
+                String a = DeviceInfoGetter.getInstance(getContext()).getDeviceName();
             }
         });
         return view;

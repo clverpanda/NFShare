@@ -8,11 +8,12 @@ package com.clverpanda.nfshare.Model;
 public class NFCTransferData
 {
     private DataType dataType;
-    private String payload;
+    private DeviceInfo deviceInfo;
+    private Object payload;
 
-    public NFCTransferData(DataType dataType, String payload)
-    {
+    public NFCTransferData(DataType dataType, DeviceInfo deviceInfo, Object payload) {
         this.dataType = dataType;
+        this.deviceInfo = deviceInfo;
         this.payload = payload;
     }
 
@@ -24,11 +25,19 @@ public class NFCTransferData
         this.dataType = dataType;
     }
 
-    public String getPayload() {
+    public DeviceInfo getDeviceInfo() {
+        return deviceInfo;
+    }
+
+    public void setDeviceInfo(DeviceInfo deviceInfo) {
+        this.deviceInfo = deviceInfo;
+    }
+
+    public Object getPayload() {
         return payload;
     }
 
-    public void setPayload(String payload) {
+    public void setPayload(Object payload) {
         this.payload = payload;
     }
 }

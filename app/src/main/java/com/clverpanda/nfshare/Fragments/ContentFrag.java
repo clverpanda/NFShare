@@ -36,6 +36,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import com.alibaba.fastjson.JSON;
+import com.clverpanda.nfshare.Util.DeviceInfoGetter;
 
 
 public class ContentFrag extends Fragment
@@ -93,11 +94,12 @@ public class ContentFrag extends Fragment
             public void onClick(View view)
             {
                 ContentPagerAdapter pagerAdapter = (ContentPagerAdapter) viewPager.getAdapter();
+                DeviceInfoGetter deviceInfoGetter = DeviceInfoGetter.getInstance(getContext());
                 if (viewPager.getCurrentItem() == 0)
                 {
                     AppShareFrag frag = (AppShareFrag) pagerAdapter.getCurrentFragment();
                     List<AppInfoTransfer> selectedData = frag.getSelectedItems();
-                    NFCTransferData nfcData = new NFCTransferData(DataType.APP, JSON.toJSONString(selectedData));
+                    NFCTransferData nfcData = new NFCTransferData(DataType.APP, deviceInfoGetter.getDeviceInfo(), selectedData);
                     Intent startIntent = new Intent(getContext(), NFCSendActivity.class);
                     startIntent.putExtra(NFCSendActivity.DATA_INFO, JSON.toJSONString(nfcData));
                     startActivity(startIntent);
@@ -106,7 +108,7 @@ public class ContentFrag extends Fragment
                 {
                     ContactShareFrag frag = (ContactShareFrag) pagerAdapter.getCurrentFragment();
                     List<ContactInfo> selectedData = frag.getSelectedItems();
-                    NFCTransferData nfcData = new NFCTransferData(DataType.CONTACT, JSON.toJSONString(selectedData));
+                    NFCTransferData nfcData = new NFCTransferData(DataType.CONTACT, deviceInfoGetter.getDeviceInfo(), selectedData);
                     Intent startIntent = new Intent(getContext(), NFCSendActivity.class);
                     startIntent.putExtra(NFCSendActivity.DATA_INFO, JSON.toJSONString(nfcData));
                     startActivity(startIntent);
