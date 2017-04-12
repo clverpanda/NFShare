@@ -9,9 +9,11 @@ public class NFCTransferData
 {
     private DataType dataType;
     private DeviceInfo deviceInfo;
-    private Object payload;
+    private String payload;
 
-    public NFCTransferData(DataType dataType, DeviceInfo deviceInfo, Object payload) {
+    public NFCTransferData() {}
+
+    public NFCTransferData(DataType dataType, DeviceInfo deviceInfo, String payload) {
         this.dataType = dataType;
         this.deviceInfo = deviceInfo;
         this.payload = payload;
@@ -33,11 +35,11 @@ public class NFCTransferData
         this.deviceInfo = deviceInfo;
     }
 
-    public Object getPayload() {
+    public String getPayload() {
         return payload;
     }
 
-    public void setPayload(Object payload) {
+    public void setPayload(String payload) {
         this.payload = payload;
     }
 }

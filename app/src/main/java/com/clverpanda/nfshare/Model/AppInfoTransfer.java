@@ -12,6 +12,8 @@ public class AppInfoTransfer
     private String pkgName;
     private String appVersion;
 
+    public AppInfoTransfer() {}
+
     public AppInfoTransfer(String appName, String pkgName, String appVersion) {
         this.appName = appName;
         this.pkgName = pkgName;

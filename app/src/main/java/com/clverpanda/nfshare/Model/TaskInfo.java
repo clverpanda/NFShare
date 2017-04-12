@@ -18,6 +18,8 @@ public class TaskInfo
     private int IsDone;
     private String ReceiveTime;
 
+    public TaskInfo() {}
+
     public TaskInfo(String name, String description, int type, String from, int isDone) {
         Name = name;
         Description = description;

@@ -74,6 +74,31 @@ public class DeviceDbHelper extends SQLiteOpenHelper
         db.close();
     }
 
+    public void addDeviceInfoNotRe(DeviceInfo deviceInfo)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor cursor = db.query(TABLE_NAME, new String[]{KEY_ID, KEY_NAME, KEY_WIFIMAC, KEY_PUBLICKEY},
+                KEY_WIFIMAC + "=?", new String[]{deviceInfo.getWifiMac()}, null, null, null, null);
+        if (cursor.moveToNext())
+        {
+            ContentValues values = new ContentValues();
+            values.put(KEY_NAME, deviceInfo.getName());
+            values.put(KEY_PUBLICKEY, deviceInfo.getPublicKey());
+            db.update(TABLE_NAME, values, KEY_WIFIMAC + "=?", new String[]{deviceInfo.getWifiMac()});
+        }
+        else
+        {
+            ContentValues values = new ContentValues();
+            values.put(KEY_NAME, deviceInfo.getName());
+            values.put(KEY_WIFIMAC, deviceInfo.getWifiMac());
+            values.put(KEY_PUBLICKEY, deviceInfo.getPublicKey());
+            db.insert(TABLE_NAME, null, values);
+        }
+        cursor.close();
+        db.close();
+    }
+
     public DeviceInfo getDeviceInfo(int Id)
     {
         SQLiteDatabase db = this.getReadableDatabase();

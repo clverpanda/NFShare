@@ -66,17 +66,18 @@ public class MainActivity extends AppCompatActivity
     public void onResume() {
         super.onResume();
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
-            processIntent(getIntent());
-            mFm.beginTransaction().replace(R.id.fragment_container, new TasksFrag()).commit();
+            String msg = processIntent(getIntent());
+            mFm.beginTransaction().replace(R.id.fragment_container, TasksFrag.newInstance(msg, 1)).commit();
         }
     }
 
 
-    void processIntent(Intent intent)
+    protected String processIntent(Intent intent)
     {
         Parcelable[] rawMsgs = intent.getParcelableArrayExtra(
                 NfcAdapter.EXTRA_NDEF_MESSAGES);
         NdefMessage msg = (NdefMessage) rawMsgs[0];
+        return msg.toString();
     }
 
 

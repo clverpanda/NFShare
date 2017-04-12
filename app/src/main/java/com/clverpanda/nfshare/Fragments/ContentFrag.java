@@ -99,7 +99,7 @@ public class ContentFrag extends Fragment
                 {
                     AppShareFrag frag = (AppShareFrag) pagerAdapter.getCurrentFragment();
                     List<AppInfoTransfer> selectedData = frag.getSelectedItems();
-                    NFCTransferData nfcData = new NFCTransferData(DataType.APP, deviceInfoGetter.getDeviceInfo(), selectedData);
+                    NFCTransferData nfcData = new NFCTransferData(DataType.APP, deviceInfoGetter.getDeviceInfo(), JSON.toJSONString(selectedData));
                     Intent startIntent = new Intent(getContext(), NFCSendActivity.class);
                     startIntent.putExtra(NFCSendActivity.DATA_INFO, JSON.toJSONString(nfcData));
                     startActivity(startIntent);
@@ -107,8 +107,8 @@ public class ContentFrag extends Fragment
                 else if (viewPager.getCurrentItem() == 1)
                 {
                     ContactShareFrag frag = (ContactShareFrag) pagerAdapter.getCurrentFragment();
-                    List<ContactInfo> selectedData = frag.getSelectedItems();
-                    NFCTransferData nfcData = new NFCTransferData(DataType.CONTACT, deviceInfoGetter.getDeviceInfo(), selectedData);
+                    ContactInfo selectedData = frag.getSelectedItems().get(0);
+                    NFCTransferData nfcData = new NFCTransferData(DataType.CONTACT, deviceInfoGetter.getDeviceInfo(), JSON.toJSONString(selectedData));
                     Intent startIntent = new Intent(getContext(), NFCSendActivity.class);
                     startIntent.putExtra(NFCSendActivity.DATA_INFO, JSON.toJSONString(nfcData));
                     startActivity(startIntent);

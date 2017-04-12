@@ -27,7 +27,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.clverpanda.nfshare.Model.DeviceInfo;
 import com.clverpanda.nfshare.R;
+import com.clverpanda.nfshare.Util.Database.DeviceDbHelper;
 import com.clverpanda.nfshare.Util.DeviceInfoGetter;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
@@ -88,7 +90,7 @@ public class DocShareFrag extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.content_doc_share, container, false);
         ButterKnife.bind(this, view);
@@ -113,8 +115,9 @@ public class DocShareFrag extends Fragment {
             @Override
             public void onClick(View view)
             {
-                textView2.setText(DeviceInfoGetter.getInstance(getContext()).getMacAddr());
-                String a = DeviceInfoGetter.getInstance(getContext()).getDeviceName();
+                DeviceInfo deviceInfo = new DeviceInfo("clverpanda新", "48-48-48-48");
+                DeviceDbHelper deviceDbHelper = new DeviceDbHelper(getContext());
+                deviceDbHelper.addDeviceInfoNotRe(deviceInfo);
             }
         });
         return view;
