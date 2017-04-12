@@ -42,5 +42,4 @@ dependencies {
     compile 'com.github.clans:fab:1.6.4'
     compile 'com.skyfishjy.ripplebackground:library:1.0.1'
     compile 'com.alibaba:fastjson:1.1.56.android'
-    compile 'com.liulishuo.filedownloader:library:1.4.2'
 }

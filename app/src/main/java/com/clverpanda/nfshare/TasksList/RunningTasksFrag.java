@@ -3,14 +3,25 @@ package com.clverpanda.nfshare.TasksList;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.OrientationHelper;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.clverpanda.nfshare.R;
+import com.clverpanda.nfshare.Util.Database.TasksDbHelper;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 
 public class RunningTasksFrag extends Fragment {
+
+    @BindView(R.id.running_tasks_recyclerView)
+    RecyclerView recyclerView;
 
 
     public RunningTasksFrag() {
@@ -20,7 +31,18 @@ public class RunningTasksFrag extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.content_running_tasks, container, false);
+        View view = inflater.inflate(R.layout.content_running_tasks, container, false);
+        ButterKnife.bind(this, view);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(layoutManager);
+        layoutManager.setOrientation(OrientationHelper.VERTICAL);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        TasksDbHelper tasksDb = new TasksDbHelper(getContext());
+        recyclerView.setAdapter(new RunningRecyclerAdapter(getContext(), tasksDb.getAllRunningTaskInfo()));
+
+        return view;
     }
 
 }

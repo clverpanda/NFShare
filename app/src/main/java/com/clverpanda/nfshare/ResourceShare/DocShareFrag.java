@@ -28,13 +28,11 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.clverpanda.nfshare.Model.DeviceInfo;
+import com.clverpanda.nfshare.Model.TaskInfo;
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.Util.Database.DeviceDbHelper;
+import com.clverpanda.nfshare.Util.Database.TasksDbHelper;
 import com.clverpanda.nfshare.Util.DeviceInfoGetter;
-import com.liulishuo.filedownloader.BaseDownloadTask;
-import com.liulishuo.filedownloader.FileDownloadListener;
-import com.liulishuo.filedownloader.FileDownloadQueueSet;
-import com.liulishuo.filedownloader.FileDownloader;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -115,9 +113,9 @@ public class DocShareFrag extends Fragment {
             @Override
             public void onClick(View view)
             {
-                DeviceInfo deviceInfo = new DeviceInfo("clverpanda新", "48-48-48-48");
-                DeviceDbHelper deviceDbHelper = new DeviceDbHelper(getContext());
-                deviceDbHelper.addDeviceInfoNotRe(deviceInfo);
+                TaskInfo taskInfo = new TaskInfo("下载测试", "aha", 2, "测试机", 0);
+                TasksDbHelper tasksDbHelper = new TasksDbHelper(getContext());
+                tasksDbHelper.addTaskInfo(taskInfo);
             }
         });
         return view;
@@ -125,17 +123,7 @@ public class DocShareFrag extends Fragment {
 
     private void startDownload()
     {
-        String[] strings = {"http://www.wandoujia.com/apps/com.dianping.v1/download", "http://www.wandoujia.com/apps/com.dianping.v1/download"};
-        for (int i = 0; i < strings.length; i++) {
-            FileDownloader.getImpl().create(strings[i])
-                    .setTag(i + 1)
-                    .setPath(Environment.DIRECTORY_DOWNLOADS + "/")
-                    .setCallbackProgressTimes(10)
-                    .setListener(queueTarget)
-                    .asInQueueTask()
-                    .enqueue();
-        }
-        FileDownloader.getImpl().start(queueTarget, true);
+
     }
 
     @Override
@@ -152,49 +140,6 @@ public class DocShareFrag extends Fragment {
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
-
-    final FileDownloadListener queueTarget = new FileDownloadListener() {
-        @Override
-        protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-        }
-
-        @Override
-        protected void connected(BaseDownloadTask task, String etag, boolean isContinue, int soFarBytes, int totalBytes) {
-        }
-
-        @Override
-        protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes)
-        {
-            if ((int)task.getTag() == 1)
-                textView.setText("任务1:" + soFarBytes + "/" + totalBytes);
-            else
-                textView.setText("任务2:" + soFarBytes + "/" + totalBytes);
-        }
-
-        @Override
-        protected void blockComplete(BaseDownloadTask task) {
-        }
-
-        @Override
-        protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
-        }
-
-        @Override
-        protected void completed(BaseDownloadTask task) {
-        }
-
-        @Override
-        protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-        }
-
-        @Override
-        protected void error(BaseDownloadTask task, Throwable e) {
-        }
-
-        @Override
-        protected void warn(BaseDownloadTask task) {
-        }
-    };
 
 
 }
