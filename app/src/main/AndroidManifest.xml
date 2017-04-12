@@ -64,6 +64,7 @@
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.Send">
         </activity>
+        <service android:name=".service.DownloadService"/>
 
     </application>
 

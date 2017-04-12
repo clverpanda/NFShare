@@ -2,33 +2,24 @@ package com.clverpanda.nfshare;
 
 import android.content.Intent;
 import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
-import android.nfc.NfcEvent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.os.Parcelable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
 import android.widget.Toast;
 
-import com.clverpanda.nfshare.Fragments.ContentFrag;
-import com.clverpanda.nfshare.Fragments.DevicesFrag;
-import com.clverpanda.nfshare.Fragments.ResourceFrag;
-import com.clverpanda.nfshare.Fragments.TasksFrag;
+import com.clverpanda.nfshare.fragments.ContentFrag;
+import com.clverpanda.nfshare.fragments.DevicesFrag;
+import com.clverpanda.nfshare.fragments.ResourceFrag;
+import com.clverpanda.nfshare.fragments.TasksFrag;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity

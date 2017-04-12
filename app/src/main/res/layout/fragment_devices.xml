@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.clverpanda.nfshare.Fragments.DevicesFrag">
+    tools:context="com.clverpanda.nfshare.fragments.DevicesFrag">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/devices_appbar"

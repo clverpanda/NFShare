@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/content_layout"
-    tools:context="com.clverpanda.nfshare.Fragments.ContentFrag">
+    tools:context="com.clverpanda.nfshare.fragments.ContentFrag">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/content_appbar"

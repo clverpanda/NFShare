@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/tasks_layout"
-    tools:context="com.clverpanda.nfshare.Fragments.TasksFrag">
+    tools:context="com.clverpanda.nfshare.fragments.TasksFrag">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/tasks_appbar"

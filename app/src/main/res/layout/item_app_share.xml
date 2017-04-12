@@ -49,7 +49,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             android:ellipsize="end"/>
 
-        <com.clverpanda.nfshare.Widget.AlwaysMarqueeTextView
+        <com.clverpanda.nfshare.widget.AlwaysMarqueeTextView
             android:id="@+id/app_share_pkg"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
