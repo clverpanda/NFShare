@@ -45,6 +45,7 @@ public class RunningTasksFrag extends Fragment {
 
     protected RunningRecyclerAdapter mAdapter;
     protected TasksDbHelper tasksDb;
+    private Context mContext;
 
 
     public RunningTasksFrag() {
@@ -56,6 +57,8 @@ public class RunningTasksFrag extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.content_running_tasks, container, false);
         ButterKnife.bind(this, view);
+
+        mContext = getActivity();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -123,7 +126,7 @@ public class RunningTasksFrag extends Fragment {
                 mAdapter.updateProgress(fileinfo.getId(), 100);
                 mAdapter.removeTask(fileinfo.getId());
                 Toast.makeText(
-                        getActivity(),
+                        mContext,
                         fileinfo.getFileName() + "下载完成",
                         Toast.LENGTH_SHORT).show();
             }

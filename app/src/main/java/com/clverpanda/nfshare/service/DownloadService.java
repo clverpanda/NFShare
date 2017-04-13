@@ -16,6 +16,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by clverpanda on 2017/4/12 0012.
@@ -102,19 +107,21 @@ public class DownloadService extends Service
 
         @Override
         public void run() {
-            HttpURLConnection conn ;
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .connectTimeout(3, TimeUnit.SECONDS)
+                    .build();
             RandomAccessFile raf ;
             try {
                 //连接网络文件
                 URL url = new URL(tFileInfo.getUrl());
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(3000);
-                conn.setRequestMethod("GET");
-                int length = -1;
-                Log.e("getResponseCode==", conn.getResponseCode() + "");
-                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                Request request = new Request.Builder().url(url).build();
+                Response response = client.newCall(request).execute();
+                long length = -1;
+                Log.e("getResponseCode==", response.code() + "");
+                if (response.isSuccessful())
+                {
                     //获取文件长度
-                    length = conn.getContentLength();
+                    length = response.body().contentLength();
                     Log.e("length==", length + "");
                 }
                 if (length < 0) {
@@ -136,7 +143,7 @@ public class DownloadService extends Service
                 mHandler.obtainMessage(MSG_INIT, tFileInfo).sendToTarget();
 
                 raf.close();
-                conn.disconnect();
+                response.close();
             }
             catch (Exception e)
             {

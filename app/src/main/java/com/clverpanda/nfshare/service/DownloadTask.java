@@ -15,6 +15,11 @@ import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by clverpanda on 2017/4/12 0012.
@@ -50,43 +55,48 @@ class DownloadTask
     class DownloadThread extends Thread
     {
         private DownloadThreadInfo threadInfo;
+        private OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(3, TimeUnit.SECONDS)
+                .build();
 
         public DownloadThread(DownloadThreadInfo threadInfo) {
             this.threadInfo = threadInfo;
         }
 
         @Override
-        public void run() {
+        public void run()
+        {
             Log.e("isExists==", mThreadDb.isExists(threadInfo.getId()) + "");
             if (!mThreadDb.isExists(threadInfo.getId()))
             {
                 mThreadDb.insertThread(threadInfo);
             }
-            HttpURLConnection connection;
             RandomAccessFile raf;
             InputStream is;
             try {
                 URL url = new URL(threadInfo.getUrl());
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setConnectTimeout(3000);
-                connection.setRequestMethod("GET");
+
                 //设置下载位置
                 long start = threadInfo.getStart() + threadInfo.getFinish();
-                connection.setRequestProperty("Range", "bytes=" + start + "-" + threadInfo.getEnd());
+                Request request = new Request.Builder()
+                        .url(url)
+                        .addHeader("Range", "bytes=" + start + "-" + threadInfo.getEnd())
+                        .build();
                 //设置文件写入位置
                 File file = new File(DownloadService.DOWNLOAD_PATH, mFileInfo.getFileName());
                 raf = new RandomAccessFile(file, "rwd");
                 raf.seek(start);
-
                 mFinished += threadInfo.getFinish();
+
+                Response response = client.newCall(request).execute();
                 Log.e("threadInfo.getFinish==", threadInfo.getFinish() + "");
-                Log.e("getResponseCode ===", connection.getResponseCode() + "");
+                Log.e("getResponseCode ===", response.code() + "");
                 //开始下载
-                if (connection.getResponseCode() == HttpURLConnection.HTTP_PARTIAL)
+                if (response.code() == HttpURLConnection.HTTP_PARTIAL)
                 {
-                    Log.e("getContentLength==", connection.getContentLength() + "");
+                    Log.e("getContentLength==", response.body().contentLength() + "");
                     //读取数据
-                    is = connection.getInputStream();
+                    is = response.body().byteStream();
                     byte[] buffer = new byte[1024 * 4];
                     int len;
                     long time = System.currentTimeMillis();
@@ -123,7 +133,7 @@ class DownloadTask
                     is.close();
                 }
                 raf.close();
-                connection.disconnect();
+                response.close();
             }
             catch (Exception e)
             {
