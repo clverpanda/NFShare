@@ -103,23 +103,27 @@ public class RunningTasksFrag extends Fragment {
         }
     }
 
-    BroadcastReceiver mReceiver = new BroadcastReceiver() {
+    BroadcastReceiver mReceiver = new BroadcastReceiver()
+    {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            if (DownloadService.ACTION_UPDATE.equals(intent.getAction())) {
-                long finished = intent.getLongExtra("finished", 0);
+        public void onReceive(Context context, Intent intent)
+        {
+            if (DownloadService.ACTION_UPDATE.equals(intent.getAction()))
+            {
+                int finished = intent.getIntExtra("finished", 0);
                 int id = intent.getIntExtra("id", 0);
                 Log.e(TAG, "finished==" + finished);
                 Log.e(TAG, "id==" + id);
                 mAdapter.updateProgress(id, finished);
-            } else if (DownloadService.ACTION_FINISHED.equals(intent.getAction())) {
+            }
+            else if (DownloadService.ACTION_FINISHED.equals(intent.getAction()))
+            {
                 DownloadFileInfo fileinfo = (DownloadFileInfo) intent.getSerializableExtra("fileinfo");
                 //更新进度为100
                 mAdapter.updateProgress(fileinfo.getId(), 100);
-                tasksDb.setIsDone(fileinfo.getId(), 1);
-                mAdapter.notifyDataSetChanged();
+                mAdapter.removeTask(fileinfo.getId());
                 Toast.makeText(
-                        getContext(),
+                        getActivity(),
                         fileinfo.getFileName() + "下载完成",
                         Toast.LENGTH_SHORT).show();
             }

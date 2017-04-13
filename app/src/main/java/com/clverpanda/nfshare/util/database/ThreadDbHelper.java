@@ -19,10 +19,14 @@ import java.util.List;
 public class ThreadDbHelper extends SQLiteOpenHelper
 {
     private static final String TAG = "ThreadDbHelper";
-
     private static final String DB_NAME = "download.db";
-    private static final String SQL_CREATE = "CREATE TABLE thread_info(_id integer primary key autoincrement," +
-                                                                    "thread_id integer," +
+    private static final String KEY_TASK_ID = "task_id";
+    private static final String KEY_URL = "url";
+    private static final String KEY_START = "start";
+    private static final String KEY_END = "end";
+    private static final String KEY_FINISHED = "finished";
+
+    private static final String SQL_CREATE = "CREATE TABLE thread_info(task_id integer primary key," +
                                                                     "url text," +
                                                                     "start long," +
                                                                     "end long," +
@@ -41,59 +45,67 @@ public class ThreadDbHelper extends SQLiteOpenHelper
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
+    {
         db.execSQL(SQL_DROP);
         db.execSQL(SQL_CREATE);
     }
 
-    public synchronized void insertThread(DownloadThreadInfo threadInfo) {
+    public synchronized void insertThread(DownloadThreadInfo threadInfo)
+    {
         Log.e("insertThread: ", "insertThread");
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("insert into thread_info(thread_id,url,start,end,finished) values(?,?,?,?,?)",
+        db.execSQL("insert into thread_info(task_id,url,start,end,finished) values(?,?,?,?,?)",
                 new Object[]{threadInfo.getId(), threadInfo.getUrl(),
                         threadInfo.getStart(), threadInfo.getEnd(), threadInfo.getFinish()});
         db.close();
     }
 
-    public synchronized void deleteThread(String url) {
+    public synchronized void deleteThread(int taskId)
+    {
         Log.e("deleteThread: ", "deleteThread");
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("delete from  thread_info where url = ?",
-                new Object[]{url});
+        db.execSQL("delete from  thread_info where task_id = ?",
+                new Object[]{taskId});
         db.close();
     }
 
-    public synchronized void updateThread(String url, int thread_id, long finished) {
+    public synchronized void updateThread(int taskId, long finished)
+    {
         Log.e("updateThread: ", "updateThread");
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("update thread_info set finished = ?  where url = ? and thread_id=?",
-                new Object[]{finished, url, thread_id});
+        db.execSQL("update thread_info set finished = ?  where task_id=?",
+                new Object[]{finished, taskId});
         db.close();
     }
 
-    public List<DownloadThreadInfo> getThread(String url) {
+    public DownloadThreadInfo getThread(int taskId)
+    {
         Log.e("getThread: ", "getThread");
-        List<DownloadThreadInfo> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from thread_info where url=?", new String[]{url});
-        while (cursor.moveToNext()) {
-            DownloadThreadInfo thread = new DownloadThreadInfo();
-            thread.setId(cursor.getInt(cursor.getColumnIndex("thread_id")));
+        Cursor cursor = db.rawQuery("select * from thread_info where task_id=?", new String[]{Integer.toString(taskId)});
+        DownloadThreadInfo thread;
+        if (cursor.moveToFirst())
+        {
+            thread = new DownloadThreadInfo();
+            thread.setId(cursor.getInt(cursor.getColumnIndex("task_id")));
             thread.setUrl(cursor.getString(cursor.getColumnIndex("url")));
             thread.setStart(cursor.getLong(cursor.getColumnIndex("start")));
             thread.setEnd(cursor.getLong(cursor.getColumnIndex("end")));
             thread.setFinish(cursor.getLong(cursor.getColumnIndex("finished")));
-            list.add(thread);
         }
+        else
+            thread = null;
         cursor.close();
         db.close();
-        return list;
+        return thread;
     }
 
-    public boolean isExists(String url, int thread_id) {
+    public boolean isExists(int taskId)
+    {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery("select * from thread_info where url=? and thread_id = ?",
-                new String[]{url, String.valueOf(thread_id)});
+        Cursor cursor = db.rawQuery("select * from thread_info where task_id = ?",
+                new String[]{Integer.toString(taskId)});
         boolean isExist = cursor.moveToNext();
         cursor.close();
         db.close();

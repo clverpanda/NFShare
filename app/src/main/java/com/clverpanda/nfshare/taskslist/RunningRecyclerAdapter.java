@@ -127,4 +127,18 @@ public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecycler
             }
         }
     }
+
+    public void removeTask(int id)
+    {
+        int i = 0;
+        for (TaskInfo taskItem : mDatas)
+        {
+            if (taskItem.getId() == id)
+            {
+                mDatas.remove(i);
+                notifyItemRemoved(i);
+            }
+            i++;
+        }
+    }
 }

@@ -47,19 +47,19 @@ public class DownloadService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        //获得Activity传来的参数
-        if (ACTION_START.equals(intent.getAction())) {
+        if (ACTION_START.equals(intent.getAction()))
+        {
             DownloadFileInfo fileInfo = (DownloadFileInfo) intent.getSerializableExtra("fileinfo");
             Log.e(TAG, "onStartCommand: ACTION_START-" + fileInfo.toString());
             new InitThread(fileInfo).start();
-
-        } else if (ACTION_PAUSE.equals(intent.getAction())) {
+        }
+        else if (ACTION_PAUSE.equals(intent.getAction()))
+        {
             DownloadFileInfo fileInfo = (DownloadFileInfo) intent.getSerializableExtra("fileinfo");
             Log.e(TAG, "onStartCommand:ACTION_PAUSE- " + fileInfo.toString());
-            //从集合在取出下载任务
             DownloadTask task = tasks.get(fileInfo.getId());
-            if (task != null) {
-                //停止下载任务
+            if (task != null)
+            {
                 task.isPause = true;
             }
 
@@ -82,18 +82,16 @@ public class DownloadService extends Service
                     DownloadFileInfo fileinfo = (DownloadFileInfo) msg.obj;
                     Log.e("mHandler--fileinfo:", fileinfo.toString());
                     //启动下载任务
-                    DownloadTask downloadTask = new DownloadTask(DownloadService.this, fileinfo, runThreadCount);
+                    DownloadTask downloadTask = new DownloadTask(DownloadService.this, fileinfo);
                     downloadTask.download();
-                    //将下载任务添加到集合中
+
                     tasks.put(fileinfo.getId(), downloadTask);
                     break;
             }
         }
     };
 
-    /**
-     * 初始化 子线程
-     */
+
     class InitThread extends Thread
     {
         private DownloadFileInfo tFileInfo;
@@ -139,7 +137,9 @@ public class DownloadService extends Service
 
                 raf.close();
                 conn.disconnect();
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 e.printStackTrace();
             }
         }
