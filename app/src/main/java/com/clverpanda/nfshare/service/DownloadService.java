@@ -55,6 +55,11 @@ public class DownloadService extends Service
         if (ACTION_START.equals(intent.getAction()))
         {
             DownloadFileInfo fileInfo = (DownloadFileInfo) intent.getSerializableExtra("fileinfo");
+            if (tasks.containsKey(fileInfo.getId()))
+            {
+                if (!tasks.get(fileInfo.getId()).isPause)
+                    return super.onStartCommand(intent, flags, startId);
+            }
             Log.e(TAG, "onStartCommand: ACTION_START-" + fileInfo.toString());
             new InitThread(fileInfo).start();
         }
