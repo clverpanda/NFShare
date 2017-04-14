@@ -33,8 +33,10 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.RuntimePermissions;
 
-
+@RuntimePermissions
 public class ContactShareFrag extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -81,7 +83,8 @@ public class ContactShareFrag extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             Bundle savedInstanceState)
+    {
         View view = inflater.inflate(R.layout.content_contact_share, container, false);
         ButterKnife.bind(this, view);
 
@@ -96,10 +99,11 @@ public class ContactShareFrag extends Fragment {
             shimmer = new Shimmer();
             shimmer.start(shimmerTextView);
 
-            initialData();
+            ContactShareFragPermissionsDispatcher.startAsyncContactLoadWithCheck(this);
             IsFirst = false;
         }
-        else {
+        else
+        {
             recyclerView.setAdapter(new ContactRecyclerAdapter(getContext(), mData));
             shimmerTextView.setVisibility(View.GONE);
         }
@@ -114,21 +118,9 @@ public class ContactShareFrag extends Fragment {
 
     }
 
-    private void initialData()
-    {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        {
-            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CONTACTS)
-                    != PackageManager.PERMISSION_GRANTED)
-                requestPermissions(new String[] {Manifest.permission.READ_CONTACTS}, REQUEST_CODE_ASK_CONTACT);
-            else
-                startAsyncContactLoad();
-        }
-        else
-            startAsyncContactLoad();
-    }
 
-    private void startAsyncContactLoad()
+    @NeedsPermission(Manifest.permission.READ_CONTACTS)
+    protected void startAsyncContactLoad()
     {
         LoadContactListAsyncTask contactListAsyncTask = new LoadContactListAsyncTask(getContext(),
                 recyclerView, shimmer, shimmerTextView);
@@ -152,16 +144,8 @@ public class ContactShareFrag extends Fragment {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
-        switch (requestCode) {
-            case REQUEST_CODE_ASK_CONTACT:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    startAsyncContactLoad();
-                else
-                    textView.setVisibility(View.VISIBLE);
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        ContactShareFragPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
     }
 
     public List<ContactInfo> getSelectedItems()

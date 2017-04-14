@@ -32,6 +32,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import permissions.dispatcher.RuntimePermissions;
 
 
 public class RunningTasksFrag extends Fragment {
@@ -71,9 +72,7 @@ public class RunningTasksFrag extends Fragment {
         getActivity().registerReceiver(mReceiver, filter);
 
         tasksDb = new TasksDbHelper(getContext());
-        List<TaskInfo> allRunningTasks = tasksDb.getAllRunningTaskInfo();
-        mAdapter = new RunningRecyclerAdapter(getContext(), allRunningTasks);
-        recyclerView.setAdapter(mAdapter);
+
 
         return view;
     }
@@ -89,6 +88,9 @@ public class RunningTasksFrag extends Fragment {
                     != PackageManager.PERMISSION_GRANTED)
                 requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_ASK_WRITE);
         }
+        List<TaskInfo> allRunningTasks = tasksDb.getAllRunningTaskInfo();
+        mAdapter = new RunningRecyclerAdapter(getContext(), allRunningTasks);
+        recyclerView.setAdapter(mAdapter);
     }
 
     @Override

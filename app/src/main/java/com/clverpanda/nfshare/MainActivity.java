@@ -19,6 +19,7 @@ import com.clverpanda.nfshare.fragments.ContentFrag;
 import com.clverpanda.nfshare.fragments.DevicesFrag;
 import com.clverpanda.nfshare.fragments.ResourceFrag;
 import com.clverpanda.nfshare.fragments.TasksFrag;
+import com.clverpanda.nfshare.fragments.TestFrag;
 
 import butterknife.ButterKnife;
 
@@ -106,7 +107,8 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(MenuItem item)
+    {
         int id = item.getItemId();
 
         if (id == R.id.nav_content)
@@ -131,8 +133,12 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction ft = mFm.beginTransaction();
             ft.replace(R.id.fragment_container, new TasksFrag());
             ft.commit();
-        } else if (id == R.id.nav_share) {
-
+        }
+        else if (id == R.id.nav_settings)
+        {
+            FragmentTransaction ft = mFm.beginTransaction();
+            ft.replace(R.id.fragment_container, new TestFrag());
+            ft.commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

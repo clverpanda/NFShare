@@ -2,28 +2,36 @@ package com.clverpanda.nfshare.resourceshare;
 
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.clverpanda.nfshare.model.TaskInfo;
 import com.clverpanda.nfshare.R;
+import com.clverpanda.nfshare.util.FileUtil;
 import com.clverpanda.nfshare.util.database.TasksDbHelper;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static android.app.Activity.RESULT_OK;
+
 
 public class DocShareFrag extends Fragment {
     private static final int REQUEST_CODE_ASK_WRITE = 111;
+    private static final int FILE_SELECT_CODE = 222;
     private static final String DOWNLOAD_FOLDER_NAME = "download/";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -74,16 +82,14 @@ public class DocShareFrag extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                {
-                    if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                            != PackageManager.PERMISSION_GRANTED)
-                        requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_ASK_WRITE);
-                    else
-                        startDownload();
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*");
+
+                try {
+                    startActivityForResult( intent, FILE_SELECT_CODE);
+                } catch (android.content.ActivityNotFoundException ex) {
+                    Toast.makeText(getActivity(), "Please install a File Manager.",  Toast.LENGTH_SHORT).show();
                 }
-                else
-                    startDownload();
             }
         });
 
@@ -117,6 +123,22 @@ public class DocShareFrag extends Fragment {
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)  {
+        switch (requestCode) {
+            case FILE_SELECT_CODE:
+                if (resultCode == RESULT_OK)
+                {
+                    Uri uri = data.getData();
+                    String path = FileUtil.getFileAbsolutePath(getActivity(), uri);
+                    Log.e("DocShare", "onActivityResult: " + path);
+                }
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
 
