@@ -132,6 +132,16 @@ public class RunningTasksFrag extends Fragment {
                         fileinfo.getFileName() + "下载完成",
                         Toast.LENGTH_SHORT).show();
             }
+            else if (DownloadService.ACTION_STARTED.equals(intent.getAction()))
+            {
+                int id = intent.getIntExtra("id", 0);
+                mAdapter.setStarted(id);
+            }
+            else if (DownloadService.ACTION_PAUSED.equals(intent.getAction()))
+            {
+                int id = intent.getIntExtra("id", 0);
+                mAdapter.setPaused(id);
+            }
         }
     };
 

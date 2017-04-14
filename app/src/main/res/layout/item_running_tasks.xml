@@ -101,7 +101,7 @@
             app:layout_constraintRight_toLeftOf="@+id/btn_start"
             android:layout_marginRight="8dp" />
 
-        <ImageView
+        <ImageButton
             android:id="@+id/btn_start"
             android:layout_width="20dp"
             android:layout_height="20dp"
@@ -109,9 +109,10 @@
             app:layout_constraintTop_toTopOf="@+id/progressBar"
             android:layout_marginTop="0dp"
             app:layout_constraintRight_toLeftOf="@+id/btn_pause"
-            android:layout_marginRight="8dp" />
+            android:layout_marginRight="8dp"
+            android:contentDescription="start"/>
 
-        <ImageView
+        <ImageButton
             android:id="@+id/btn_pause"
             android:layout_width="20dp"
             android:layout_height="20dp"
@@ -119,7 +120,8 @@
             app:layout_constraintTop_toTopOf="@+id/btn_start"
             android:layout_marginTop="-4dp"
             android:layout_marginRight="0dp"
-            app:layout_constraintRight_toRightOf="@+id/task_from" />
+            app:layout_constraintRight_toRightOf="@+id/task_from"
+            android:contentDescription="pause"/>
 
     </android.support.constraint.ConstraintLayout>
 

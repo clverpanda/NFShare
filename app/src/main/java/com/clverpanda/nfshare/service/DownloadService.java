@@ -9,6 +9,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.clverpanda.nfshare.model.DownloadFileInfo;
+import com.clverpanda.nfshare.util.database.TasksDbHelper;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -31,6 +32,7 @@ public class DownloadService extends Service
 {
     public static final int runThreadCount = 3;
 
+
     private static final String TAG = "DownloadService";
     //初始化
     private static final int MSG_INIT = 0x2;
@@ -42,6 +44,9 @@ public class DownloadService extends Service
     public static final String ACTION_FINISHED = "ACTION_FINISHED";
     //更新UI
     public static final String ACTION_UPDATE = "ACTION_UPDATE";
+    public static final String ACTION_STARTED = "ACTION_STARTED";
+    public static final String ACTION_PAUSED = "ACTION_PAUSED";
+    public static final String ACTION_PAUSE_ALL = "ACTION_PAUSE_ALL";
     //下载路径
     public static final String DOWNLOAD_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/";
 
@@ -61,6 +66,7 @@ public class DownloadService extends Service
                     return super.onStartCommand(intent, flags, startId);
             }
             Log.e(TAG, "onStartCommand: ACTION_START-" + fileInfo.toString());
+            setStarted(fileInfo.getId());
             new InitThread(fileInfo).start();
         }
         else if (ACTION_PAUSE.equals(intent.getAction()))
@@ -75,6 +81,15 @@ public class DownloadService extends Service
 
         }
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    protected void setStarted(int taskId)
+    {
+        TasksDbHelper tasksDb = new TasksDbHelper(DownloadService.this);
+        tasksDb.setStatus(taskId, 2);
+        Intent intent = new Intent(DownloadService.ACTION_STARTED);
+        intent.putExtra("id", taskId);
+        sendBroadcast(intent);
     }
 
 

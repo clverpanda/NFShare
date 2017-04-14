@@ -2,10 +2,12 @@ package com.clverpanda.nfshare.taskslist;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -56,6 +58,14 @@ public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecycler
         holder.tvTaskType.setText(DataType.getName(theInfo.getType()));
         int pro = (int) theInfo.getFinish();
         holder.pbDownload.setProgress(pro);
+        if (theInfo.getStatus() == 0)//暂停中的任务
+        {
+            holder.imgbPause.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_pause_clicked));
+        }
+        else if (theInfo.getStatus() == 2)//进行中的任务
+        {
+            holder.imgbStart.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_start_clicked));
+        }
         if (theInfo.getType() == DataType.APP.getIndex())
         {
             AppInfo appInfo = JSON.parseObject(theInfo.getDescription(), AppInfo.class);
@@ -63,24 +73,32 @@ public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecycler
             final String fileName = appInfo.getAppName() + ".apk";
             holder.imgbStart.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(mContext, DownloadService.class);
-                    intent.setAction(DownloadService.ACTION_START);
-                    DownloadFileInfo fileInfo = new DownloadFileInfo(theInfo.getId(), downloadUrl,
-                            fileName, 0, 0);
-                    intent.putExtra("fileinfo", fileInfo);
-                    mContext.startService(intent);
+                public void onClick(View v)
+                {
+                    if (theInfo.getStatus() == 0)
+                    {
+                        Intent intent = new Intent(mContext, DownloadService.class);
+                        intent.setAction(DownloadService.ACTION_START);
+                        DownloadFileInfo fileInfo = new DownloadFileInfo(theInfo.getId(), downloadUrl,
+                                fileName, 0, 0);
+                        intent.putExtra("fileinfo", fileInfo);
+                        mContext.startService(intent);
+                    }
                 }
             });
-            holder.imgbPause.setOnClickListener(new View.OnClickListener() {
+            holder.imgbPause.setOnClickListener(new View.OnClickListener()
+            {
                 @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(mContext, DownloadService.class);
-                    intent.setAction(DownloadService.ACTION_PAUSE);
-                    DownloadFileInfo fileInfo = new DownloadFileInfo(theInfo.getId(), downloadUrl,
-                            fileName, 0, 0);
-                    intent.putExtra("fileinfo", fileInfo);
-                    mContext.startService(intent);
+                public void onClick(View v)
+                {
+                    if (theInfo.getStatus() == 2) {
+                        Intent intent = new Intent(mContext, DownloadService.class);
+                        intent.setAction(DownloadService.ACTION_PAUSE);
+                        DownloadFileInfo fileInfo = new DownloadFileInfo(theInfo.getId(), downloadUrl,
+                                fileName, 0, 0);
+                        intent.putExtra("fileinfo", fileInfo);
+                        mContext.startService(intent);
+                    }
                 }
             });
         }
@@ -104,9 +122,9 @@ public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecycler
         @BindView(R.id.progressBar)
         ProgressBar pbDownload;
         @BindView(R.id.btn_start)
-        ImageView imgbStart;
+        ImageButton imgbStart;
         @BindView(R.id.btn_pause)
-        ImageView imgbPause;
+        ImageButton imgbPause;
 
 
         RunningViewHolder(View view)
@@ -141,4 +159,29 @@ public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecycler
             i++;
         }
     }
+
+    public void setStarted(int id)
+    {
+        for (TaskInfo taskItem : mDatas)
+        {
+            if (taskItem.getId() == id)
+            {
+                taskItem.setStatus(2);
+                notifyDataSetChanged();
+            }
+        }
+    }
+
+    public void setPaused(int id)
+    {
+        for (TaskInfo taskItem : mDatas)
+        {
+            if (taskItem.getId() == id)
+            {
+                taskItem.setStatus(0);
+                notifyDataSetChanged();
+            }
+        }
+    }
+
 }

@@ -36,7 +36,7 @@ public class DeviceDbHelper extends SQLiteOpenHelper
             "Description text, " +
             "Type INTEGER, " +
             "FromDevice text, " +
-            "IsDone INTEGER, " +
+            "Status INTEGER, " +
             "ReceiveTime DATETIME DEFAULT CURRENT_TIMESTAMP);";
     public DeviceDbHelper(Context context)
     {

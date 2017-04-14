@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -30,6 +29,7 @@ class DownloadTask
 {
     private Context mContext = null;
     private DownloadFileInfo mFileInfo = null;
+    private TasksDbHelper mTasksDb = null;
     private ThreadDbHelper mThreadDb = null;
     private long mFinished = 0;
     boolean isPause = false;
@@ -39,6 +39,7 @@ class DownloadTask
         this.mContext = mContext;
         this.mFileInfo = mFileInfo;
         mThreadDb = new ThreadDbHelper(mContext);
+        mTasksDb = new TasksDbHelper(mContext);
     }
 
     public void download()
@@ -107,6 +108,10 @@ class DownloadTask
                         {
                             Log.e("mfinished==", mFinished + "");
                             mThreadDb.updateThread(mFileInfo.getId(), mFinished);
+                            mTasksDb.setStatus(mFileInfo.getId(), 0);
+                            Intent intent = new Intent(DownloadService.ACTION_PAUSED);
+                            intent.putExtra("id", mFileInfo.getId());
+                            mContext.sendBroadcast(intent);
                             return;
                         }
                         //写入文件
@@ -128,8 +133,7 @@ class DownloadTask
                     intent.putExtra("fileinfo", mFileInfo);
                     mContext.sendBroadcast(intent);
                     mThreadDb.deleteThread(mFileInfo.getId());
-                    TasksDbHelper tasksDb = new TasksDbHelper(mContext);
-                    tasksDb.setIsDone(mFileInfo.getId(), 1);
+                    mTasksDb.setStatus(mFileInfo.getId(), 1);
                     is.close();
                 }
                 raf.close();

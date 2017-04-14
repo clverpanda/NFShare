@@ -12,27 +12,27 @@ public class TaskInfo
     private String Description;
     private int Type;
     private String From;
-    private int IsDone;
+    private int Status;
     private String ReceiveTime;
     private long finish;
 
     public TaskInfo() {}
 
-    public TaskInfo(String name, String description, int type, String from, int isDone) {
+    public TaskInfo(String name, String description, int type, String from, int status) {
         Name = name;
         Description = description;
         Type = type;
         From = from;
-        IsDone = isDone;
+        Status = status;
     }
 
-    public TaskInfo(int id, String name, String description, int type, String from, int isDone, String receiveTime) {
+    public TaskInfo(int id, String name, String description, int type, String from, int status, String receiveTime) {
         Id = id;
         Name = name;
         Description = description;
         Type = type;
         From = from;
-        IsDone = isDone;
+        Status = status;
         ReceiveTime = receiveTime;
     }
 
@@ -76,12 +76,12 @@ public class TaskInfo
         From = from;
     }
 
-    public int getIsDone() {
-        return IsDone;
+    public int getStatus() {
+        return Status;
     }
 
-    public void setIsDone(int isDone) {
-        IsDone = isDone;
+    public void setStatus(int status) {
+        Status = status;
     }
 
     public String getReceiveTime() {

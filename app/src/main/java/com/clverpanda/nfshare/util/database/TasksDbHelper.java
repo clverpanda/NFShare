@@ -26,7 +26,7 @@ public class TasksDbHelper extends SQLiteOpenHelper
     private static final String KEY_DESCRIPTION = "Description";
     private static final String KEY_TYPE = "Type";
     private static final String KEY_FROMDEVICE = "FromDevice";
-    private static final String KEY_ISDONE = "IsDone";
+    private static final String KEY_STATUS = "Status";
     private static final String KEY_RECEIVETIME = "ReceiveTime";
 
     public TasksDbHelper(Context context)
@@ -61,7 +61,7 @@ public class TasksDbHelper extends SQLiteOpenHelper
         values.put(KEY_DESCRIPTION, taskInfo.getDescription());
         values.put(KEY_TYPE, taskInfo.getType());
         values.put(KEY_FROMDEVICE, taskInfo.getFrom());
-        values.put(KEY_ISDONE, taskInfo.getIsDone());
+        values.put(KEY_STATUS, taskInfo.getStatus());
         db.insert(TABLE_NAME, null, values);
         db.close();
     }
@@ -69,7 +69,7 @@ public class TasksDbHelper extends SQLiteOpenHelper
     public TaskInfo getTaskInfo(int Id)
     {
         SQLiteDatabase db = this.getReadableDatabase();
-        String selectQuery = "SELECT Id, Name, Description, Type, FromDevice, IsDone, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
+        String selectQuery = "SELECT Id, Name, Description, Type, FromDevice, Status, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
                 " WHERE Id=" + Id;
         Cursor cursor = db.rawQuery(selectQuery, null);
         TaskInfo tasksInfo = null;
@@ -106,33 +106,33 @@ public class TasksDbHelper extends SQLiteOpenHelper
 
     public List<TaskInfo> getAllTaskInfo()
     {
-        String selectQuery = "SELECT Id, Name, Description, Type, FromDevice, IsDone, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
+        String selectQuery = "SELECT Id, Name, Description, Type, FromDevice, Status, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
                 " ORDER BY Id DESC";
         return queryRawSQL(selectQuery);
     }
 
     public List<TaskInfo> getAllDoneTaskInfo()
     {
-        String selectQuery = "SELECT Id, Name, Description, Type, FromDevice, IsDone, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
-                " WHERE IsDone=1" +
+        String selectQuery = "SELECT Id, Name, Description, Type, FromDevice, Status, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
+                " WHERE Status=1" +
                 " ORDER BY Id DESC";
         return queryRawSQL(selectQuery);
     }
 
     public List<TaskInfo> getAllRunningTaskInfo()
     {
-        String selectQuery = "SELECT Id, Name, Description, Type, FromDevice, IsDone, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
-                " WHERE IsDone=0" +
+        String selectQuery = "SELECT Id, Name, Description, Type, FromDevice, Status, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
+                " WHERE Status=0 or Status=2" +
                 " ORDER BY Id DESC";
         return queryRawSQL(selectQuery);
     }
 
 
-    public void setIsDone(int Id, int IsDone)
+    public void setStatus(int Id, int Status)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_ISDONE, IsDone);
+        values.put(KEY_STATUS, Status);
         db.update(TABLE_NAME, values, KEY_ID + "=?", new String[]{Integer.toString(Id)});
         db.close();
     }
