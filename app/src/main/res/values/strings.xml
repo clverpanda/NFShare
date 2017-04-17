@@ -14,10 +14,16 @@
     <string name="drawer_item_resource">资源分享</string>
     <string name="drawer_item_devices">已知设备</string>
     <string name="drawer_item_tasks">任务列表</string>
-    <string name="drawer_item_settings">设置</string>
+    <string name="drawer_item_settings">测试</string>
     <string name="loading">加载中...</string>
     <string name="no_contact_permission">没有通讯录权限！</string>
     <string name="nfc_notify">请将另一台手机靠近NFC感应区域</string>
+
+
+    <string name="pending_file">未选择文件</string>
+    <string name="choose_image">分享图片</string>
+    <string name="choose_video">分享视频</string>
+    <string name="choose_file">分享文件</string>
 
 
 </resources>

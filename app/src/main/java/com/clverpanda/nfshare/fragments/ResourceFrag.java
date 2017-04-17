@@ -2,10 +2,7 @@ package com.clverpanda.nfshare.fragments;
 
 
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,24 +10,35 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.bilibili.boxing.Boxing;
+import com.bilibili.boxing.BoxingMediaLoader;
+import com.bilibili.boxing.loader.IBoxingMediaLoader;
+import com.bilibili.boxing.model.config.BoxingConfig;
+import com.bilibili.boxing_impl.ui.BoxingActivity;
 import com.clverpanda.nfshare.R;
-import com.clverpanda.nfshare.resourceshare.ResourcePagerAdapter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 public class ResourceFrag extends Fragment {
 
-    @BindView(R.id.resource_viewpager)
-    protected ViewPager viewPager;
-    @BindView(R.id.resource_tabs)
-    protected TabLayout tabLayout;
-    @BindView(R.id.resource_layout)
-    protected CoordinatorLayout coordinatorLayout;
+    private static final int CHOOSE_IMAGE_CODE = 1024;
+    private static final int CHOOSE_VIDEO_CODE = 2048;
+    private static final int CHOOSE_FILE_CODE = 4096;
+
+
     @BindView(R.id.resource_toolbar)
-    protected Toolbar toolbar;
+    Toolbar toolbar;
+    @BindView(R.id.image_btn)
+    TextView btnShareImage;
+    @BindView(R.id.video_btn)
+    TextView btnShareVideo;
+    @BindView(R.id.file_btn)
+    TextView btnShareFile;
 
 
     public ResourceFrag() {
@@ -53,10 +61,8 @@ public class ResourceFrag extends Fragment {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+
         toolbar.setTitle(R.string.drawer_item_resource);
-        viewPager.setAdapter(new ResourcePagerAdapter(getChildFragmentManager(), getContext()));
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.setTabMode(TabLayout.MODE_FIXED);
         return view;
     }
 
@@ -64,6 +70,13 @@ public class ResourceFrag extends Fragment {
     public void onDestroyView()
     {
         super.onDestroyView();
+    }
+
+    @OnClick(R.id.image_btn)
+    void imageChooseClicked()
+    {
+        BoxingConfig singleImgConfig = new BoxingConfig(BoxingConfig.Mode.SINGLE_IMG);
+        Boxing.of(singleImgConfig).withIntent(getContext(), BoxingActivity.class).start(this, CHOOSE_IMAGE_CODE);
     }
 
 }
