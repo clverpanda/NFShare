@@ -20,7 +20,7 @@
     <string name="nfc_notify">请将另一台手机靠近NFC感应区域</string>
 
 
-    <string name="pending_file">未选择文件</string>
+    <string name="pending_file">无</string>
     <string name="choose_image">分享图片</string>
     <string name="choose_video">分享视频</string>
     <string name="choose_file">分享文件</string>

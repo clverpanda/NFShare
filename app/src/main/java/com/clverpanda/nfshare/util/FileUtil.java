@@ -112,4 +112,9 @@ public class FileUtil
     public static boolean isGooglePhotosUri(Uri uri) {
         return "com.google.android.apps.photos.content".equals(uri.getAuthority());
     }
+
+    public static String getFileNameFromPath(String path)
+    {
+        return path.substring(path.lastIndexOf('/') + 1);
+    }
 }

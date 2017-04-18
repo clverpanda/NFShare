@@ -31,10 +31,10 @@
 
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/image_preview"
             android:layout_width="0dp"
             android:layout_height="325dp"
-            app:srcCompat="@drawable/ic_file"
+            app:srcCompat="@drawable/file_choose"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="30dp"
             android:layout_marginLeft="50dp"
@@ -52,9 +52,9 @@
             android:layout_marginTop="8dp"
             android:text="@string/pending_file"
             android:textAlignment="center"
-            app:layout_constraintLeft_toLeftOf="@+id/imageView"
-            app:layout_constraintRight_toRightOf="@+id/imageView"
-            app:layout_constraintTop_toBottomOf="@+id/imageView" />
+            app:layout_constraintLeft_toLeftOf="@+id/image_preview"
+            app:layout_constraintRight_toRightOf="@+id/image_preview"
+            app:layout_constraintTop_toBottomOf="@+id/image_preview" />
 
         <TextView
             android:id="@+id/image_btn"
@@ -66,7 +66,7 @@
             android:padding="@dimen/btn_spacing"
             android:text="@string/choose_image"
             android:textSize="12sp"
-            app:layout_constraintLeft_toLeftOf="@+id/imageView"
+            app:layout_constraintLeft_toLeftOf="@+id/image_preview"
             app:layout_constraintTop_toBottomOf="@+id/fileName_textView" />
 
         <TextView
@@ -94,7 +94,7 @@
             android:padding="@dimen/btn_spacing"
             android:text="@string/choose_file"
             android:textSize="12sp"
-            app:layout_constraintRight_toRightOf="@+id/imageView"
+            app:layout_constraintRight_toRightOf="@+id/image_preview"
             app:layout_constraintTop_toTopOf="@+id/video_btn" />
     </android.support.constraint.ConstraintLayout>
 
