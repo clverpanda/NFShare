@@ -96,7 +96,7 @@ public class ContentFrag extends Fragment
                     List<AppInfoTransfer> selectedData = frag.getSelectedItems();
                     NFCTransferData nfcData = new NFCTransferData(DataType.APP, deviceInfoGetter.getDeviceInfo(), JSON.toJSONString(selectedData));
                     Intent startIntent = new Intent(getContext(), NFCSendActivity.class);
-                    startIntent.putExtra(NFCSendActivity.DATA_INFO, JSON.toJSONString(nfcData));
+                    startIntent.putExtra(NFCSendActivity.DATA_INFO, nfcData);
                     startActivity(startIntent);
                 }
                 else if (viewPager.getCurrentItem() == 1)
@@ -105,7 +105,7 @@ public class ContentFrag extends Fragment
                     ContactInfo selectedData = frag.getSelectedItems().get(0);
                     NFCTransferData nfcData = new NFCTransferData(DataType.CONTACT, deviceInfoGetter.getDeviceInfo(), JSON.toJSONString(selectedData));
                     Intent startIntent = new Intent(getContext(), NFCSendActivity.class);
-                    startIntent.putExtra(NFCSendActivity.DATA_INFO, JSON.toJSONString(nfcData));
+                    startIntent.putExtra(NFCSendActivity.DATA_INFO, nfcData);
                     startActivity(startIntent);
                 }
             }

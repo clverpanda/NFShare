@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.bilibili.boxing.Boxing;
 import com.bilibili.boxing.BoxingMediaLoader;
 import com.bilibili.boxing.loader.IBoxingMediaLoader;
@@ -25,9 +26,19 @@ import com.bilibili.boxing.model.entity.BaseMedia;
 import com.bilibili.boxing.model.entity.impl.ImageMedia;
 import com.bilibili.boxing_impl.ui.BoxingActivity;
 import com.bilibili.boxing_impl.ui.BoxingBottomSheetActivity;
+import com.clverpanda.nfshare.NFCSendActivity;
 import com.clverpanda.nfshare.R;
+import com.clverpanda.nfshare.WIFISendActivity;
+import com.clverpanda.nfshare.contentshare.AppShareFrag;
+import com.clverpanda.nfshare.model.AppInfoTransfer;
+import com.clverpanda.nfshare.model.DataType;
+import com.clverpanda.nfshare.model.FileInfo;
+import com.clverpanda.nfshare.model.NFCTransferData;
+import com.clverpanda.nfshare.model.WIFITransferData;
+import com.clverpanda.nfshare.util.DeviceInfoGetter;
 import com.clverpanda.nfshare.util.FileUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +56,7 @@ public class ResourceFrag extends Fragment {
     private static final int CHOOSE_FILE_CODE = 4096;
 
     private String mSelectedFilePath = null;
+    private DataType mSelectedFileType = null;
 
 
     @BindView(R.id.resource_toolbar)
@@ -104,6 +116,7 @@ public class ResourceFrag extends Fragment {
                     final ArrayList<BaseMedia> imageMedias = Boxing.getResult(data);
                     BaseMedia imageMedia = imageMedias.get(0);
                     mSelectedFilePath = imageMedia.getPath();
+                    mSelectedFileType = DataType.FILE;
                     tvFileName.setText(FileUtil.getFileNameFromPath(mSelectedFilePath));
                     String path;
                     path = ((ImageMedia) imageMedia).getThumbnailPath();
@@ -114,6 +127,7 @@ public class ResourceFrag extends Fragment {
                     final ArrayList<BaseMedia> videoMedias = Boxing.getResult(data);
                     BaseMedia videoMedia = videoMedias.get(0);
                     mSelectedFilePath = videoMedia.getPath();
+                    mSelectedFileType = DataType.STREAM;
                     tvFileName.setText(FileUtil.getFileNameFromPath(mSelectedFilePath));
                     BoxingMediaLoader.getInstance().displayThumbnail(imgPreview, mSelectedFilePath, 300, 300);
                     Log.e("ResourceShare", "选择了视频: " + mSelectedFilePath);
@@ -121,6 +135,7 @@ public class ResourceFrag extends Fragment {
                 case CHOOSE_FILE_CODE:
                     Uri uri = data.getData();
                     mSelectedFilePath = FileUtil.getFileAbsolutePath(getActivity(), uri);
+                    mSelectedFileType = DataType.FILE;
                     tvFileName.setText(FileUtil.getFileNameFromPath(mSelectedFilePath));
                     imgPreview.setImageResource(R.drawable.file_preview);
                     Log.e("ResourceShare", "选择了文件: " + mSelectedFilePath);
@@ -155,6 +170,40 @@ public class ResourceFrag extends Fragment {
         catch (android.content.ActivityNotFoundException ex)
         {
             Toast.makeText(getActivity(), "没有默认文件管理器，请安装",  Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @OnClick(R.id.resource_share_menu_nfc)
+    void NFCShareClicked()
+    {
+        if (mSelectedFilePath == null || mSelectedFileType == null)
+            Toast.makeText(getActivity(), "请先选择文件！", Toast.LENGTH_SHORT).show();
+        else
+        {
+            DeviceInfoGetter deviceInfoGetter = DeviceInfoGetter.getInstance(getContext());
+            File file = new File(mSelectedFilePath);
+            FileInfo fileInfo = new FileInfo(FileUtil.getFileNameFromPath(mSelectedFilePath), mSelectedFilePath, file.getTotalSpace());
+            NFCTransferData nfcData = new NFCTransferData(mSelectedFileType, deviceInfoGetter.getDeviceInfo(), JSON.toJSONString(fileInfo));
+            Intent startIntent = new Intent(getContext(), NFCSendActivity.class);
+            startIntent.putExtra(NFCSendActivity.DATA_INFO, nfcData);
+            startActivity(startIntent);
+        }
+    }
+
+    @OnClick(R.id.resource_share_menu_wifi)
+    void WIFIShareClicked()
+    {
+        if (mSelectedFilePath == null || mSelectedFileType == null)
+            Toast.makeText(getActivity(), "请先选择文件！", Toast.LENGTH_SHORT).show();
+        else
+        {
+            DeviceInfoGetter deviceInfoGetter = DeviceInfoGetter.getInstance(getContext());
+            File file = new File(mSelectedFilePath);
+            FileInfo fileInfo = new FileInfo(FileUtil.getFileNameFromPath(mSelectedFilePath), mSelectedFilePath, file.getTotalSpace());
+            WIFITransferData wifiData = new WIFITransferData(mSelectedFileType, deviceInfoGetter.getDeviceInfo(), JSON.toJSONString(fileInfo));
+            Intent startIntent = new Intent(getContext(), WIFISendActivity.class);
+            startIntent.putExtra(WIFISendActivity.DATA_INFO, wifiData);
+            startActivity(startIntent);
         }
     }
 }

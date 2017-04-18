@@ -12,6 +12,8 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
+import com.clverpanda.nfshare.model.NFCTransferData;
 import com.skyfishjy.library.RippleBackground;
 
 import butterknife.BindView;
@@ -26,7 +28,7 @@ public class NFCSendActivity extends AppCompatActivity implements NfcAdapter.Cre
 
     private NfcAdapter mNfcAdapter;
 
-    private String jsonToSend;
+    private NFCTransferData dataToSend;
     @BindView(R.id.nfc_animation)
     RippleBackground rippleBackground;
 
@@ -52,7 +54,7 @@ public class NFCSendActivity extends AppCompatActivity implements NfcAdapter.Cre
     @Override
     public NdefMessage createNdefMessage(NfcEvent event)
         {
-        String message = jsonToSend;
+        String message = JSON.toJSONString(dataToSend);
         NdefMessage msg = new NdefMessage(NdefRecord.createMime(
                 "application/com.clverpanda.nfshare", message.getBytes()),
                 NdefRecord.createApplicationRecord("com.clverpanda.nfshare"));
@@ -71,7 +73,7 @@ public class NFCSendActivity extends AppCompatActivity implements NfcAdapter.Cre
         {
             switch (msg.what) {
                 case MESSAGE_SENT:
-                    Toast.makeText(getApplicationContext(), "NFC消息已经发送!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "需要传输的内容已经发送完毕!", Toast.LENGTH_LONG).show();
                     finish();
                     break;
             }
@@ -80,7 +82,7 @@ public class NFCSendActivity extends AppCompatActivity implements NfcAdapter.Cre
 
     private void getINFO()
     {
-        jsonToSend = getIntent().getStringExtra(DATA_INFO);
+        dataToSend = (NFCTransferData) getIntent().getSerializableExtra(DATA_INFO);
     }
 
     @Override
