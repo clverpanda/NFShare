@@ -8,15 +8,11 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -27,7 +23,7 @@ import android.widget.Toast;
 
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.receiver.WiFiReceiveBroadcastReceiver;
-import com.clverpanda.nfshare.receiver.WiFiSendBroadcastReceiver;
+import com.clverpanda.nfshare.widget.RecyclerItemClickListener;
 import com.skyfishjy.library.RippleBackground;
 
 import java.util.ArrayList;
@@ -40,7 +36,8 @@ import butterknife.OnClick;
 import static android.os.Looper.getMainLooper;
 
 
-public class ReceiveFrag extends Fragment implements WifiP2pManager.PeerListListener
+public class ReceiveFrag extends Fragment
+        implements WifiP2pManager.PeerListListener, RecyclerItemClickListener
 {
     public static final String TAG = "ReceiveFrag";
 
@@ -90,6 +87,7 @@ public class ReceiveFrag extends Fragment implements WifiP2pManager.PeerListList
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         mAdapter = new ReceiveRecyclerAdapter(getContext(), peers);
+        mAdapter.setOnItemClickListener(this);
         recyclerView.setAdapter(mAdapter);
 
         toolbar.setTitle(R.string.drawer_item_receive);
@@ -137,6 +135,13 @@ public class ReceiveFrag extends Fragment implements WifiP2pManager.PeerListList
         {
             Log.d(TAG, "No devices found");
         }
+    }
+
+    @Override
+    public void onItemClick(View v, int position)
+    {
+        WifiP2pDevice device = peers.get(position);
+        Toast.makeText(getContext(), "设备：" + device.deviceName, Toast.LENGTH_SHORT).show();
     }
 
 

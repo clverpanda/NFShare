@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 
 import com.clverpanda.nfshare.R;
+import com.clverpanda.nfshare.widget.RecyclerItemClickListener;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class ReceiveRecyclerAdapter extends RecyclerView.Adapter<ReceiveRecycler
     private List<WifiP2pDevice> mDatas;
     private Context mContext;
     private LayoutInflater inflater;
+    private RecyclerItemClickListener itemClickListener = null;
 
     public ReceiveRecyclerAdapter(Context context, List<WifiP2pDevice> datas)
     {
@@ -50,22 +52,38 @@ public class ReceiveRecyclerAdapter extends RecyclerView.Adapter<ReceiveRecycler
     public ReceiveViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
         View view = inflater.inflate(R.layout.item_devices, parent, false);
-        return new ReceiveViewHolder(view);
+        return new ReceiveViewHolder(view, itemClickListener);
+    }
+
+    public void setOnItemClickListener(RecyclerItemClickListener listener)
+    {
+        this.itemClickListener = listener;
     }
 
 
 
-    class ReceiveViewHolder extends RecyclerView.ViewHolder
+    class ReceiveViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         @BindView(R.id.devices_name)
         TextView tvDeviceName;
         @BindView(R.id.devices_mac)
         TextView tvDeviceMac;
+        private RecyclerItemClickListener mListener;
 
-        ReceiveViewHolder(View view)
+        ReceiveViewHolder(View view, RecyclerItemClickListener listener)
         {
             super(view);
             ButterKnife.bind(this, view);
+
+            this.mListener = listener;
+        }
+
+
+        @Override
+        public void onClick(View v)
+        {
+            if (mListener != null)
+                mListener.onItemClick(v, getLayoutPosition());
         }
     }
 }
