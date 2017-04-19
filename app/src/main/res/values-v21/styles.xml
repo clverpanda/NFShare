@@ -46,4 +46,11 @@
     <style name="MyTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabIndicatorColor">@color/colorPrimary</item>
     </style>
+
+    <style name="horizontal_division">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0.5dp</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:background">@color/secondary_text</item>
+    </style>
 </resources>

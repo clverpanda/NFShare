@@ -15,7 +15,7 @@ import com.clverpanda.nfshare.WIFISendActivity;
  * It's the file for NFShare.
  */
 
-public class WiFiDirectBroadcastReceiver extends BroadcastReceiver
+public class WiFiSendBroadcastReceiver extends BroadcastReceiver
 {
 
     private WifiP2pManager manager;
@@ -23,8 +23,9 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver
     private WIFISendActivity activity;
 
 
-    public WiFiDirectBroadcastReceiver(WifiP2pManager manager, WifiP2pManager.Channel channel,
-                                       WIFISendActivity activity) {
+    public WiFiSendBroadcastReceiver(WifiP2pManager manager, WifiP2pManager.Channel channel,
+                                     WIFISendActivity activity)
+    {
         super();
         this.manager = manager;
         this.channel = channel;
@@ -33,10 +34,12 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver
 
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(Context context, Intent intent)
+    {
         String action = intent.getAction();
 
-        if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
+        if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action))
+        {
 
             int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
             if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED)

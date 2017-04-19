@@ -1,11 +1,13 @@
 package com.clverpanda.nfshare.model;
 
+import java.io.Serializable;
+
 /**
  * Created by clverpanda on 2017/4/7 0007.
  * It's the file for NFShare.
  */
 
-public class DeviceInfo
+public class DeviceInfo implements Serializable
 {
     private int Id;
     private String Name;

@@ -4,19 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
-import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.clverpanda.nfshare.model.NFCTransferData;
 import com.clverpanda.nfshare.model.WIFITransferData;
-import com.clverpanda.nfshare.receiver.WiFiDirectBroadcastReceiver;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.clverpanda.nfshare.receiver.WiFiSendBroadcastReceiver;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -54,7 +47,7 @@ public class WIFISendActivity extends AppCompatActivity
     public void onResume()
     {
         super.onResume();
-        receiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
+        receiver = new WiFiSendBroadcastReceiver(mManager, mChannel, this);
         registerReceiver(receiver, intentFilter);
     }
 
@@ -77,7 +70,6 @@ public class WIFISendActivity extends AppCompatActivity
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-
     }
 
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
