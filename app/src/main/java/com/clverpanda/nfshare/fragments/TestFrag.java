@@ -1,6 +1,7 @@
 package com.clverpanda.nfshare.fragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,11 +10,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.clverpanda.nfshare.R;
+import com.clverpanda.nfshare.WIFISendActivity;
 import com.clverpanda.nfshare.model.TaskInfo;
 import com.clverpanda.nfshare.util.database.TasksDbHelper;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 public class TestFrag extends Fragment {
@@ -45,6 +48,13 @@ public class TestFrag extends Fragment {
         });
 
         return view;
+    }
+
+    @OnClick(R.id.button2)
+    void button2Clicked()
+    {
+        Intent intent = new Intent(getContext(), WIFISendActivity.class);
+        startActivity(intent);
     }
 
 }

@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.clverpanda.nfshare.fragments.ContentFrag;
 import com.clverpanda.nfshare.fragments.DevicesFrag;
+import com.clverpanda.nfshare.fragments.ReceiveFrag;
 import com.clverpanda.nfshare.fragments.ResourceFrag;
 import com.clverpanda.nfshare.fragments.TasksFrag;
 import com.clverpanda.nfshare.fragments.TestFrag;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity
         mFm = getSupportFragmentManager();
 
         //Fragment
-        mFm.beginTransaction().replace(R.id.fragment_container, new ContentFrag()).commit();
+        mFm.beginTransaction().replace(R.id.fragment_container, new ReceiveFrag()).commit();
 
         //NFC
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -138,6 +139,12 @@ public class MainActivity extends AppCompatActivity
         {
             FragmentTransaction ft = mFm.beginTransaction();
             ft.replace(R.id.fragment_container, new TestFrag());
+            ft.commit();
+        }
+        else if (id == R.id.nav_receive)
+        {
+            FragmentTransaction ft = mFm.beginTransaction();
+            ft.replace(R.id.fragment_container, new ReceiveFrag());
             ft.commit();
         }
 

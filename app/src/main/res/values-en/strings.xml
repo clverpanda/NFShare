@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NFShare</string>
+    <string name="action_settings">Settings</string>
+    <string name="choose_file">Share File</string>
+    <string name="choose_image">Share Image</string>
+    <string name="choose_video">Share Video</string>
+    <string name="drawer_item_content">Content</string>
+    <string name="drawer_item_devices">Devices</string>
+    <string name="drawer_item_receive">Receive</string>
+    <string name="drawer_item_resource">Resource</string>
+    <string name="drawer_item_settings">Test</string>
+    <string name="drawer_item_tasks">Tasks</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="loading">loading...</string>
+    <string name="pending_file">null</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="title_activity_receive">Receive</string>
+    <string name="receive_with_pin">Receive with PIN</string>
+    <string name="receive_with_wifi">Receive by search</string>
+    <string name="no_contact_permission">NO CONTACT PERMISSION</string>
+    <string name="nfc_notify">Approach to another device</string>
+</resources>
