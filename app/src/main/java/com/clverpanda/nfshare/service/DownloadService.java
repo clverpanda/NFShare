@@ -90,9 +90,17 @@ public class DownloadService extends Service
         tasksDb.setStatus(taskId, 2);
         Intent intent = new Intent(DownloadService.ACTION_STARTED);
         intent.putExtra("id", taskId);
-        this.sendBroadcast(intent);
+        sendBroadcast(intent);
     }
 
+    protected void setFailed(int taskId)
+    {
+        TasksDbHelper tasksDb = new TasksDbHelper(DownloadService.this);
+        tasksDb.setStatus(taskId, -1);
+        Intent intent = new Intent(DownloadService.ACTION_FAILED);
+        intent.putExtra("id", taskId);
+        sendBroadcast(intent);
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -127,7 +135,8 @@ public class DownloadService extends Service
         }
 
         @Override
-        public void run() {
+        public void run()
+        {
             OkHttpClient client = new OkHttpClient.Builder()
                     .connectTimeout(3, TimeUnit.SECONDS)
                     .build();
@@ -145,6 +154,8 @@ public class DownloadService extends Service
                     length = response.body().contentLength();
                     Log.e("length==", length + "");
                 }
+                else
+                    throw new Exception();
                 if (length < 0) {
                     return;
                 }
@@ -169,9 +180,7 @@ public class DownloadService extends Service
             catch (Exception e)
             {
                 e.printStackTrace();
-                Intent intent = new Intent(ACTION_FAILED);
-                intent.putExtra("id", tFileInfo.getId());
-                sendBroadcast(intent);
+                setFailed(tFileInfo.getId());
             }
         }
     }

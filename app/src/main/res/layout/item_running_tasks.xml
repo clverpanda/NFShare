@@ -123,6 +123,19 @@
             app:layout_constraintRight_toRightOf="@+id/task_from"
             android:contentDescription="pause"/>
 
+        <TextView
+            android:id="@+id/task_failed"
+            android:layout_width="48dp"
+            android:layout_height="17dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginTop="-1dp"
+            android:text="任务失败"
+            android:textColor="#ff0000"
+            android:textSize="12sp"
+            app:layout_constraintRight_toRightOf="@+id/task_from"
+            app:layout_constraintTop_toTopOf="@+id/progressBar"
+            android:visibility="invisible"/>
+
     </android.support.constraint.ConstraintLayout>
 
 </android.support.v7.widget.CardView>

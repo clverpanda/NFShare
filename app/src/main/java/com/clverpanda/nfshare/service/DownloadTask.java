@@ -52,6 +52,13 @@ class DownloadTask
         new DownloadThread(threadInfo).start();
     }
 
+    protected void setFailed(int taskId)
+    {
+        mTasksDb.setStatus(taskId, -1);
+        Intent intent = new Intent(DownloadService.ACTION_FAILED);
+        intent.putExtra("id", taskId);
+        mContext.sendBroadcast(intent);
+    }
 
     class DownloadThread extends Thread
     {
@@ -129,11 +136,11 @@ class DownloadTask
                         }
 
                     }
+                    mThreadDb.deleteThread(mFileInfo.getId());
+                    mTasksDb.setStatus(mFileInfo.getId(), 1);
                     Intent intent = new Intent(DownloadService.ACTION_FINISHED);
                     intent.putExtra("fileinfo", mFileInfo);
                     mContext.sendBroadcast(intent);
-                    mThreadDb.deleteThread(mFileInfo.getId());
-                    mTasksDb.setStatus(mFileInfo.getId(), 1);
                     is.close();
                 }
                 raf.close();
@@ -142,9 +149,7 @@ class DownloadTask
             catch (Exception e)
             {
                 e.printStackTrace();
-                Intent intent = new Intent(DownloadService.ACTION_FAILED);
-                intent.putExtra("id", mFileInfo.getId());
-                mContext.sendBroadcast(intent);
+                setFailed(mFileInfo.getId());
             }
         }
     }

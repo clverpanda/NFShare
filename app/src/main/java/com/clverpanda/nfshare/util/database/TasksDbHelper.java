@@ -122,7 +122,7 @@ public class TasksDbHelper extends SQLiteOpenHelper
     public List<TaskInfo> getAllRunningTaskInfo()
     {
         String selectQuery = "SELECT Id, Name, Description, Type, FromDevice, Status, datetime(ReceiveTime, 'localtime') FROM " + TABLE_NAME +
-                " WHERE Status=0 or Status=2" +
+                " WHERE Status=0 or Status=2 or Status=-1" +
                 " ORDER BY Id DESC";
         return queryRawSQL(selectQuery);
     }

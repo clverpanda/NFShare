@@ -95,7 +95,13 @@ public class RunningTasksFrag extends Fragment {
                     != PackageManager.PERMISSION_GRANTED)
                 requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_ASK_WRITE);
         }
+    }
 
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        getActivity().unregisterReceiver(mReceiver);
     }
 
     @Override
@@ -130,7 +136,6 @@ public class RunningTasksFrag extends Fragment {
             {
                 DownloadFileInfo fileinfo = (DownloadFileInfo) intent.getSerializableExtra("fileinfo");
                 //更新进度为100
-                mAdapter.updateProgress(fileinfo.getId(), 100);
                 mAdapter.removeTask(fileinfo.getId());
                 Toast.makeText(
                         mContext,
@@ -150,6 +155,7 @@ public class RunningTasksFrag extends Fragment {
             else if (DownloadService.ACTION_FAILED.equals(intent.getAction()))
             {
                 int id = intent.getIntExtra("id", 0);
+                mAdapter.setFailed(id);
             }
         }
     };

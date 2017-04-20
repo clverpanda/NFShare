@@ -20,6 +20,7 @@ import com.clverpanda.nfshare.model.TaskInfo;
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.service.DownloadService;
 
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -60,11 +61,19 @@ public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecycler
         holder.pbDownload.setProgress(pro);
         if (theInfo.getStatus() == 0)//暂停中的任务
         {
-            holder.imgbPause.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_pause_clicked));
+            holder.imgbPause.setImageResource(R.drawable.ic_pause_clicked);
+            holder.imgbStart.setImageResource(R.drawable.ic_start);
         }
         else if (theInfo.getStatus() == 2)//进行中的任务
         {
-            holder.imgbStart.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_start_clicked));
+            holder.imgbStart.setImageResource(R.drawable.ic_start_clicked);
+            holder.imgbPause.setImageResource(R.drawable.ic_pause);
+        }
+        else if (theInfo.getStatus() == -1)//失败的任务
+        {
+            holder.tvTaskFailed.setVisibility(View.VISIBLE);
+            holder.imgbStart.setVisibility(View.INVISIBLE);
+            holder.imgbPause.setVisibility(View.INVISIBLE);
         }
         if (theInfo.getType() == DataType.APP.getIndex())
         {
@@ -125,6 +134,8 @@ public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecycler
         ImageButton imgbStart;
         @BindView(R.id.btn_pause)
         ImageButton imgbPause;
+        @BindView(R.id.task_failed)
+        TextView tvTaskFailed;
 
 
         RunningViewHolder(View view)
@@ -182,6 +193,23 @@ public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecycler
                 notifyDataSetChanged();
             }
         }
+    }
+
+    public void setFailed(int id)
+    {
+        for (TaskInfo taskItem : mDatas)
+        {
+            if (taskItem.getId() == id)
+            {
+                taskItem.setStatus(-1);
+                notifyDataSetChanged();
+            }
+        }
+    }
+
+    public void refreshData(int id)
+    {
+        notifyDataSetChanged();
     }
 
 }
