@@ -7,15 +7,34 @@
     tools:context="com.clverpanda.nfshare.WIFISendActivity">
 
 
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="开始搜索"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
+
+    <com.skyfishjy.library.RippleBackground
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="375dp"
+        android:layout_height="361dp"
+        android:id="@+id/wifi_animation"
+        app:rb_color="#0099CC"
+        app:rb_radius="32dp"
+        app:rb_rippleAmount="4"
+        app:rb_duration="3000"
+        app:rb_scale="6"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="127dp" />
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent">
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_centerInParent="true"
+            android:id="@+id/centerImage"
+            android:src="@drawable/ic_wifi"/>
+
+
+    </com.skyfishjy.library.RippleBackground>
+
 </android.support.constraint.ConstraintLayout>

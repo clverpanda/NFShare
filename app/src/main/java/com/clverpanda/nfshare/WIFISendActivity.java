@@ -10,7 +10,9 @@ import android.widget.Toast;
 
 import com.clverpanda.nfshare.model.WIFITransferData;
 import com.clverpanda.nfshare.receiver.WiFiSendBroadcastReceiver;
+import com.skyfishjy.library.RippleBackground;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -24,6 +26,9 @@ public class WIFISendActivity extends AppCompatActivity
     private WifiP2pManager.Channel mChannel;
     private BroadcastReceiver receiver = null;
     private boolean isWifiP2pEnabled = false;
+
+    @BindView(R.id.wifi_animation)
+    RippleBackground rippleBackground;
 
 
     private final IntentFilter intentFilter = new IntentFilter();
@@ -49,6 +54,21 @@ public class WIFISendActivity extends AppCompatActivity
         super.onResume();
         receiver = new WiFiSendBroadcastReceiver(mManager, mChannel, this);
         registerReceiver(receiver, intentFilter);
+        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+
+            @Override
+            public void onSuccess()
+            {
+                Toast.makeText(WIFISendActivity.this, "准备开始发送", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int reasonCode)
+            {
+                Toast.makeText(WIFISendActivity.this, "初始化发送失败！", Toast.LENGTH_SHORT).show();
+            }
+        });
+        rippleBackground.startRippleAnimation();
     }
 
     @Override
@@ -56,6 +76,7 @@ public class WIFISendActivity extends AppCompatActivity
     {
         super.onPause();
         unregisterReceiver(receiver);
+        rippleBackground.stopRippleAnimation();
     }
 
 
@@ -75,25 +96,5 @@ public class WIFISendActivity extends AppCompatActivity
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
         this.isWifiP2pEnabled = isWifiP2pEnabled;
     }
-
-    @OnClick(R.id.button3)
-    void button3Clicked()
-    {
-        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
-
-            @Override
-            public void onSuccess()
-            {
-                Toast.makeText(WIFISendActivity.this, "成功开始搜索！", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFailure(int reasonCode)
-            {
-
-            }
-        });
-    }
-
 
 }

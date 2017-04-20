@@ -49,7 +49,8 @@ import butterknife.OnClick;
 import static android.app.Activity.RESULT_OK;
 
 
-public class ResourceFrag extends Fragment {
+public class ResourceFrag extends Fragment
+{
 
     private static final int CHOOSE_IMAGE_CODE = 1024;
     private static final int CHOOSE_VIDEO_CODE = 2048;

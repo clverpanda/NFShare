@@ -27,12 +27,13 @@ public class ReceiveRecyclerAdapter extends RecyclerView.Adapter<ReceiveRecycler
     private List<WifiP2pDevice> mDatas;
     private Context mContext;
     private LayoutInflater inflater;
-    private RecyclerItemClickListener itemClickListener = null;
+    private RecyclerItemClickListener itemClickListener;
 
-    public ReceiveRecyclerAdapter(Context context, List<WifiP2pDevice> datas)
+    public ReceiveRecyclerAdapter(Context context, List<WifiP2pDevice> datas, RecyclerItemClickListener listener)
     {
         this.mContext = context;
         this.mDatas = datas;
+        this.itemClickListener = listener;
         inflater = LayoutInflater.from(mContext);
     }
 
@@ -76,6 +77,7 @@ public class ReceiveRecyclerAdapter extends RecyclerView.Adapter<ReceiveRecycler
             ButterKnife.bind(this, view);
 
             this.mListener = listener;
+            view.setOnClickListener(this);
         }
 
 

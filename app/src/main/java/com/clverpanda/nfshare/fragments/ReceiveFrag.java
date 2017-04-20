@@ -4,8 +4,11 @@ package com.clverpanda.nfshare.fragments;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.net.wifi.WpsInfo;
+import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -26,6 +29,7 @@ import com.clverpanda.nfshare.receiver.WiFiReceiveBroadcastReceiver;
 import com.clverpanda.nfshare.widget.RecyclerItemClickListener;
 import com.skyfishjy.library.RippleBackground;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +41,7 @@ import static android.os.Looper.getMainLooper;
 
 
 public class ReceiveFrag extends Fragment
-        implements WifiP2pManager.PeerListListener, RecyclerItemClickListener
+        implements WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener, RecyclerItemClickListener
 {
     public static final String TAG = "ReceiveFrag";
 
@@ -86,8 +90,7 @@ public class ReceiveFrag extends Fragment
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new ReceiveRecyclerAdapter(getContext(), peers);
-        mAdapter.setOnItemClickListener(this);
+        mAdapter = new ReceiveRecyclerAdapter(getContext(), peers, this);
         recyclerView.setAdapter(mAdapter);
 
         toolbar.setTitle(R.string.drawer_item_receive);
@@ -100,13 +103,13 @@ public class ReceiveFrag extends Fragment
     @OnClick(R.id.btn_start_search)
     void searchClicked()
     {
-        rippleBackground.startRippleAnimation();
         mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener()
         {
             @Override
             public void onSuccess()
             {
                 Toast.makeText(getContext(), "开始搜索", Toast.LENGTH_SHORT).show();
+                rippleBackground.startRippleAnimation();
             }
             @Override
             public void onFailure(int reasonCode)
@@ -124,7 +127,25 @@ public class ReceiveFrag extends Fragment
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
     }
 
+    //连接到对等点
+    @Override
+    public void onConnectionInfoAvailable(final WifiP2pInfo info)
+    {
+        String groupOwnerAddress = info.groupOwnerAddress.getHostAddress();
+        Toast.makeText(getContext(), "已经连接到设备，队长地址是" + groupOwnerAddress, Toast.LENGTH_SHORT).show();
+        if (info.groupFormed && info.isGroupOwner)
+        {
 
+        }
+        else if (info.groupFormed)
+        {
+
+        }
+    }
+
+
+
+    //搜索到对等点
     @Override
     public void onPeersAvailable(WifiP2pDeviceList peerList)
     {
@@ -141,7 +162,25 @@ public class ReceiveFrag extends Fragment
     public void onItemClick(View v, int position)
     {
         WifiP2pDevice device = peers.get(position);
-        Toast.makeText(getContext(), "设备：" + device.deviceName, Toast.LENGTH_SHORT).show();
+        connect(device);
+    }
+
+    public void connect(WifiP2pDevice device2connect) {
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress = device2connect.deviceAddress;
+        config.wps.setup = WpsInfo.PBC;
+
+        mManager.connect(mChannel, config, new WifiP2pManager.ActionListener()
+        {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Toast.makeText(getActivity(), "连接失败，请重试", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
