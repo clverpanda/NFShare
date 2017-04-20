@@ -142,6 +142,9 @@ class DownloadTask
             catch (Exception e)
             {
                 e.printStackTrace();
+                Intent intent = new Intent(DownloadService.ACTION_FAILED);
+                intent.putExtra("id", mFileInfo.getId());
+                mContext.sendBroadcast(intent);
             }
         }
     }

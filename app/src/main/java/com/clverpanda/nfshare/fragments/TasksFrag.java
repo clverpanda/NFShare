@@ -48,13 +48,7 @@ public class TasksFrag extends Fragment {
     @BindView(R.id.tasks_toolbar)
     protected Toolbar toolbar;
 
-//    public static AppShareFrag newInstance(int page) {
-//        AppShareFrag fragment = new AppShareFrag();
-//        Bundle args = new Bundle();
-//        args.putInt(ARG_PAGE, page);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
+
 
     public TasksFrag() {}
 
@@ -97,6 +91,7 @@ public class TasksFrag extends Fragment {
         super.onResume();
         processData();
     }
+
 
     protected void processData()
     {

@@ -7,7 +7,7 @@ package com.clverpanda.nfshare.model;
 
 public class TaskInfo
 {
-    private int Id;
+    private int Id;//0=>暂停中   1=>已完成  2=>进行中   -1=>失败
     private String Name;
     private String Description;
     private int Type;

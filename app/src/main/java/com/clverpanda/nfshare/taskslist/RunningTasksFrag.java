@@ -47,6 +47,7 @@ public class RunningTasksFrag extends Fragment {
     protected RunningRecyclerAdapter mAdapter;
     protected TasksDbHelper tasksDb;
     private Context mContext;
+    private List<TaskInfo> mData;
 
 
     public RunningTasksFrag() {
@@ -55,7 +56,8 @@ public class RunningTasksFrag extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             Bundle savedInstanceState)
+    {
         View view = inflater.inflate(R.layout.content_running_tasks, container, false);
         ButterKnife.bind(this, view);
 
@@ -69,10 +71,15 @@ public class RunningTasksFrag extends Fragment {
         IntentFilter filter = new IntentFilter();
         filter.addAction(DownloadService.ACTION_UPDATE);
         filter.addAction(DownloadService.ACTION_FINISHED);
+        filter.addAction(DownloadService.ACTION_STARTED);
+        filter.addAction(DownloadService.ACTION_PAUSED);
+        filter.addAction(DownloadService.ACTION_FAILED);
         getActivity().registerReceiver(mReceiver, filter);
 
         tasksDb = new TasksDbHelper(getContext());
-
+        mData = tasksDb.getAllRunningTaskInfo();
+        mAdapter = new RunningRecyclerAdapter(getContext(), mData);
+        recyclerView.setAdapter(mAdapter);
 
         return view;
     }
@@ -88,9 +95,7 @@ public class RunningTasksFrag extends Fragment {
                     != PackageManager.PERMISSION_GRANTED)
                 requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_ASK_WRITE);
         }
-        List<TaskInfo> allRunningTasks = tasksDb.getAllRunningTaskInfo();
-        mAdapter = new RunningRecyclerAdapter(getContext(), allRunningTasks);
-        recyclerView.setAdapter(mAdapter);
+
     }
 
     @Override
@@ -141,6 +146,10 @@ public class RunningTasksFrag extends Fragment {
             {
                 int id = intent.getIntExtra("id", 0);
                 mAdapter.setPaused(id);
+            }
+            else if (DownloadService.ACTION_FAILED.equals(intent.getAction()))
+            {
+                int id = intent.getIntExtra("id", 0);
             }
         }
     };

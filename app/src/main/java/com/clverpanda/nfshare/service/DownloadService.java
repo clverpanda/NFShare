@@ -47,6 +47,7 @@ public class DownloadService extends Service
     public static final String ACTION_STARTED = "ACTION_STARTED";
     public static final String ACTION_PAUSED = "ACTION_PAUSED";
     public static final String ACTION_PAUSE_ALL = "ACTION_PAUSE_ALL";
+    public static final String ACTION_FAILED = "ACTION_FAILED";
     //下载路径
     public static final String DOWNLOAD_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/";
 
@@ -89,7 +90,7 @@ public class DownloadService extends Service
         tasksDb.setStatus(taskId, 2);
         Intent intent = new Intent(DownloadService.ACTION_STARTED);
         intent.putExtra("id", taskId);
-        sendBroadcast(intent);
+        this.sendBroadcast(intent);
     }
 
 
@@ -168,6 +169,9 @@ public class DownloadService extends Service
             catch (Exception e)
             {
                 e.printStackTrace();
+                Intent intent = new Intent(ACTION_FAILED);
+                intent.putExtra("id", tFileInfo.getId());
+                sendBroadcast(intent);
             }
         }
     }
