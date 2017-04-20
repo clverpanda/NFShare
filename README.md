@@ -24,4 +24,7 @@
 
 
 ## 样例
-<img src="https://github.com/clverpanda/NFShare/blob/master/sample/sample_app_share.png" width = "300" alt="图片名称" align=center />
+<img src="https://github.com/clverpanda/NFShare/blob/master/sample/sample1.png" width = "300" alt="图片名称" align=center />
+<img src="https://github.com/clverpanda/NFShare/blob/master/sample/sample2.jpg" width = "300" alt="图片名称" align=center />
+<img src="https://github.com/clverpanda/NFShare/blob/master/sample/sample3.png" width = "300" alt="图片名称" align=center />
+<img src="https://github.com/clverpanda/NFShare/blob/master/sample/sample4.jpg" width = "300" alt="图片名称" align=center />
