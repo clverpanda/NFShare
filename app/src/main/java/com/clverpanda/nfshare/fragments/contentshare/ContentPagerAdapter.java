@@ -1,4 +1,4 @@
-package com.clverpanda.nfshare.taskslist;
+package com.clverpanda.nfshare.fragments.contentshare;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
@@ -7,18 +7,17 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
 /**
- * Created by clverpanda on 2017/4/7 0007.
- * It's the file for NFShare.
+ * Created by miaol on 2017/3/28 0028.
  */
 
-public class TasksPagerAdapter extends FragmentPagerAdapter
+public class ContentPagerAdapter extends FragmentPagerAdapter
 {
     final int PAGE_COUNT = 2;
-    private String tabTitles[] = new String[] {"进行中", "已完成"};
+    private String tabTitles[] = new String[] {"应用", "联系人"};
     private Context context;
     private Fragment mCurrentFragment;
 
-    public TasksPagerAdapter(FragmentManager fm, Context context)
+    public ContentPagerAdapter(FragmentManager fm, Context context)
     {
         super(fm);
         this.context = context;
@@ -28,9 +27,9 @@ public class TasksPagerAdapter extends FragmentPagerAdapter
     public Fragment getItem(int position)
     {
         if (position == 0)
-            return new RunningTasksFrag();
+            return AppShareFrag.newInstance(position);
         else
-            return new DoneTasksFrag();
+            return ContactShareFrag.newInstance("", "");
     }
 
     @Override
@@ -55,4 +54,5 @@ public class TasksPagerAdapter extends FragmentPagerAdapter
     {
         return mCurrentFragment;
     }
+
 }

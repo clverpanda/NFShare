@@ -5,7 +5,7 @@ import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.clverpanda.nfshare.contentshare.AppRecyclerAdapter;
+import com.clverpanda.nfshare.fragments.contentshare.AppRecyclerAdapter;
 import com.clverpanda.nfshare.model.AppInfo;
 import com.clverpanda.nfshare.util.AppInfoGetter;
 import com.romainpiel.shimmer.Shimmer;

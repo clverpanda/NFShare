@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.greenrobot.greendao'
 
 android {
     signingConfigs {
@@ -48,4 +49,5 @@ dependencies {
     compile 'com.facebook.fresco:fresco:1.2.0'
     compile 'com.facebook.fresco:animated-gif:1.2.0'
     compile 'com.github.GoodieBag:Pinview:v1.3'
+    compile 'org.greenrobot:greendao:3.2.2'
 }

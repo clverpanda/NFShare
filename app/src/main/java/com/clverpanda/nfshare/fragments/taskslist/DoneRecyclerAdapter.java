@@ -1,4 +1,4 @@
-package com.clverpanda.nfshare.taskslist;
+package com.clverpanda.nfshare.fragments.taskslist;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

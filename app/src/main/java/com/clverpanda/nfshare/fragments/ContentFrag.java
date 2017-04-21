@@ -15,9 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.design.widget.CoordinatorLayout;
 
-import com.clverpanda.nfshare.contentshare.AppShareFrag;
-import com.clverpanda.nfshare.contentshare.ContactShareFrag;
-import com.clverpanda.nfshare.contentshare.ContentPagerAdapter;
+import com.clverpanda.nfshare.fragments.contentshare.AppShareFrag;
+import com.clverpanda.nfshare.fragments.contentshare.ContactShareFrag;
+import com.clverpanda.nfshare.fragments.contentshare.ContentPagerAdapter;
 import com.clverpanda.nfshare.model.AppInfoTransfer;
 import com.clverpanda.nfshare.model.ContactInfo;
 import com.clverpanda.nfshare.model.DataType;

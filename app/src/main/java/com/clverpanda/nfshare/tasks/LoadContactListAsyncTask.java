@@ -8,7 +8,7 @@ import android.provider.ContactsContract;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.clverpanda.nfshare.contentshare.ContactRecyclerAdapter;
+import com.clverpanda.nfshare.fragments.contentshare.ContactRecyclerAdapter;
 import com.clverpanda.nfshare.model.ContactInfo;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;

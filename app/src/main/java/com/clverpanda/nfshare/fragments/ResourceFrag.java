@@ -20,17 +20,13 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.bilibili.boxing.Boxing;
 import com.bilibili.boxing.BoxingMediaLoader;
-import com.bilibili.boxing.loader.IBoxingMediaLoader;
 import com.bilibili.boxing.model.config.BoxingConfig;
 import com.bilibili.boxing.model.entity.BaseMedia;
 import com.bilibili.boxing.model.entity.impl.ImageMedia;
 import com.bilibili.boxing_impl.ui.BoxingActivity;
-import com.bilibili.boxing_impl.ui.BoxingBottomSheetActivity;
 import com.clverpanda.nfshare.NFCSendActivity;
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.WIFISendActivity;
-import com.clverpanda.nfshare.contentshare.AppShareFrag;
-import com.clverpanda.nfshare.model.AppInfoTransfer;
 import com.clverpanda.nfshare.model.DataType;
 import com.clverpanda.nfshare.model.FileInfo;
 import com.clverpanda.nfshare.model.NFCTransferData;
@@ -40,7 +36,6 @@ import com.clverpanda.nfshare.util.FileUtil;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

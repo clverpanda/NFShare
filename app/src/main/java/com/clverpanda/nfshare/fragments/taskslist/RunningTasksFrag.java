@@ -1,4 +1,4 @@
-package com.clverpanda.nfshare.taskslist;
+package com.clverpanda.nfshare.fragments.taskslist;
 
 
 import android.Manifest;
@@ -32,7 +32,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import permissions.dispatcher.RuntimePermissions;
 
 
 public class RunningTasksFrag extends Fragment {

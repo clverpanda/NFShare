@@ -1,4 +1,4 @@
-package com.clverpanda.nfshare.contentshare;
+package com.clverpanda.nfshare.fragments.contentshare;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

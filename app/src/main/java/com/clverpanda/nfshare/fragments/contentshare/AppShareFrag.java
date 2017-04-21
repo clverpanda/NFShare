@@ -1,4 +1,4 @@
-package com.clverpanda.nfshare.contentshare;
+package com.clverpanda.nfshare.fragments.contentshare;
 
 
 

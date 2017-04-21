@@ -24,7 +24,7 @@ import com.clverpanda.nfshare.model.DataType;
 import com.clverpanda.nfshare.model.NFCTransferData;
 import com.clverpanda.nfshare.model.TaskInfo;
 import com.clverpanda.nfshare.R;
-import com.clverpanda.nfshare.taskslist.TasksPagerAdapter;
+import com.clverpanda.nfshare.fragments.taskslist.TasksPagerAdapter;
 import com.clverpanda.nfshare.util.database.DeviceDbHelper;
 import com.clverpanda.nfshare.util.database.TasksDbHelper;
 

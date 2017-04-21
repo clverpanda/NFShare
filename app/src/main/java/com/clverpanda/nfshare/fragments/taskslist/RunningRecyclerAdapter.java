@@ -1,14 +1,12 @@
-package com.clverpanda.nfshare.taskslist;
+package com.clverpanda.nfshare.fragments.taskslist;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -20,7 +18,6 @@ import com.clverpanda.nfshare.model.TaskInfo;
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.service.DownloadService;
 
-import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
