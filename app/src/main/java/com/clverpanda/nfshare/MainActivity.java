@@ -33,7 +33,8 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction()))
         {
             String msg = processIntent(getIntent());
-            mFm.beginTransaction().replace(R.id.fragment_container, TasksFrag.newInstance(msg, 1)).commit();
+            mFm.beginTransaction().replace(R.id.fragment_container, TasksFrag.newInstance(msg)).commit();
             setIntent(null);
         }
     }

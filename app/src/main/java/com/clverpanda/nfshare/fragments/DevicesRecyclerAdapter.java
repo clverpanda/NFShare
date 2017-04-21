@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.clverpanda.nfshare.model.DeviceInfo;
 import com.clverpanda.nfshare.R;
+import com.clverpanda.nfshare.dao.Device;
 
 import java.util.List;
 
@@ -22,11 +22,11 @@ import butterknife.ButterKnife;
 
 public class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecyclerAdapter.DevicesViewHolder>
 {
-    private List<DeviceInfo> mDatas;
+    private List<Device> mDatas;
     private Context mContext;
     private LayoutInflater inflater;
 
-    public DevicesRecyclerAdapter(Context context, List<DeviceInfo> datas)
+    public DevicesRecyclerAdapter(Context context, List<Device> datas)
     {
         this.mContext = context;
         this.mDatas = datas;
@@ -42,10 +42,10 @@ public class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecycler
     @Override
     public void onBindViewHolder(final DevicesViewHolder holder, final int position)
     {
-        DeviceInfo theInfo = mDatas.get(position);
+        Device theInfo = mDatas.get(position);
 
         holder.tvDeviceName.setText(theInfo.getName());
-        holder.tvDeviceMac.setText(theInfo.getWifiMac());
+        holder.tvDeviceMac.setText(theInfo.getWiFiMac());
     }
 
     @Override

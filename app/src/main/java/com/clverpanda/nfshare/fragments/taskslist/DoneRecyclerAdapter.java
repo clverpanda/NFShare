@@ -10,8 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.clverpanda.nfshare.dao.Task;
 import com.clverpanda.nfshare.model.DataType;
-import com.clverpanda.nfshare.model.TaskInfo;
 import com.clverpanda.nfshare.R;
 
 
@@ -26,11 +26,11 @@ import butterknife.ButterKnife;
 
 public class DoneRecyclerAdapter extends RecyclerView.Adapter<DoneRecyclerAdapter.DoneViewHolder>
 {
-    private List<TaskInfo> mDatas;
+    private List<Task> mDatas;
     private Context mContext;
     private LayoutInflater inflater;
 
-    public DoneRecyclerAdapter(Context context, List<TaskInfo> datas)
+    public DoneRecyclerAdapter(Context context, List<Task> datas)
     {
         this.mContext = context;
         this.mDatas = datas;
@@ -46,12 +46,12 @@ public class DoneRecyclerAdapter extends RecyclerView.Adapter<DoneRecyclerAdapte
     @Override
     public void onBindViewHolder(final DoneViewHolder holder, final int position)
     {
-        TaskInfo theInfo = mDatas.get(position);
+        Task theInfo = mDatas.get(position);
 
-        holder.tvTaskFrom.setText(theInfo.getFrom());
+        holder.tvTaskFrom.setText(theInfo.getOriginDevice().getName());
         holder.tvTaskName.setText(theInfo.getName());
         holder.tvTaskTime.setText(theInfo.getReceiveTime());
-        holder.tvTaskType.setText(DataType.getName(theInfo.getType()));
+        holder.tvTaskType.setText(theInfo.getType().getName());
         Drawable typeIcon;
         switch (theInfo.getType())
         {

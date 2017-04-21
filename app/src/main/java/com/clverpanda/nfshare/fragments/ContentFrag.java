@@ -21,7 +21,7 @@ import com.clverpanda.nfshare.fragments.contentshare.ContentPagerAdapter;
 import com.clverpanda.nfshare.model.AppInfoTransfer;
 import com.clverpanda.nfshare.model.ContactInfo;
 import com.clverpanda.nfshare.model.DataType;
-import com.clverpanda.nfshare.model.NFCTransferData;
+import com.clverpanda.nfshare.model.TransferData;
 import com.clverpanda.nfshare.NFCSendActivity;
 import com.clverpanda.nfshare.R;
 
@@ -94,7 +94,7 @@ public class ContentFrag extends Fragment
                 {
                     AppShareFrag frag = (AppShareFrag) pagerAdapter.getCurrentFragment();
                     List<AppInfoTransfer> selectedData = frag.getSelectedItems();
-                    NFCTransferData nfcData = new NFCTransferData(DataType.APP, deviceInfoGetter.getDeviceInfo(), JSON.toJSONString(selectedData));
+                    TransferData nfcData = new TransferData(DataType.APP, deviceInfoGetter.getDeviceInfo(), JSON.toJSONString(selectedData));
                     Intent startIntent = new Intent(getContext(), NFCSendActivity.class);
                     startIntent.putExtra(NFCSendActivity.DATA_INFO, nfcData);
                     startActivity(startIntent);
@@ -103,7 +103,7 @@ public class ContentFrag extends Fragment
                 {
                     ContactShareFrag frag = (ContactShareFrag) pagerAdapter.getCurrentFragment();
                     ContactInfo selectedData = frag.getSelectedItems().get(0);
-                    NFCTransferData nfcData = new NFCTransferData(DataType.CONTACT, deviceInfoGetter.getDeviceInfo(), JSON.toJSONString(selectedData));
+                    TransferData nfcData = new TransferData(DataType.CONTACT, deviceInfoGetter.getDeviceInfo(), JSON.toJSONString(selectedData));
                     Intent startIntent = new Intent(getContext(), NFCSendActivity.class);
                     startIntent.putExtra(NFCSendActivity.DATA_INFO, nfcData);
                     startActivity(startIntent);

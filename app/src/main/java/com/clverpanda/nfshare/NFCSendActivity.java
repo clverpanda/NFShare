@@ -8,12 +8,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.clverpanda.nfshare.model.NFCTransferData;
+import com.clverpanda.nfshare.model.TransferData;
 import com.skyfishjy.library.RippleBackground;
 
 import butterknife.BindView;
@@ -28,7 +26,7 @@ public class NFCSendActivity extends AppCompatActivity implements NfcAdapter.Cre
 
     private NfcAdapter mNfcAdapter;
 
-    private NFCTransferData dataToSend;
+    private TransferData dataToSend;
     @BindView(R.id.nfc_animation)
     RippleBackground rippleBackground;
 
@@ -82,7 +80,7 @@ public class NFCSendActivity extends AppCompatActivity implements NfcAdapter.Cre
 
     private void getINFO()
     {
-        dataToSend = (NFCTransferData) getIntent().getSerializableExtra(DATA_INFO);
+        dataToSend = (TransferData) getIntent().getSerializableExtra(DATA_INFO);
     }
 
     @Override

@@ -6,7 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.clverpanda.nfshare.fragments.DevicesRecyclerAdapter;
-import com.clverpanda.nfshare.model.DeviceInfo;
 import com.clverpanda.nfshare.util.database.DeviceDbHelper;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;

@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.clverpanda.nfshare.model.TaskInfo;
 import com.clverpanda.nfshare.fragments.taskslist.DoneRecyclerAdapter;
 import com.clverpanda.nfshare.util.database.TasksDbHelper;
 import com.romainpiel.shimmer.Shimmer;

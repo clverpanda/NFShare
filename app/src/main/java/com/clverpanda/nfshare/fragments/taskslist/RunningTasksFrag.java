@@ -23,7 +23,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.clverpanda.nfshare.model.DownloadFileInfo;
-import com.clverpanda.nfshare.model.TaskInfo;
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.service.DownloadService;
 import com.clverpanda.nfshare.util.database.TasksDbHelper;

@@ -1,23 +1,25 @@
 package com.clverpanda.nfshare.model;
 
+import com.clverpanda.nfshare.dao.Device;
+
 import java.io.Serializable;
 
 /**
- * Created by clverpanda on 2017/4/18 0018.
+ * Created by clverpanda on 2017/4/5 0005.
  * It's the file for NFShare.
  */
 
-public class WIFITransferData implements Serializable
+public class TransferData implements Serializable
 {
     private DataType dataType;
-    private DeviceInfo deviceInfo;
+    private Device device;
     private String payload;
 
-    public WIFITransferData() {}
+    public TransferData() {}
 
-    public WIFITransferData(DataType dataType, DeviceInfo deviceInfo, String payload) {
+    public TransferData(DataType dataType, Device device, String payload) {
         this.dataType = dataType;
-        this.deviceInfo = deviceInfo;
+        this.device = device;
         this.payload = payload;
     }
 
@@ -29,12 +31,12 @@ public class WIFITransferData implements Serializable
         this.dataType = dataType;
     }
 
-    public DeviceInfo getDeviceInfo() {
-        return deviceInfo;
+    public Device getDevice() {
+        return device;
     }
 
-    public void setDeviceInfo(DeviceInfo deviceInfo) {
-        this.deviceInfo = deviceInfo;
+    public void setDevice(Device device) {
+        this.device = device;
     }
 
     public String getPayload() {

@@ -5,8 +5,6 @@ import android.content.Context;
 import android.os.Build;
 import android.provider.Settings;
 
-import com.clverpanda.nfshare.model.DeviceInfo;
-
 import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.List;

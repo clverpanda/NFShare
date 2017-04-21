@@ -29,8 +29,7 @@ import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.WIFISendActivity;
 import com.clverpanda.nfshare.model.DataType;
 import com.clverpanda.nfshare.model.FileInfo;
-import com.clverpanda.nfshare.model.NFCTransferData;
-import com.clverpanda.nfshare.model.WIFITransferData;
+import com.clverpanda.nfshare.model.TransferData;
 import com.clverpanda.nfshare.util.DeviceInfoGetter;
 import com.clverpanda.nfshare.util.FileUtil;
 
@@ -179,7 +178,7 @@ public class ResourceFrag extends Fragment
             DeviceInfoGetter deviceInfoGetter = DeviceInfoGetter.getInstance(getContext());
             File file = new File(mSelectedFilePath);
             FileInfo fileInfo = new FileInfo(FileUtil.getFileNameFromPath(mSelectedFilePath), mSelectedFilePath, file.getTotalSpace());
-            NFCTransferData nfcData = new NFCTransferData(mSelectedFileType, deviceInfoGetter.getDeviceInfo(), JSON.toJSONString(fileInfo));
+            TransferData nfcData = new TransferData(mSelectedFileType, deviceInfoGetter.getDeviceInfo(), JSON.toJSONString(fileInfo));
             Intent startIntent = new Intent(getContext(), NFCSendActivity.class);
             startIntent.putExtra(NFCSendActivity.DATA_INFO, nfcData);
             startActivity(startIntent);
@@ -196,7 +195,7 @@ public class ResourceFrag extends Fragment
             DeviceInfoGetter deviceInfoGetter = DeviceInfoGetter.getInstance(getContext());
             File file = new File(mSelectedFilePath);
             FileInfo fileInfo = new FileInfo(FileUtil.getFileNameFromPath(mSelectedFilePath), mSelectedFilePath, file.getTotalSpace());
-            WIFITransferData wifiData = new WIFITransferData(mSelectedFileType, deviceInfoGetter.getDeviceInfo(), JSON.toJSONString(fileInfo));
+            TransferData wifiData = new TransferData(mSelectedFileType, deviceInfoGetter.getDeviceInfo(), JSON.toJSONString(fileInfo));
             Intent startIntent = new Intent(getContext(), WIFISendActivity.class);
             startIntent.putExtra(WIFISendActivity.DATA_INFO, wifiData);
             startActivity(startIntent);

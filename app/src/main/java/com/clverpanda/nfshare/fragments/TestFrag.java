@@ -11,7 +11,6 @@ import android.widget.Button;
 
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.WIFISendActivity;
-import com.clverpanda.nfshare.model.TaskInfo;
 import com.clverpanda.nfshare.util.database.TasksDbHelper;
 
 import butterknife.BindView;

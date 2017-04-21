@@ -18,16 +18,20 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.alibaba.fastjson.JSON;
+import com.clverpanda.nfshare.NFShareApplication;
+import com.clverpanda.nfshare.dao.DaoSession;
+import com.clverpanda.nfshare.dao.DeviceDao;
+import com.clverpanda.nfshare.dao.Task;
+import com.clverpanda.nfshare.dao.TaskDao;
 import com.clverpanda.nfshare.model.AppInfo;
 import com.clverpanda.nfshare.model.ContactInfo;
 import com.clverpanda.nfshare.model.DataType;
-import com.clverpanda.nfshare.model.NFCTransferData;
-import com.clverpanda.nfshare.model.TaskInfo;
+import com.clverpanda.nfshare.model.TaskStatus;
+import com.clverpanda.nfshare.model.TransferData;
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.fragments.taskslist.TasksPagerAdapter;
-import com.clverpanda.nfshare.util.database.DeviceDbHelper;
-import com.clverpanda.nfshare.util.database.TasksDbHelper;
 
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -36,7 +40,6 @@ import butterknife.ButterKnife;
 
 public class TasksFrag extends Fragment {
     public static final String DATA_INFO = "DATA_INFO";
-    public static final String DATA_TYPE = "DATA_TYPE";
 
 
     @BindView(R.id.tasks_viewpager)
@@ -52,12 +55,11 @@ public class TasksFrag extends Fragment {
 
     public TasksFrag() {}
 
-    public static TasksFrag newInstance(String Data, int Type)
+    public static TasksFrag newInstance(String Data)
     {
         TasksFrag fragment = new TasksFrag();
         Bundle args = new Bundle();
         args.putString(DATA_INFO, Data);
-        args.putInt(DATA_TYPE, Type);
         fragment.setArguments(args);
         return fragment;
     }
@@ -98,42 +100,38 @@ public class TasksFrag extends Fragment {
         Bundle args = this.getArguments();
         if (args == null) return;
         String data = args.getString(DATA_INFO);
-        int type = args.getInt(DATA_TYPE);
         if (data != null)
         {
-            if (type == 1)
+            TransferData NFCData = JSON.parseObject(data, TransferData.class);
+            DaoSession daoSession = ((NFShareApplication) getActivity().getApplication()).getDaoSession();
+            DeviceDao deviceDao = daoSession.getDeviceDao();
+            TaskDao taskDao = daoSession.getTaskDao();
+            long deviceId = deviceDao.insertOrReplace(NFCData.getDevice());
+            switch (NFCData.getDataType())
             {
-                NFCTransferData NFCData = JSON.parseObject(data, NFCTransferData.class);
-                DeviceDbHelper deviceDb = new DeviceDbHelper(getContext());
-                TasksDbHelper tasksDb = new TasksDbHelper(getContext());
-                deviceDb.addDeviceInfoNotRe(NFCData.getDeviceInfo());
-                switch (NFCData.getDataType())
-                {
-                    case APP:
-                        List<AppInfo> appInfo = JSON.parseArray(NFCData.getPayload(), AppInfo.class);
-                        for (AppInfo appInfoItem : appInfo)
-                        {
-                            TaskInfo taskInfo = new TaskInfo(appInfoItem.getAppName(), JSON.toJSONString(appInfoItem),
-                                    DataType.APP.getIndex(), NFCData.getDeviceInfo().getName(), 0);
-                            tasksDb.addTaskInfo(taskInfo);
-                        }
-                        break;
-                    case CONTACT:
-                        ContactInfo contactInfo = JSON.parseObject(NFCData.getPayload(), ContactInfo.class);
-                        TaskInfo taskInfo = new TaskInfo(contactInfo.getName(), JSON.toJSONString(contactInfo),
-                                DataType.CONTACT.getIndex(), NFCData.getDeviceInfo().getName(), 1);
-                        tasksDb.addTaskInfo(taskInfo);
-                        Intent addIntent = new Intent(Intent.ACTION_INSERT, Uri.withAppendedPath(Uri.parse("content://com.android.contacts"), "contacts"));
-                        addIntent.setType("vnd.android.cursor.dir/person");
-                        addIntent.setType("vnd.android.cursor.dir/contact");
-                        addIntent.setType("vnd.android.cursor.dir/raw_contact");
-                        addIntent.putExtra(ContactsContract.Intents.Insert.PHONE, contactInfo.getNumber());
-                        addIntent.putExtra(ContactsContract.Intents.Insert.NAME, contactInfo.getName());
-                        startActivity(addIntent);
-                        break;
-                }
+                case APP:
+                    List<AppInfo> appInfo = JSON.parseArray(NFCData.getPayload(), AppInfo.class);
+                    for (AppInfo appInfoItem : appInfo)
+                    {
+                        Task task = new Task(appInfoItem.getAppName(), JSON.toJSONString(appInfoItem),
+                                DataType.APP, TaskStatus.PAUSED, new Date(), deviceDao.load(deviceId));
+                        taskDao.insert(task);
+                    }
+                    break;
+                case CONTACT:
+                    ContactInfo contactInfo = JSON.parseObject(NFCData.getPayload(), ContactInfo.class);
+                    Task task = new Task(contactInfo.getName(), JSON.toJSONString(contactInfo),
+                            DataType.CONTACT, TaskStatus.DONE, new Date(), deviceDao.load(deviceId));
+                    taskDao.insert(task);
+                    Intent addIntent = new Intent(Intent.ACTION_INSERT, Uri.withAppendedPath(Uri.parse("content://com.android.contacts"), "contacts"));
+                    addIntent.setType("vnd.android.cursor.dir/person");
+                    addIntent.setType("vnd.android.cursor.dir/contact");
+                    addIntent.setType("vnd.android.cursor.dir/raw_contact");
+                    addIntent.putExtra(ContactsContract.Intents.Insert.PHONE, contactInfo.getNumber());
+                    addIntent.putExtra(ContactsContract.Intents.Insert.NAME, contactInfo.getName());
+                    startActivity(addIntent);
+                    break;
             }
-
         }
     }
 

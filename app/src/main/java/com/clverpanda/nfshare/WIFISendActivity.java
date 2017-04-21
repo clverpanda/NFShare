@@ -8,20 +8,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.clverpanda.nfshare.model.WIFITransferData;
+import com.clverpanda.nfshare.model.TransferData;
 import com.clverpanda.nfshare.receiver.WiFiSendBroadcastReceiver;
 import com.skyfishjy.library.RippleBackground;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class WIFISendActivity extends AppCompatActivity
 {
     public static final String DATA_INFO = "com.clverpanda.nfshare.WIFISendActivity.data";
     public static final String TAG = "WIFISendActivity";
 
-    private WIFITransferData dataToSend;
+    private TransferData dataToSend;
     private WifiP2pManager mManager;
     private WifiP2pManager.Channel mChannel;
     private BroadcastReceiver receiver = null;
@@ -82,7 +81,7 @@ public class WIFISendActivity extends AppCompatActivity
 
     private void getINFO()
     {
-        dataToSend = (WIFITransferData) getIntent().getSerializableExtra(DATA_INFO);
+        dataToSend = (TransferData) getIntent().getSerializableExtra(DATA_INFO);
     }
 
     private void addFilterAction()
