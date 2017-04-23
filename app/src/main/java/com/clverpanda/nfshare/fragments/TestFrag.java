@@ -9,9 +9,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.clverpanda.nfshare.NFShareApplication;
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.WIFISendActivity;
-import com.clverpanda.nfshare.util.database.TasksDbHelper;
+import com.clverpanda.nfshare.dao.DaoSession;
+import com.clverpanda.nfshare.dao.Device;
+import com.clverpanda.nfshare.dao.Task;
+import com.clverpanda.nfshare.model.DataType;
+import com.clverpanda.nfshare.model.TaskStatus;
+
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,9 +47,12 @@ public class TestFrag extends Fragment {
             @Override
             public void onClick(View view)
             {
-                TaskInfo taskInfo = new TaskInfo("下载测试", "{\"appName\":\"百度地图\",\"appVersion\":\"9.7.5\",\"pkgName\":\"com.baidu.BaiduMap\"}", 2, "测试机", 0);
-                TasksDbHelper tasksDbHelper = new TasksDbHelper(getContext());
-                tasksDbHelper.addTaskInfo(taskInfo);
+                DaoSession daoSession = NFShareApplication.getInstance().getDaoSession();
+                Device device = new Device("测试机", "11:11:11:11:11", "");
+                long deviceId = daoSession.getDeviceDao().insert(device);
+                Task taskInfo = new Task("下载测试", "{\"appName\":\"百度地图\",\"appVersion\":\"9.7.5\",\"pkgName\":\"com.baidu.BaiduMap\"}",
+                        DataType.APP, TaskStatus.PAUSED, new Date(), deviceId);
+                daoSession.getTaskDao().insert(taskInfo);
             }
         });
 

@@ -20,8 +20,14 @@ public class TransferProgress
 
     private Long endPosition;
 
-    @ToOne
+    private Long taskId;
+    @ToOne(joinProperty = "taskId")
     private Task task;
+
+    public TransferProgress(Long transferredPosition, Long endPosition) {
+        this.transferredPosition = transferredPosition;
+        this.endPosition = endPosition;
+    }
 
     /** Used to resolve relations */
     @Generated(hash = 2040040024)
@@ -31,11 +37,12 @@ public class TransferProgress
     @Generated(hash = 1083568804)
     private transient TransferProgressDao myDao;
 
-    @Generated(hash = 900254049)
-    public TransferProgress(Long Id, Long transferredPosition, Long endPosition) {
+    @Generated(hash = 587985618)
+    public TransferProgress(Long Id, Long transferredPosition, Long endPosition, Long taskId) {
         this.Id = Id;
         this.transferredPosition = transferredPosition;
         this.endPosition = endPosition;
+        this.taskId = taskId;
     }
 
     @Generated(hash = 1487612377)
@@ -66,35 +73,35 @@ public class TransferProgress
         this.endPosition = endPosition;
     }
 
-    @Generated(hash = 524156212)
-    private transient boolean task__refreshed;
+    @Generated(hash = 100676365)
+    private transient Long task__resolvedKey;
 
     /** To-one relationship, resolved on first access. */
-    @Generated(hash = 1288792359)
+    @Generated(hash = 410192089)
     public Task getTask() {
-        if (task != null || !task__refreshed) {
+        Long __key = this.taskId;
+        if (task__resolvedKey == null || !task__resolvedKey.equals(__key)) {
+            final DaoSession daoSession = this.daoSession;
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
             TaskDao targetDao = daoSession.getTaskDao();
-            targetDao.refresh(task);
-            task__refreshed = true;
+            Task taskNew = targetDao.load(__key);
+            synchronized (this) {
+                task = taskNew;
+                task__resolvedKey = __key;
+            }
         }
         return task;
     }
 
-    /** To-one relationship, returned entity is not refreshed and may carry only the PK property. */
-    @Generated(hash = 1173059015)
-    public Task peakTask() {
-        return task;
-    }
-
     /** called by internal mechanisms, do not call yourself. */
-    @Generated(hash = 780247324)
+    @Generated(hash = 711336367)
     public void setTask(Task task) {
         synchronized (this) {
             this.task = task;
-            task__refreshed = true;
+            taskId = task == null ? null : task.getId();
+            task__resolvedKey = taskId;
         }
     }
 
@@ -132,6 +139,14 @@ public class TransferProgress
             throw new DaoException("Entity is detached from DAO context");
         }
         myDao.update(this);
+    }
+
+    public Long getTaskId() {
+        return this.taskId;
+    }
+
+    public void setTaskId(Long taskId) {
+        this.taskId = taskId;
     }
 
     /** called by internal mechanisms, do not call yourself. */

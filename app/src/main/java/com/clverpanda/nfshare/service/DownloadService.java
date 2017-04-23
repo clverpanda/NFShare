@@ -8,8 +8,12 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 
+import com.clverpanda.nfshare.NFShareApplication;
+import com.clverpanda.nfshare.dao.DaoSession;
+import com.clverpanda.nfshare.dao.Task;
+import com.clverpanda.nfshare.dao.TaskDao;
 import com.clverpanda.nfshare.model.DownloadFileInfo;
-import com.clverpanda.nfshare.util.database.TasksDbHelper;
+import com.clverpanda.nfshare.model.TaskStatus;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -52,12 +56,15 @@ public class DownloadService extends Service
     public static final String DOWNLOAD_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/";
 
     //下载任务集合
-    private Map<Integer, DownloadTask> tasks = new LinkedHashMap<>();
+    private Map<Long, DownloadTask> tasks = new LinkedHashMap<>();
+    private TaskDao taskDao;
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
+        DaoSession daoSession = NFShareApplication.getInstance().getDaoSession();
+        taskDao = daoSession.getTaskDao();
         if (ACTION_START.equals(intent.getAction()))
         {
             DownloadFileInfo fileInfo = (DownloadFileInfo) intent.getSerializableExtra("fileinfo");
@@ -84,19 +91,21 @@ public class DownloadService extends Service
         return super.onStartCommand(intent, flags, startId);
     }
 
-    protected void setStarted(int taskId)
+    protected void setStarted(long taskId)
     {
-        TasksDbHelper tasksDb = new TasksDbHelper(DownloadService.this);
-        tasksDb.setStatus(taskId, 2);
+        Task task = taskDao.load(taskId);
+        task.setStatus(TaskStatus.RUNNING);
+        taskDao.update(task);
         Intent intent = new Intent(DownloadService.ACTION_STARTED);
         intent.putExtra("id", taskId);
         sendBroadcast(intent);
     }
 
-    protected void setFailed(int taskId)
+    protected void setFailed(long taskId)
     {
-        TasksDbHelper tasksDb = new TasksDbHelper(DownloadService.this);
-        tasksDb.setStatus(taskId, -1);
+        Task task = taskDao.load(taskId);
+        task.setStatus(TaskStatus.FAILED);
+        taskDao.update(task);
         Intent intent = new Intent(DownloadService.ACTION_FAILED);
         intent.putExtra("id", taskId);
         sendBroadcast(intent);

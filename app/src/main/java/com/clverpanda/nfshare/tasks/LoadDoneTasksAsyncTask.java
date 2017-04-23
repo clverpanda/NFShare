@@ -5,8 +5,12 @@ import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.clverpanda.nfshare.NFShareApplication;
+import com.clverpanda.nfshare.dao.DaoSession;
+import com.clverpanda.nfshare.dao.Task;
+import com.clverpanda.nfshare.dao.TaskDao;
 import com.clverpanda.nfshare.fragments.taskslist.DoneRecyclerAdapter;
-import com.clverpanda.nfshare.util.database.TasksDbHelper;
+import com.clverpanda.nfshare.model.TaskStatus;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
 
@@ -16,7 +20,7 @@ import java.util.List;
  * Created by miaol on 2017/4/8 0008.
  */
 
-public class LoadDoneTasksAsyncTask extends AsyncTask<Void, Void, List<TaskInfo>>
+public class LoadDoneTasksAsyncTask extends AsyncTask<Void, Void, List<Task>>
 {
     private Context context;
     private RecyclerView recyclerView;
@@ -33,14 +37,14 @@ public class LoadDoneTasksAsyncTask extends AsyncTask<Void, Void, List<TaskInfo>
     }
 
     @Override
-    protected List<TaskInfo> doInBackground(Void... params)
+    protected List<Task> doInBackground(Void... params)
     {
-        TasksDbHelper tasksDb = new TasksDbHelper(context);
-        return tasksDb.getAllDoneTaskInfo();
+        DaoSession daoSession = NFShareApplication.getInstance().getDaoSession();
+        return daoSession.getTaskDao().queryBuilder().where(TaskDao.Properties.Status.eq(TaskStatus.DONE.getIndex())).list();
     }
 
     @Override
-    protected void onPostExecute(List<TaskInfo> result)
+    protected void onPostExecute(List<Task> result)
     {
         if (result != null)
         {

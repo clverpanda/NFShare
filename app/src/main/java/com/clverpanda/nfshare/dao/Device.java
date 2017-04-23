@@ -26,6 +26,13 @@ public class Device
 
     private String PublicKey;
 
+    public Device(String name, String wiFiMac, String publicKey)
+    {
+        Name = name;
+        WiFiMac = wiFiMac;
+        PublicKey = publicKey;
+    }
+
     @Generated(hash = 1333542263)
     public Device(Long Id, @NotNull String Name, @NotNull String WiFiMac,
             String PublicKey) {

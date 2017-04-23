@@ -5,6 +5,8 @@ import android.content.Context;
 import android.os.Build;
 import android.provider.Settings;
 
+import com.clverpanda.nfshare.dao.Device;
+
 import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.List;
@@ -31,9 +33,9 @@ public class DeviceInfoGetter
         return deviceInfoGetter;
     }
 
-    public DeviceInfo getDeviceInfo()
+    public Device getDeviceInfo()
     {
-        return new DeviceInfo(getDeviceName(), getMacAddr(), "");
+        return new Device(getDeviceName(), getMacAddr(), "");
     }
 
 

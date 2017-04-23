@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 public class DownloadFileInfo implements Serializable
 {
-    private  int id;
+    private long id;
     private String url;
     private String fileName;
     private long length;
@@ -18,7 +18,7 @@ public class DownloadFileInfo implements Serializable
     public DownloadFileInfo() {
     }
 
-    public DownloadFileInfo(int id, String url, String fileName, long length, long finish) {
+    public DownloadFileInfo(long id, String url, String fileName, long length, long finish) {
         this.id = id;
         this.url = url;
         this.fileName = fileName;
@@ -26,11 +26,11 @@ public class DownloadFileInfo implements Serializable
         this.finish = finish;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

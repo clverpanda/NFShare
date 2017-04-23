@@ -4,10 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.clverpanda.nfshare.NFShareApplication;
+import com.clverpanda.nfshare.dao.DaoSession;
+import com.clverpanda.nfshare.dao.Task;
+import com.clverpanda.nfshare.dao.TaskDao;
+import com.clverpanda.nfshare.dao.TransferProgress;
+import com.clverpanda.nfshare.dao.TransferProgressDao;
 import com.clverpanda.nfshare.model.DownloadFileInfo;
 import com.clverpanda.nfshare.model.DownloadThreadInfo;
-import com.clverpanda.nfshare.util.database.TasksDbHelper;
-import com.clverpanda.nfshare.util.database.ThreadDbHelper;
+import com.clverpanda.nfshare.model.TaskStatus;
+
 
 import java.io.File;
 import java.io.InputStream;
@@ -29,8 +35,8 @@ class DownloadTask
 {
     private Context mContext = null;
     private DownloadFileInfo mFileInfo = null;
-    private TasksDbHelper mTasksDb = null;
-    private ThreadDbHelper mThreadDb = null;
+    private TaskDao taskDao;
+    private TransferProgressDao transferProgressDao;
     private long mFinished = 0;
     boolean isPause = false;
 
@@ -38,23 +44,27 @@ class DownloadTask
     {
         this.mContext = mContext;
         this.mFileInfo = mFileInfo;
-        mThreadDb = new ThreadDbHelper(mContext);
-        mTasksDb = new TasksDbHelper(mContext);
+        DaoSession daoSession = NFShareApplication.getInstance().getDaoSession();
+        taskDao = daoSession.getTaskDao();
+        transferProgressDao = daoSession.getTransferProgressDao();
     }
 
     public void download()
     {
-        DownloadThreadInfo threadInfo = mThreadDb.getThread(mFileInfo.getId());
+        TransferProgress threadInfo = taskDao.loadDeep(mFileInfo.getId()).getTransferProgress();
         if (threadInfo == null)
         {
-            threadInfo = new DownloadThreadInfo(mFileInfo.getId(), mFileInfo.getUrl(), 0, mFileInfo.getLength(), 0);
+            threadInfo = new TransferProgress((long) 0, mFileInfo.getLength());
+            threadInfo.setTask(taskDao.load(mFileInfo.getId()));
         }
         new DownloadThread(threadInfo).start();
     }
 
-    protected void setFailed(int taskId)
+    protected void setFailed(long taskId)
     {
-        mTasksDb.setStatus(taskId, -1);
+        Task task = taskDao.load(taskId);
+        task.setStatus(TaskStatus.FAILED);
+        taskDao.update(task);
         Intent intent = new Intent(DownloadService.ACTION_FAILED);
         intent.putExtra("id", taskId);
         mContext.sendBroadcast(intent);
@@ -62,42 +72,41 @@ class DownloadTask
 
     class DownloadThread extends Thread
     {
-        private DownloadThreadInfo threadInfo;
+        private TransferProgress threadInfo;
         private OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(3, TimeUnit.SECONDS)
                 .build();
 
-        public DownloadThread(DownloadThreadInfo threadInfo) {
+        public DownloadThread(TransferProgress threadInfo) {
             this.threadInfo = threadInfo;
         }
 
         @Override
         public void run()
         {
-            Log.e("isExists==", mThreadDb.isExists(threadInfo.getId()) + "");
-            if (!mThreadDb.isExists(threadInfo.getId()))
+            Log.e("isExists==", transferProgressDao.hasKey(threadInfo) + "");
+            if (!transferProgressDao.hasKey(threadInfo))
             {
-                mThreadDb.insertThread(threadInfo);
+                transferProgressDao.insert(threadInfo);
             }
             RandomAccessFile raf;
             InputStream is;
             try {
-                URL url = new URL(threadInfo.getUrl());
+                URL url = new URL(mFileInfo.getUrl());
 
                 //设置下载位置
-                long start = threadInfo.getStart() + threadInfo.getFinish();
+                long start = threadInfo.getTransferredPosition();
                 Request request = new Request.Builder()
                         .url(url)
-                        .addHeader("Range", "bytes=" + start + "-" + threadInfo.getEnd())
+                        .addHeader("Range", "bytes=" + start + "-" + threadInfo.getEndPosition())
                         .build();
                 //设置文件写入位置
                 File file = new File(DownloadService.DOWNLOAD_PATH, mFileInfo.getFileName());
                 raf = new RandomAccessFile(file, "rwd");
                 raf.seek(start);
-                mFinished += threadInfo.getFinish();
+                mFinished += threadInfo.getTransferredPosition();
 
                 Response response = client.newCall(request).execute();
-                Log.e("threadInfo.getFinish==", threadInfo.getFinish() + "");
                 Log.e("getResponseCode ===", response.code() + "");
                 //开始下载
                 if (response.code() == HttpURLConnection.HTTP_PARTIAL)
@@ -114,8 +123,11 @@ class DownloadTask
                         if (isPause)
                         {
                             Log.e("mfinished==", mFinished + "");
-                            mThreadDb.updateThread(mFileInfo.getId(), mFinished);
-                            mTasksDb.setStatus(mFileInfo.getId(), 0);
+                            threadInfo.setTransferredPosition(mFinished);
+                            Task theTask = threadInfo.getTask();
+                            theTask.setStatus(TaskStatus.PAUSED);
+                            transferProgressDao.update(threadInfo);
+                            taskDao.update(theTask);
                             Intent intent = new Intent(DownloadService.ACTION_PAUSED);
                             intent.putExtra("id", mFileInfo.getId());
                             mContext.sendBroadcast(intent);
@@ -136,8 +148,10 @@ class DownloadTask
                         }
 
                     }
-                    mThreadDb.deleteThread(mFileInfo.getId());
-                    mTasksDb.setStatus(mFileInfo.getId(), 1);
+                    Task theTask = threadInfo.getTask();
+                    theTask.setStatus(TaskStatus.DONE);
+                    taskDao.update(theTask);
+                    transferProgressDao.delete(threadInfo);
                     Intent intent = new Intent(DownloadService.ACTION_FINISHED);
                     intent.putExtra("fileinfo", mFileInfo);
                     mContext.sendBroadcast(intent);

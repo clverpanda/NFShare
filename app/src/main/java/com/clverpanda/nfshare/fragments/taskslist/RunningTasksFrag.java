@@ -22,10 +22,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.clverpanda.nfshare.NFShareApplication;
+import com.clverpanda.nfshare.dao.DaoSession;
+import com.clverpanda.nfshare.dao.Task;
+import com.clverpanda.nfshare.dao.TaskDao;
 import com.clverpanda.nfshare.model.DownloadFileInfo;
 import com.clverpanda.nfshare.R;
+import com.clverpanda.nfshare.model.TaskStatus;
 import com.clverpanda.nfshare.service.DownloadService;
-import com.clverpanda.nfshare.util.database.TasksDbHelper;
 
 import java.util.List;
 
@@ -43,9 +47,10 @@ public class RunningTasksFrag extends Fragment {
     RecyclerView recyclerView;
 
     protected RunningRecyclerAdapter mAdapter;
-    protected TasksDbHelper tasksDb;
+    private TaskDao taskDao;
     private Context mContext;
-    private List<TaskInfo> mData;
+    private List<Task> mData;
+    private IntentFilter filter;
 
 
     public RunningTasksFrag() {
@@ -66,16 +71,17 @@ public class RunningTasksFrag extends Fragment {
         layoutManager.setOrientation(OrientationHelper.VERTICAL);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        IntentFilter filter = new IntentFilter();
+        filter = new IntentFilter();
         filter.addAction(DownloadService.ACTION_UPDATE);
         filter.addAction(DownloadService.ACTION_FINISHED);
         filter.addAction(DownloadService.ACTION_STARTED);
         filter.addAction(DownloadService.ACTION_PAUSED);
         filter.addAction(DownloadService.ACTION_FAILED);
-        getActivity().registerReceiver(mReceiver, filter);
 
-        tasksDb = new TasksDbHelper(getContext());
-        mData = tasksDb.getAllRunningTaskInfo();
+        DaoSession daoSession = ((NFShareApplication) getActivity().getApplication()).getDaoSession();
+        taskDao = daoSession.getTaskDao();
+
+        mData = taskDao.queryBuilder().where(TaskDao.Properties.Status.notEq(TaskStatus.DONE.getIndex())).list();
         mAdapter = new RunningRecyclerAdapter(getContext(), mData);
         recyclerView.setAdapter(mAdapter);
 
@@ -86,6 +92,8 @@ public class RunningTasksFrag extends Fragment {
     public void onResume()
     {
         super.onResume();
+        getActivity().registerReceiver(mReceiver, filter);
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
@@ -125,7 +133,7 @@ public class RunningTasksFrag extends Fragment {
             if (DownloadService.ACTION_UPDATE.equals(intent.getAction()))
             {
                 int finished = intent.getIntExtra("finished", 0);
-                int id = intent.getIntExtra("id", 0);
+                long id = intent.getLongExtra("id", 0);
                 Log.e(TAG, "finished==" + finished);
                 Log.e(TAG, "id==" + id);
                 mAdapter.updateProgress(id, finished);
@@ -142,17 +150,17 @@ public class RunningTasksFrag extends Fragment {
             }
             else if (DownloadService.ACTION_STARTED.equals(intent.getAction()))
             {
-                int id = intent.getIntExtra("id", 0);
+                long id = intent.getLongExtra("id", 0);
                 mAdapter.setStarted(id);
             }
             else if (DownloadService.ACTION_PAUSED.equals(intent.getAction()))
             {
-                int id = intent.getIntExtra("id", 0);
+                long id = intent.getLongExtra("id", 0);
                 mAdapter.setPaused(id);
             }
             else if (DownloadService.ACTION_FAILED.equals(intent.getAction()))
             {
-                int id = intent.getIntExtra("id", 0);
+                long id = intent.getLongExtra("id", 0);
                 mAdapter.setFailed(id);
             }
         }

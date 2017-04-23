@@ -18,10 +18,19 @@ import org.greenrobot.greendao.database.Database;
 public class NFShareApplication extends Application
 {
     private DaoSession daoSession;
+    private static NFShareApplication _instance;
+
+    public static NFShareApplication getInstance()
+    {
+        return _instance;
+    }
+
     @Override
     public void onCreate()
     {
         super.onCreate();
+
+        _instance = this;
 
         //BiliBili Boxing Initialize
         IBoxingMediaLoader loader = new ThumbnailLoader(this);

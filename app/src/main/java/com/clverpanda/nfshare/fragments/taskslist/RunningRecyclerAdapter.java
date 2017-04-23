@@ -11,10 +11,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
+import com.clverpanda.nfshare.dao.Device;
+import com.clverpanda.nfshare.dao.Task;
 import com.clverpanda.nfshare.model.AppInfo;
 import com.clverpanda.nfshare.model.DataType;
 import com.clverpanda.nfshare.model.DownloadFileInfo;
 import com.clverpanda.nfshare.R;
+import com.clverpanda.nfshare.model.TaskStatus;
 import com.clverpanda.nfshare.service.DownloadService;
 
 import java.util.List;
@@ -28,11 +31,11 @@ import butterknife.ButterKnife;
 
 public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecyclerAdapter.RunningViewHolder>
 {
-    private List<TaskInfo> mDatas;
+    private List<Task> mDatas;
     private Context mContext;
     private LayoutInflater inflater;
 
-    public RunningRecyclerAdapter(Context context, List<TaskInfo> datas)
+    public RunningRecyclerAdapter(Context context, List<Task> datas)
     {
         this.mContext = context;
         this.mDatas = datas;
@@ -48,30 +51,30 @@ public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecycler
     @Override
     public void onBindViewHolder(final RunningViewHolder holder, final int position)
     {
-        final TaskInfo theInfo = mDatas.get(position);
+        final Task theInfo = mDatas.get(position);
 
-        holder.tvTaskFrom.setText(theInfo.getFrom());
+        holder.tvTaskFrom.setText(theInfo.getOriginDevice().getName());
         holder.tvTaskName.setText(theInfo.getName());
-        holder.tvTaskType.setText(DataType.getName(theInfo.getType()));
-        int pro = (int) theInfo.getFinish();
+        holder.tvTaskType.setText(theInfo.getType().getName());
+        int pro = theInfo.getProgress();
         holder.pbDownload.setProgress(pro);
-        if (theInfo.getStatus() == 0)//暂停中的任务
+        if (theInfo.getStatus() == TaskStatus.PAUSED)//暂停中的任务
         {
             holder.imgbPause.setImageResource(R.drawable.ic_pause_clicked);
             holder.imgbStart.setImageResource(R.drawable.ic_start);
         }
-        else if (theInfo.getStatus() == 2)//进行中的任务
+        else if (theInfo.getStatus() == TaskStatus.RUNNING)//进行中的任务
         {
             holder.imgbStart.setImageResource(R.drawable.ic_start_clicked);
             holder.imgbPause.setImageResource(R.drawable.ic_pause);
         }
-        else if (theInfo.getStatus() == -1)//失败的任务
+        else if (theInfo.getStatus() == TaskStatus.FAILED)//失败的任务
         {
             holder.tvTaskFailed.setVisibility(View.VISIBLE);
             holder.imgbStart.setVisibility(View.INVISIBLE);
             holder.imgbPause.setVisibility(View.INVISIBLE);
         }
-        if (theInfo.getType() == DataType.APP.getIndex())
+        if (theInfo.getType() == DataType.APP)
         {
             AppInfo appInfo = JSON.parseObject(theInfo.getDescription(), AppInfo.class);
             final String downloadUrl = "http://www.wandoujia.com/apps/" + appInfo.getPkgName() + "/download";
@@ -80,7 +83,7 @@ public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecycler
                 @Override
                 public void onClick(View v)
                 {
-                    if (theInfo.getStatus() == 0)
+                    if (theInfo.getStatus() == TaskStatus.PAUSED)
                     {
                         Intent intent = new Intent(mContext, DownloadService.class);
                         intent.setAction(DownloadService.ACTION_START);
@@ -96,7 +99,7 @@ public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecycler
                 @Override
                 public void onClick(View v)
                 {
-                    if (theInfo.getStatus() == 2) {
+                    if (theInfo.getStatus() == TaskStatus.RUNNING) {
                         Intent intent = new Intent(mContext, DownloadService.class);
                         intent.setAction(DownloadService.ACTION_PAUSE);
                         DownloadFileInfo fileInfo = new DownloadFileInfo(theInfo.getId(), downloadUrl,
@@ -141,22 +144,22 @@ public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecycler
         }
     }
 
-    public void updateProgress(int id, long progress)
+    public void updateProgress(long id, int progress)
     {
-        for (TaskInfo taskItem : mDatas)
+        for (Task taskItem : mDatas)
         {
             if (taskItem.getId() == id)
             {
-                taskItem.setFinish(progress);
+                taskItem.setProgress(progress);
                 notifyDataSetChanged();
             }
         }
     }
 
-    public void removeTask(int id)
+    public void removeTask(long id)
     {
         int i = 0;
-        for (TaskInfo taskItem : mDatas)
+        for (Task taskItem : mDatas)
         {
             if (taskItem.getId() == id)
             {
@@ -167,45 +170,40 @@ public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecycler
         }
     }
 
-    public void setStarted(int id)
+    public void setStarted(long id)
     {
-        for (TaskInfo taskItem : mDatas)
+        for (Task taskItem : mDatas)
         {
             if (taskItem.getId() == id)
             {
-                taskItem.setStatus(2);
+                taskItem.setStatus(TaskStatus.RUNNING);
                 notifyDataSetChanged();
             }
         }
     }
 
-    public void setPaused(int id)
+    public void setPaused(long id)
     {
-        for (TaskInfo taskItem : mDatas)
+        for (Task taskItem : mDatas)
         {
             if (taskItem.getId() == id)
             {
-                taskItem.setStatus(0);
+                taskItem.setStatus(TaskStatus.PAUSED);
                 notifyDataSetChanged();
             }
         }
     }
 
-    public void setFailed(int id)
+    public void setFailed(long id)
     {
-        for (TaskInfo taskItem : mDatas)
+        for (Task taskItem : mDatas)
         {
             if (taskItem.getId() == id)
             {
-                taskItem.setStatus(-1);
+                taskItem.setStatus(TaskStatus.FAILED);
                 notifyDataSetChanged();
             }
         }
-    }
-
-    public void refreshData(int id)
-    {
-        notifyDataSetChanged();
     }
 
 }

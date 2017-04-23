@@ -15,6 +15,8 @@ import com.clverpanda.nfshare.model.DataType;
 import com.clverpanda.nfshare.R;
 
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import butterknife.BindView;
@@ -50,24 +52,25 @@ public class DoneRecyclerAdapter extends RecyclerView.Adapter<DoneRecyclerAdapte
 
         holder.tvTaskFrom.setText(theInfo.getOriginDevice().getName());
         holder.tvTaskName.setText(theInfo.getName());
-        holder.tvTaskTime.setText(theInfo.getReceiveTime());
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+        holder.tvTaskTime.setText(df.format(theInfo.getReceiveTime()));
         holder.tvTaskType.setText(theInfo.getType().getName());
         Drawable typeIcon;
         switch (theInfo.getType())
         {
-            case 1:
+            case PLAIN:
                 typeIcon = ContextCompat.getDrawable(mContext, R.drawable.ic_plain_text);
                 holder.imgTaskType.setImageDrawable(typeIcon);
                 break;
-            case 3:
+            case CONTACT:
                 typeIcon = ContextCompat.getDrawable(mContext, R.drawable.ic_contact);
                 holder.imgTaskType.setImageDrawable(typeIcon);
                 break;
-            case 4:
+            case FILE:
                 typeIcon = ContextCompat.getDrawable(mContext, R.drawable.ic_file);
                 holder.imgTaskType.setImageDrawable(typeIcon);
                 break;
-            case 5:
+            case STREAM:
                 typeIcon = ContextCompat.getDrawable(mContext, R.drawable.ic_stream);
                 holder.imgTaskType.setImageDrawable(typeIcon);
                 break;

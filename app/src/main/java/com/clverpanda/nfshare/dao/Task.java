@@ -12,6 +12,7 @@ import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.ToOne;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.DaoException;
+import org.greenrobot.greendao.annotation.Transient;
 
 import java.util.Date;
 
@@ -43,17 +44,25 @@ public class Task
     @NotNull
     private java.util.Date receiveTime;
 
-    @ToOne
+    private Long deviceId;
+    @ToOne(joinProperty = "deviceId")
     private Device originDevice;
 
-    public Task(String name, String description, DataType type, TaskStatus status, Date receiveTime, Device originDevice)
-    {
+    private Long progressId;
+    @ToOne(joinProperty = "progressId")
+    private TransferProgress transferProgress;
+
+    @Transient
+    private int progress;
+
+
+    public Task(String name, String description, DataType type, TaskStatus status, Date receiveTime, Long deviceId) {
         Name = name;
         Description = description;
         Type = type;
         Status = status;
         this.receiveTime = receiveTime;
-        this.originDevice = originDevice;
+        this.deviceId = deviceId;
     }
 
     /** Used to resolve relations */
@@ -64,16 +73,17 @@ public class Task
     @Generated(hash = 1469429066)
     private transient TaskDao myDao;
 
-    @Generated(hash = 733564585)
-    public Task(Long Id, @NotNull String Name, @NotNull String Description,
-            @NotNull DataType Type, @NotNull TaskStatus Status,
-            @NotNull java.util.Date receiveTime) {
+    @Generated(hash = 1252811447)
+    public Task(Long Id, @NotNull String Name, @NotNull String Description, @NotNull DataType Type,
+            @NotNull TaskStatus Status, @NotNull java.util.Date receiveTime, Long deviceId, Long progressId) {
         this.Id = Id;
         this.Name = Name;
         this.Description = Description;
         this.Type = Type;
         this.Status = Status;
         this.receiveTime = receiveTime;
+        this.deviceId = deviceId;
+        this.progressId = progressId;
     }
 
     @Generated(hash = 733837707)
@@ -128,35 +138,46 @@ public class Task
         this.receiveTime = receiveTime;
     }
 
-    @Generated(hash = 1453090739)
-    private transient boolean originDevice__refreshed;
+    public int getProgress() {
+        return progress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
+    }
+
+    @Generated(hash = 836965034)
+    private transient Long originDevice__resolvedKey;
+
+    @Generated(hash = 538125673)
+    private transient Long transferProgress__resolvedKey;
 
     /** To-one relationship, resolved on first access. */
-    @Generated(hash = 1598599123)
+    @Generated(hash = 1454397888)
     public Device getOriginDevice() {
-        if (originDevice != null || !originDevice__refreshed) {
+        Long __key = this.deviceId;
+        if (originDevice__resolvedKey == null || !originDevice__resolvedKey.equals(__key)) {
+            final DaoSession daoSession = this.daoSession;
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
             DeviceDao targetDao = daoSession.getDeviceDao();
-            targetDao.refresh(originDevice);
-            originDevice__refreshed = true;
+            Device originDeviceNew = targetDao.load(__key);
+            synchronized (this) {
+                originDevice = originDeviceNew;
+                originDevice__resolvedKey = __key;
+            }
         }
         return originDevice;
     }
 
-    /** To-one relationship, returned entity is not refreshed and may carry only the PK property. */
-    @Generated(hash = 917089999)
-    public Device peakOriginDevice() {
-        return originDevice;
-    }
-
     /** called by internal mechanisms, do not call yourself. */
-    @Generated(hash = 356732557)
+    @Generated(hash = 448134710)
     public void setOriginDevice(Device originDevice) {
         synchronized (this) {
             this.originDevice = originDevice;
-            originDevice__refreshed = true;
+            deviceId = originDevice == null ? null : originDevice.getId();
+            originDevice__resolvedKey = deviceId;
         }
     }
 
@@ -194,6 +215,51 @@ public class Task
             throw new DaoException("Entity is detached from DAO context");
         }
         myDao.update(this);
+    }
+
+    /** To-one relationship, resolved on first access. */
+    @Generated(hash = 294628259)
+    public TransferProgress getTransferProgress() {
+        Long __key = this.progressId;
+        if (transferProgress__resolvedKey == null || !transferProgress__resolvedKey.equals(__key)) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            TransferProgressDao targetDao = daoSession.getTransferProgressDao();
+            TransferProgress transferProgressNew = targetDao.load(__key);
+            synchronized (this) {
+                transferProgress = transferProgressNew;
+                transferProgress__resolvedKey = __key;
+            }
+        }
+        return transferProgress;
+    }
+
+    /** called by internal mechanisms, do not call yourself. */
+    @Generated(hash = 1547815997)
+    public void setTransferProgress(TransferProgress transferProgress) {
+        synchronized (this) {
+            this.transferProgress = transferProgress;
+            progressId = transferProgress == null ? null : transferProgress.getId();
+            transferProgress__resolvedKey = progressId;
+        }
+    }
+
+    public Long getDeviceId() {
+        return this.deviceId;
+    }
+
+    public void setDeviceId(Long deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public Long getProgressId() {
+        return this.progressId;
+    }
+
+    public void setProgressId(Long progressId) {
+        this.progressId = progressId;
     }
 
     /** called by internal mechanisms, do not call yourself. */

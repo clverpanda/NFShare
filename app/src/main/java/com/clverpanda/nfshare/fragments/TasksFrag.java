@@ -114,14 +114,14 @@ public class TasksFrag extends Fragment {
                     for (AppInfo appInfoItem : appInfo)
                     {
                         Task task = new Task(appInfoItem.getAppName(), JSON.toJSONString(appInfoItem),
-                                DataType.APP, TaskStatus.PAUSED, new Date(), deviceDao.load(deviceId));
+                                DataType.APP, TaskStatus.PAUSED, new Date(), deviceId);
                         taskDao.insert(task);
                     }
                     break;
                 case CONTACT:
                     ContactInfo contactInfo = JSON.parseObject(NFCData.getPayload(), ContactInfo.class);
                     Task task = new Task(contactInfo.getName(), JSON.toJSONString(contactInfo),
-                            DataType.CONTACT, TaskStatus.DONE, new Date(), deviceDao.load(deviceId));
+                            DataType.CONTACT, TaskStatus.DONE, new Date(), deviceId);
                     taskDao.insert(task);
                     Intent addIntent = new Intent(Intent.ACTION_INSERT, Uri.withAppendedPath(Uri.parse("content://com.android.contacts"), "contacts"));
                     addIntent.setType("vnd.android.cursor.dir/person");
