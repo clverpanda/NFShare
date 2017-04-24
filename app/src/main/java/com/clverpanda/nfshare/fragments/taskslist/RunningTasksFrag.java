@@ -140,7 +140,7 @@ public class RunningTasksFrag extends Fragment {
             }
             else if (DownloadService.ACTION_FINISHED.equals(intent.getAction()))
             {
-                DownloadFileInfo fileinfo = (DownloadFileInfo) intent.getSerializableExtra("fileinfo");
+                DownloadFileInfo fileinfo = intent.getParcelableExtra("fileinfo");
                 //更新进度为100
                 mAdapter.removeTask(fileinfo.getId());
                 Toast.makeText(

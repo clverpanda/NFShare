@@ -58,7 +58,16 @@ public class WiFiSendBroadcastReceiver extends BroadcastReceiver
         }
         else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action))
         {
+            if (manager == null) {
+                return;
+            }
 
+            NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
+
+            if (networkInfo.isConnected())
+            {
+                manager.requestConnectionInfo(channel, activity);
+            }
         }
         else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action))
         {

@@ -80,7 +80,7 @@ public class NFCSendActivity extends AppCompatActivity implements NfcAdapter.Cre
 
     private void getINFO()
     {
-        dataToSend = (TransferData) getIntent().getSerializableExtra(DATA_INFO);
+        dataToSend = getIntent().getParcelableExtra(DATA_INFO);
     }
 
     @Override

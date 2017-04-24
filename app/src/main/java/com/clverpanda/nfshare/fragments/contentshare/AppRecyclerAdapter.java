@@ -12,7 +12,12 @@ import android.widget.TextView;
 
 import com.clverpanda.nfshare.model.AppInfo;
 import com.clverpanda.nfshare.R;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.interfaces.SimpleDraweeControllerBuilder;
+import com.facebook.drawee.view.SimpleDraweeView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,20 +34,13 @@ public class AppRecyclerAdapter extends RecyclerView.Adapter<AppRecyclerAdapter.
     private List<AppInfo> mDatas;
     private Context mContext;
     private LayoutInflater inflater;
-    private Map<Integer, Boolean> selectMap = new HashMap<>();
+    private List<AppInfo> selectedItems = new ArrayList<>();
 
 
     public AppRecyclerAdapter(Context context, List<AppInfo> datas){
         this.mContext = context;
         this.mDatas = datas;
-        initSelectMap();
         inflater = LayoutInflater.from(mContext);
-    }
-
-    private void initSelectMap()
-    {
-        for (int i = 0; i < mDatas.size(); i++)
-            selectMap.put(i, false);
     }
 
     @Override
@@ -59,14 +57,7 @@ public class AppRecyclerAdapter extends RecyclerView.Adapter<AppRecyclerAdapter.
         holder.tvAppName.setText(theInfo.getAppName());
         holder.tvAppPkg.setText(theInfo.getPkgName());
         holder.imgAppIcon.setImageDrawable(theInfo.getAppIcon());
-        holder.cbxApp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                selectMap.put(holder.getAdapterPosition(), b);
-            }
-        });
-        if (selectMap.get(position) == null)
-            selectMap.put(position, false);
+
     }
 
     //重写onCreateViewHolder方法，返回一个自定义的ViewHolder
@@ -78,7 +69,8 @@ public class AppRecyclerAdapter extends RecyclerView.Adapter<AppRecyclerAdapter.
         return holder;
     }
 
-    class AppViewHolder extends RecyclerView.ViewHolder {
+    class AppViewHolder extends RecyclerView.ViewHolder implements CompoundButton.OnCheckedChangeListener
+    {
 
         @BindView(R.id.app_share_name)
         TextView tvAppName;
@@ -89,19 +81,25 @@ public class AppRecyclerAdapter extends RecyclerView.Adapter<AppRecyclerAdapter.
         @BindView(R.id.app_share_checkBox)
         CheckBox cbxApp;
 
-        AppViewHolder(View view) {
+        AppViewHolder(View view)
+        {
             super(view);
             ButterKnife.bind(this, view);
+            cbxApp.setOnCheckedChangeListener(this);
+        }
+
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean b)
+        {
+            if (b)
+                selectedItems.add(mDatas.get(getLayoutPosition()));
+            else
+                selectedItems.remove(mDatas.get(getLayoutPosition()));
         }
     }
 
-    public Map<Integer, Boolean> getSelectMap()
+    public List<AppInfo> getSelectedItems()
     {
-        return selectMap;
-    }
-
-    public AppInfo getItem(int position)
-    {
-        return mDatas.get(position);
+        return selectedItems;
     }
 }

@@ -3,9 +3,11 @@ package com.clverpanda.nfshare;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.clverpanda.nfshare.model.TransferData;
@@ -15,7 +17,7 @@ import com.skyfishjy.library.RippleBackground;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class WIFISendActivity extends AppCompatActivity
+public class WIFISendActivity extends AppCompatActivity implements WifiP2pManager.ConnectionInfoListener
 {
     public static final String DATA_INFO = "com.clverpanda.nfshare.WIFISendActivity.data";
     public static final String TAG = "WIFISendActivity";
@@ -28,6 +30,8 @@ public class WIFISendActivity extends AppCompatActivity
 
     @BindView(R.id.wifi_animation)
     RippleBackground rippleBackground;
+    @BindView(R.id.send_log)
+    TextView tvSendLog;
 
 
     private final IntentFilter intentFilter = new IntentFilter();
@@ -54,17 +58,16 @@ public class WIFISendActivity extends AppCompatActivity
         receiver = new WiFiSendBroadcastReceiver(mManager, mChannel, this);
         registerReceiver(receiver, intentFilter);
         mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
-
             @Override
             public void onSuccess()
             {
-                Toast.makeText(WIFISendActivity.this, "准备开始发送", Toast.LENGTH_SHORT).show();
+                tvSendLog.append("准备开始发送！\r\n");
             }
 
             @Override
             public void onFailure(int reasonCode)
             {
-                Toast.makeText(WIFISendActivity.this, "初始化发送失败！", Toast.LENGTH_SHORT).show();
+                tvSendLog.append("初始化发送失败！ \r\n");
             }
         });
         rippleBackground.startRippleAnimation();
@@ -81,7 +84,7 @@ public class WIFISendActivity extends AppCompatActivity
 
     private void getINFO()
     {
-        dataToSend = (TransferData) getIntent().getSerializableExtra(DATA_INFO);
+        dataToSend = getIntent().getParcelableExtra(DATA_INFO);
     }
 
     private void addFilterAction()
@@ -94,6 +97,22 @@ public class WIFISendActivity extends AppCompatActivity
 
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
         this.isWifiP2pEnabled = isWifiP2pEnabled;
+    }
+
+    //连接到对等点
+    @Override
+    public void onConnectionInfoAvailable(final WifiP2pInfo info)
+    {
+        String groupOwnerAddress = info.groupOwnerAddress.getHostAddress();
+        tvSendLog.append("已经连接到对方设备！\r\n");
+        if (info.groupFormed && info.isGroupOwner)
+        {
+
+        }
+        else if (info.groupFormed)
+        {
+
+        }
     }
 
 }

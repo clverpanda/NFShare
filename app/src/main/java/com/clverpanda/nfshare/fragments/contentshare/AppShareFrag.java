@@ -114,16 +114,10 @@ public class AppShareFrag extends Fragment
     {
         List<AppInfoTransfer> result = new ArrayList<>();
         AppRecyclerAdapter dataAdapter = (AppRecyclerAdapter) recyclerView.getAdapter();
-        Map<Integer, Boolean> selectMap = dataAdapter.getSelectMap();
-        for (Map.Entry<Integer, Boolean> entry : selectMap.entrySet())
+        for (AppInfo appInfo : dataAdapter.getSelectedItems())
         {
-            if (entry.getValue())
-            {
-                AppInfo appInfo = dataAdapter.getItem(entry.getKey());
-                AppInfoTransfer appInfoTransfer = new AppInfoTransfer(appInfo.getAppName(),
-                        appInfo.getPkgName(), appInfo.getAppVersion());
-                result.add(appInfoTransfer);
-            }
+            AppInfoTransfer info = new AppInfoTransfer(appInfo);
+            result.add(info);
         }
         return result;
     }

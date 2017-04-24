@@ -147,17 +147,8 @@ public class ContactShareFrag extends Fragment {
 
     public List<ContactInfo> getSelectedItems()
     {
-        List<ContactInfo> result = new ArrayList<>();
         ContactRecyclerAdapter dataAdapter = (ContactRecyclerAdapter) recyclerView.getAdapter();
-        Map<Integer, Boolean> selectMap = dataAdapter.getSelectMap();
-        for (Map.Entry<Integer, Boolean> entry : selectMap.entrySet())
-        {
-            if (entry.getValue())
-            {
-                result.add(dataAdapter.getItem(entry.getKey()));
-            }
-        }
-        return result;
+        return dataAdapter.getSelectedItems();
     }
 
 }

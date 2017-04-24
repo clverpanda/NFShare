@@ -1,11 +1,13 @@
 package com.clverpanda.nfshare.model;
 
+import java.io.Serializable;
+
 /**
  * Created by clverpanda on 2017/4/5 0005.
  * It's the file for NFShare.
  */
 
-public enum DataType
+public enum DataType implements Serializable
 {
     PLAIN("普通文本", 1), APP("应用", 2), CONTACT("联系人", 3), FILE("文件", 4), STREAM("流媒体", 5), UNKNOWN("未知", 0);
     private String name;

@@ -7,6 +7,18 @@
     tools:context="com.clverpanda.nfshare.WIFISendActivity">
 
 
+    <ProgressBar
+        android:id="@+id/send_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="35dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="@+id/wifi_animation"
+        app:layout_constraintRight_toRightOf="@+id/wifi_animation"
+        app:layout_constraintTop_toBottomOf="@+id/wifi_animation" />
 
     <com.skyfishjy.library.RippleBackground
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -36,5 +48,20 @@
 
 
     </com.skyfishjy.library.RippleBackground>
+
+    <TextView
+        android:id="@+id/send_log"
+        android:layout_width="wrap_content"
+        android:layout_height="50sp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="15dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="@+id/wifi_animation"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintLeft_toLeftOf="@+id/wifi_animation"
+        app:layout_constraintRight_toRightOf="@+id/wifi_animation" />
 
 </android.support.constraint.ConstraintLayout>

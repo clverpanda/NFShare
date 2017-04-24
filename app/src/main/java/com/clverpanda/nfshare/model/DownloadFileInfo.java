@@ -1,5 +1,8 @@
 package com.clverpanda.nfshare.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
 
 /**
@@ -7,7 +10,7 @@ import java.io.Serializable;
  * It's the file for NFShare.
  */
 
-public class DownloadFileInfo implements Serializable
+public class DownloadFileInfo implements Parcelable
 {
     private long id;
     private String url;
@@ -65,4 +68,41 @@ public class DownloadFileInfo implements Serializable
     public void setFinish(long finish) {
         this.finish = finish;
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeLong(id);
+        dest.writeString(url);
+        dest.writeString(fileName);
+        dest.writeLong(length);
+        dest.writeLong(finish);
+    }
+
+    public static final Parcelable.Creator<DownloadFileInfo> CREATOR = new Creator<DownloadFileInfo>()
+    {
+        @Override
+        public DownloadFileInfo createFromParcel(Parcel source)
+        {
+            DownloadFileInfo fileInfo = new DownloadFileInfo();
+            fileInfo.setId(source.readLong());
+            fileInfo.setUrl(source.readString());
+            fileInfo.setFileName(source.readString());
+            fileInfo.setLength(source.readLong());
+            fileInfo.setFinish(source.readLong());
+            return fileInfo;
+        }
+
+        @Override
+        public DownloadFileInfo[] newArray(int size)
+        {
+            return new DownloadFileInfo[size];
+        }
+    };
 }

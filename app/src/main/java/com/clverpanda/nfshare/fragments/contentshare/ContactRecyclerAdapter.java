@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.clverpanda.nfshare.model.ContactInfo;
 import com.clverpanda.nfshare.R;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,21 +31,14 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
     private List<ContactInfo> mDatas;
     private Context mContext;
     private LayoutInflater inflater;
-    private Map<Integer, Boolean> selectMap = new HashMap<>();
+    private List<ContactInfo> selectedItems = new ArrayList<>();
 
 
     public ContactRecyclerAdapter(Context context, List<ContactInfo> datas)
     {
         this.mContext = context;
         this.mDatas = datas;
-        initSelectMap();
         inflater = LayoutInflater.from(mContext);
-    }
-
-    private void initSelectMap()
-    {
-        for (int i = 0; i < mDatas.size(); i++)
-            selectMap.put(i, false);
     }
 
     @Override
@@ -60,14 +54,6 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
 
         holder.tvContactName.setText(theInfo.getName());
         holder.tvContactNumber.setText(theInfo.getNumber());
-        holder.cbxContact.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                selectMap.put(holder.getAdapterPosition(), b);
-            }
-        });
-        if (selectMap.get(position) == null)
-            selectMap.put(position, false);
     }
 
     @Override
@@ -78,7 +64,7 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
         return holder;
     }
 
-    class ContactViewHolder extends RecyclerView.ViewHolder
+    class ContactViewHolder extends RecyclerView.ViewHolder implements CompoundButton.OnCheckedChangeListener
     {
         @BindView(R.id.contact_share_name)
         TextView tvContactName;
@@ -94,15 +80,20 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
             super(view);
             ButterKnife.bind(this, view);
         }
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+        {
+            if (isChecked)
+            {
+                selectedItems.add(mDatas.get(getLayoutPosition()));
+            }
+            else
+            {
+                selectedItems.remove(mDatas.get(getLayoutPosition()));
+            }
+        }
     }
 
-    public Map<Integer, Boolean> getSelectMap()
-    {
-        return selectMap;
-    }
-
-    public ContactInfo getItem(int position)
-    {
-        return mDatas.get(position);
-    }
+    public List<ContactInfo> getSelectedItems() { return selectedItems; }
 }

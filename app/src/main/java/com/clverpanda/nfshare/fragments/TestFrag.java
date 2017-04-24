@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.clverpanda.nfshare.NFShareApplication;
 import com.clverpanda.nfshare.R;
@@ -29,6 +30,8 @@ public class TestFrag extends Fragment {
 
     @BindView(R.id.button)
     Button button;
+    @BindView(R.id.test_textView)
+    TextView tvTest;
 
 
 
@@ -64,6 +67,12 @@ public class TestFrag extends Fragment {
     {
         Intent intent = new Intent(getContext(), WIFISendActivity.class);
         startActivity(intent);
+    }
+
+    @OnClick(R.id.button3)
+    void button3Clicked()
+    {
+        tvTest.append("测试测试测试！\r\n");
     }
 
 }

@@ -20,6 +20,13 @@ public class AppInfoTransfer
         this.appVersion = appVersion;
     }
 
+    public AppInfoTransfer(AppInfo appInfo)
+    {
+        this.appName = appInfo.getAppName();
+        this.pkgName = appInfo.getPkgName();
+        this.appVersion = appInfo.getAppVersion();
+    }
+
     public String getAppName() {
         return appName;
     }
