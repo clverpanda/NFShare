@@ -9,6 +9,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.clverpanda.nfshare.model.AppInfo;
 import com.clverpanda.nfshare.R;
@@ -31,6 +32,8 @@ import butterknife.ButterKnife;
 
 public class AppRecyclerAdapter extends RecyclerView.Adapter<AppRecyclerAdapter.AppViewHolder>
 {
+    private static final int MAX_SELECT_COUNT = 5;
+
     private List<AppInfo> mDatas;
     private Context mContext;
     private LayoutInflater inflater;
@@ -92,7 +95,15 @@ public class AppRecyclerAdapter extends RecyclerView.Adapter<AppRecyclerAdapter.
         public void onCheckedChanged(CompoundButton compoundButton, boolean b)
         {
             if (b)
-                selectedItems.add(mDatas.get(getLayoutPosition()));
+            {
+                if (selectedItems.size() < MAX_SELECT_COUNT) {
+                    selectedItems.add(mDatas.get(getLayoutPosition()));
+                }
+                else {
+                    compoundButton.setChecked(false);
+                    Toast.makeText(mContext, "已经到达可选最大值", Toast.LENGTH_SHORT).show();
+                }
+            }
             else
                 selectedItems.remove(mDatas.get(getLayoutPosition()));
         }

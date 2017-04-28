@@ -18,6 +18,7 @@ import com.clverpanda.nfshare.dao.Device;
 import com.clverpanda.nfshare.dao.Task;
 import com.clverpanda.nfshare.model.DataType;
 import com.clverpanda.nfshare.model.TaskStatus;
+import com.hanks.htextview.evaporate.EvaporateTextView;
 
 import java.util.Date;
 
@@ -31,7 +32,7 @@ public class TestFrag extends Fragment {
     @BindView(R.id.button)
     Button button;
     @BindView(R.id.test_textView)
-    TextView tvTest;
+    EvaporateTextView tvTest;
 
 
 
@@ -72,7 +73,7 @@ public class TestFrag extends Fragment {
     @OnClick(R.id.button3)
     void button3Clicked()
     {
-        tvTest.append("测试测试测试！\r\n");
+        tvTest.animateText("asfsdfasdf");
     }
 
 }

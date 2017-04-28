@@ -9,6 +9,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.clverpanda.nfshare.model.ContactInfo;
 import com.clverpanda.nfshare.R;
@@ -28,6 +29,8 @@ import butterknife.ButterKnife;
 
 public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecyclerAdapter.ContactViewHolder>
 {
+    private static final int MAX_SELECT_COUNT = 1;
+
     private List<ContactInfo> mDatas;
     private Context mContext;
     private LayoutInflater inflater;
@@ -79,6 +82,7 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
         {
             super(view);
             ButterKnife.bind(this, view);
+            cbxContact.setOnCheckedChangeListener(this);
         }
 
         @Override
@@ -86,7 +90,13 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
         {
             if (isChecked)
             {
-                selectedItems.add(mDatas.get(getLayoutPosition()));
+                if (selectedItems.size() < MAX_SELECT_COUNT) {
+                    selectedItems.add(mDatas.get(getLayoutPosition()));
+                }
+                else {
+                    buttonView.setChecked(false);
+                    Toast.makeText(mContext, "已经到达可选最大值", Toast.LENGTH_SHORT).show();
+                }
             }
             else
             {
