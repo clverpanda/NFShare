@@ -10,6 +10,7 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -31,7 +32,9 @@ import com.skyfishjy.library.RippleBackground;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,7 +44,7 @@ import static android.os.Looper.getMainLooper;
 
 
 public class ReceiveFrag extends Fragment
-        implements WifiP2pManager.PeerListListener, WifiP2pManager.ConnectionInfoListener, RecyclerItemClickListener
+        implements WifiP2pManager.ConnectionInfoListener, RecyclerItemClickListener
 {
     public static final String TAG = "ReceiveFrag";
 
@@ -62,7 +65,7 @@ public class ReceiveFrag extends Fragment
     private List<WifiP2pDevice> peers = new ArrayList<>();
 
     private ReceiveRecyclerAdapter mAdapter;
-
+    WifiP2pDnsSdServiceRequest serviceRequest = null;
 
 
 
@@ -103,20 +106,8 @@ public class ReceiveFrag extends Fragment
     @OnClick(R.id.btn_start_search)
     void searchClicked()
     {
-        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener()
-        {
-            @Override
-            public void onSuccess()
-            {
-                Toast.makeText(getContext(), "开始搜索", Toast.LENGTH_SHORT).show();
-                rippleBackground.startRippleAnimation();
-            }
-            @Override
-            public void onFailure(int reasonCode)
-            {
-                Toast.makeText(getContext(), "开始失败", Toast.LENGTH_SHORT).show();
-            }
-        });
+        discoverService();
+        rippleBackground.startRippleAnimation();
     }
 
     private void addFilterAction()
@@ -131,32 +122,11 @@ public class ReceiveFrag extends Fragment
     @Override
     public void onConnectionInfoAvailable(final WifiP2pInfo info)
     {
-        String groupOwnerAddress = info.groupOwnerAddress.getHostAddress();
-        Toast.makeText(getContext(), "已经连接到设备，队长地址是" + groupOwnerAddress, Toast.LENGTH_SHORT).show();
-        if (info.groupFormed && info.isGroupOwner)
+        if (info.groupFormed)
         {
-
-        }
-        else if (info.groupFormed)
-        {
-
         }
     }
 
-
-
-    //搜索到对等点
-    @Override
-    public void onPeersAvailable(WifiP2pDeviceList peerList)
-    {
-        peers.clear();
-        peers.addAll(peerList.getDeviceList());
-        mAdapter.notifyDataSetChanged();
-        if (peers.size() == 0)
-        {
-            Log.d(TAG, "No devices found");
-        }
-    }
 
     @Override
     public void onItemClick(View v, int position)
@@ -165,7 +135,8 @@ public class ReceiveFrag extends Fragment
         connect(device);
     }
 
-    public void connect(WifiP2pDevice device2connect) {
+    public void connect(WifiP2pDevice device2connect)
+    {
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = device2connect.deviceAddress;
         config.wps.setup = WpsInfo.PBC;
@@ -202,6 +173,65 @@ public class ReceiveFrag extends Fragment
     {
         super.onPause();
         getActivity().unregisterReceiver(receiver);
+    }
+
+    final HashMap<String, String> buddies = new HashMap<>();
+    private void discoverService()
+    {
+        WifiP2pManager.DnsSdTxtRecordListener txtListener = new WifiP2pManager.DnsSdTxtRecordListener()
+        {
+            @Override
+            public void onDnsSdTxtRecordAvailable(String fullDomain, Map<String, String> record, WifiP2pDevice device)
+            {
+                Log.d(TAG, "DnsSdTxtRecord available -" + record.toString());
+                buddies.put(device.deviceAddress, record.get("name"));
+            }
+        };
+
+        WifiP2pManager.DnsSdServiceResponseListener servListener = new WifiP2pManager.DnsSdServiceResponseListener() {
+            @Override
+            public void onDnsSdServiceAvailable(String instanceName, String registrationType,
+                                                WifiP2pDevice resourceType)
+            {
+                resourceType.deviceName = buddies
+                        .containsKey(resourceType.deviceAddress) ? buddies
+                        .get(resourceType.deviceAddress) : resourceType.deviceName;
+                peers.add(resourceType);
+                mAdapter.notifyDataSetChanged();
+                Log.d(TAG, "onBonjourServiceAvailable " + instanceName);
+            }
+        };
+
+        mManager.setDnsSdResponseListeners(mChannel, servListener, txtListener);
+
+        serviceRequest = WifiP2pDnsSdServiceRequest.newInstance();
+        mManager.addServiceRequest(mChannel, serviceRequest,
+                new WifiP2pManager.ActionListener()
+                {
+                    @Override
+                    public void onSuccess() {
+                        Log.d(TAG, "onSuccess: added service request");
+                    }
+
+                    @Override
+                    public void onFailure(int code) {
+                        Log.e(TAG, "onFailure: add service request");
+                    }
+                });
+
+        mManager.discoverServices(mChannel, new WifiP2pManager.ActionListener()
+        {
+            @Override
+            public void onSuccess()
+            {
+                Log.d(TAG, "onSuccess: discover services");
+            }
+
+            @Override
+            public void onFailure(int code) {
+                Log.e(TAG, "onFailure: discover services");
+            }
+        });
     }
 
 }

@@ -2,26 +2,22 @@ package com.clverpanda.nfshare;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.nsd.NsdManager;
-import android.net.nsd.NsdServiceInfo;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.clverpanda.nfshare.model.TransferData;
 import com.clverpanda.nfshare.receiver.WiFiSendBroadcastReceiver;
+import com.clverpanda.nfshare.service.HttpService;
 import com.hanks.htextview.evaporate.EvaporateTextView;
 import com.skyfishjy.library.RippleBackground;
 
-import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +43,7 @@ public class WIFISendActivity extends AppCompatActivity implements WifiP2pManage
     private boolean isWifiP2pEnabled = false;
 
     private ServerSocket mServerSocket;
-    private int mLocalPort;
+    private int mLocalPort = 8080;
     private NsdManager.RegistrationListener mRegistrationListener;
     private String mServiceName;
     private NsdManager mNsdManager;
@@ -81,19 +77,7 @@ public class WIFISendActivity extends AppCompatActivity implements WifiP2pManage
         super.onResume();
         receiver = new WiFiSendBroadcastReceiver(mManager, mChannel, this);
         registerReceiver(receiver, intentFilter);
-        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess()
-            {
-                tvLog.animateText("准备开始发送");
-            }
-
-            @Override
-            public void onFailure(int reasonCode)
-            {
-                tvLog.animateText("初始化发送失败！");
-            }
-        });
+        startServiceRegistration();
         rippleBackground.startRippleAnimation();
     }
 
@@ -102,6 +86,18 @@ public class WIFISendActivity extends AppCompatActivity implements WifiP2pManage
     {
         super.onPause();
         unregisterReceiver(receiver);
+        mManager.clearLocalServices(mChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess()
+            {
+                Log.d(TAG, "onSuccess: 成功清理服务");
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Log.e(TAG, "onFailure: 清理服务失败");
+            }
+        });
         rippleBackground.stopRippleAnimation();
     }
 
@@ -127,21 +123,17 @@ public class WIFISendActivity extends AppCompatActivity implements WifiP2pManage
     @Override
     public void onConnectionInfoAvailable(final WifiP2pInfo info)
     {
-        String groupOwnerAddress = info.groupOwnerAddress.getHostAddress();
         tvLog.animateText("已经连接到接收设备");
-        if (info.groupFormed && info.isGroupOwner)
+        if (info.groupFormed)
         {
-
-        }
-        else if (info.groupFormed)
-        {
-
+            Intent intent = new Intent(this, HttpService.class);
+            startService(intent);
         }
     }
 
-    private void startRegistration()
+    private void startServiceRegistration()
     {
-        initializeServerSocket();
+
         Map<String, String> record = new HashMap<>();
         record.put(KEY_PORT, String.valueOf(mLocalPort));
         record.put(KEY_NAME, "NFShare_FileShare_service");
@@ -163,19 +155,6 @@ public class WIFISendActivity extends AppCompatActivity implements WifiP2pManage
                 Log.e(TAG, "onFailure: local service not added");
             }
         });
-    }
-
-    public void initializeServerSocket()
-    {
-        try
-        {
-            mServerSocket = new ServerSocket(0);
-            mLocalPort = mServerSocket.getLocalPort();
-        }
-        catch (IOException e)
-        {
-            Log.e(TAG, "initializeServerSocket: failed", e);
-        }
     }
 
 }

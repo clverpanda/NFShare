@@ -50,6 +50,6 @@ dependencies {
     compile 'com.facebook.fresco:animated-gif:1.2.0'
     compile 'com.github.GoodieBag:Pinview:v1.3'
     compile 'org.greenrobot:greendao:3.2.2'
-    compile "com.hanks:htextview-base:0.1.1"
-    compile "com.hanks:htextview-evaporate:0.1.1"
+    compile 'com.hanks:htextview-base:0.1.1'
+    compile 'com.hanks:htextview-evaporate:0.1.1'
 }
