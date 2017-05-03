@@ -25,20 +25,33 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
+import com.clverpanda.nfshare.NFShareApplication;
 import com.clverpanda.nfshare.R;
+import com.clverpanda.nfshare.WIFISendActivity;
+import com.clverpanda.nfshare.dao.DaoSession;
+import com.clverpanda.nfshare.model.TransferData;
 import com.clverpanda.nfshare.receiver.WiFiReceiveBroadcastReceiver;
 import com.clverpanda.nfshare.widget.RecyclerItemClickListener;
 import com.skyfishjy.library.RippleBackground;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import static android.os.Looper.getMainLooper;
 
@@ -64,6 +77,7 @@ public class ReceiveFrag extends Fragment
     private final IntentFilter intentFilter = new IntentFilter();
     private List<WifiP2pDevice> peers = new ArrayList<>();
 
+    private int mServerPort = 0;
     private ReceiveRecyclerAdapter mAdapter;
     WifiP2pDnsSdServiceRequest serviceRequest = null;
 
@@ -122,8 +136,39 @@ public class ReceiveFrag extends Fragment
     @Override
     public void onConnectionInfoAvailable(final WifiP2pInfo info)
     {
+        String ownerIP = info.groupOwnerAddress.getHostAddress();
+        String rawUrl = "http://" + ownerIP + ":" + mServerPort;
+        final String infoUrl = rawUrl + "/getInfo";
+        final String fileUrl = rawUrl + "/getFile";
         if (info.groupFormed)
         {
+            new Thread(new Runnable() {
+                @Override
+                public void run()
+                {
+                    OkHttpClient client = new OkHttpClient.Builder()
+                            .connectTimeout(3, TimeUnit.SECONDS)
+                            .build();
+                    try {
+                    URL url = new URL(infoUrl);
+                    Request request = new Request.Builder().url(url).build();
+                        Response response = client.newCall(request).execute();
+                        if (response.isSuccessful())
+                        {
+                            Log.d(TAG, "run: 服务器连接成功");
+                            String result = response.body().string();
+                            Log.d(TAG, "run: " + result);
+                            TransferData resultData = JSON.parseObject(result, TransferData.class);
+                            DaoSession daoSession = NFShareApplication.getInstance().getDaoSession();
+
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        Log.e(TAG, "run: ", e);
+                    }
+                }
+            }).start();
         }
     }
 
@@ -135,7 +180,7 @@ public class ReceiveFrag extends Fragment
         connect(device);
     }
 
-    public void connect(WifiP2pDevice device2connect)
+    public void connect(final WifiP2pDevice device2connect)
     {
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = device2connect.deviceAddress;
@@ -144,7 +189,9 @@ public class ReceiveFrag extends Fragment
         mManager.connect(mChannel, config, new WifiP2pManager.ActionListener()
         {
             @Override
-            public void onSuccess() {
+            public void onSuccess()
+            {
+                mServerPort = Integer.parseInt(ports.get(device2connect.deviceAddress));
             }
 
             @Override
@@ -176,6 +223,7 @@ public class ReceiveFrag extends Fragment
     }
 
     final HashMap<String, String> buddies = new HashMap<>();
+    final HashMap<String, String> ports = new HashMap<>();
     private void discoverService()
     {
         WifiP2pManager.DnsSdTxtRecordListener txtListener = new WifiP2pManager.DnsSdTxtRecordListener()
@@ -184,7 +232,8 @@ public class ReceiveFrag extends Fragment
             public void onDnsSdTxtRecordAvailable(String fullDomain, Map<String, String> record, WifiP2pDevice device)
             {
                 Log.d(TAG, "DnsSdTxtRecord available -" + record.toString());
-                buddies.put(device.deviceAddress, record.get("buddyname"));
+                buddies.put(device.deviceAddress, record.get(WIFISendActivity.KEY_NAME));
+                ports.put(device.deviceAddress, record.get(WIFISendActivity.KEY_PORT));
             }
         };
 

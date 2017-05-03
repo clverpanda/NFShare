@@ -79,6 +79,7 @@ public class WIFISendActivity extends AppCompatActivity implements WifiP2pManage
         registerReceiver(receiver, intentFilter);
         registerReceiver(httpReceiver, httpFilter);
         Intent intent = new Intent(this, HttpService.class);
+        intent.putExtra(HttpService.HTTP_SHARE_FILEINFO, dataToSend);
         startService(intent);
         mManager.removeGroup(mChannel, null);
 

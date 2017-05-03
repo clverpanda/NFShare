@@ -122,7 +122,7 @@ public class ResourceFrag extends Fragment
                     final ArrayList<BaseMedia> videoMedias = Boxing.getResult(data);
                     BaseMedia videoMedia = videoMedias.get(0);
                     mSelectedFilePath = videoMedia.getPath();
-                    mSelectedFileType = DataType.STREAM;
+                    mSelectedFileType = DataType.FILE;
                     tvFileName.setText(FileUtil.getFileNameFromPath(mSelectedFilePath));
                     BoxingMediaLoader.getInstance().displayThumbnail(imgPreview, mSelectedFilePath, 300, 300);
                     Log.e("ResourceShare", "选择了视频: " + mSelectedFilePath);

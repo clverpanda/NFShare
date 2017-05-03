@@ -2,6 +2,10 @@ package com.clverpanda.nfshare.webserver;
 
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+import com.clverpanda.nfshare.model.FileInfo;
+import com.clverpanda.nfshare.model.TransferData;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,6 +44,8 @@ public class HttpFileServer extends NanoHTTPD
 {
     public static final String TAG = "HttpFileServer";
     private File mSharedFile;
+    private TransferData mSharedFileInfo;
+    private boolean needAuth = false;
 
     public HttpFileServer(int port)
     {
@@ -52,14 +58,36 @@ public class HttpFileServer extends NanoHTTPD
         this.mSharedFile = file;
     }
 
+    public HttpFileServer(int port, TransferData fileData)
+    {
+        super(port);
+        mSharedFileInfo = fileData;
+        FileInfo fileInfo = JSON.parseObject(fileData.getPayload(), FileInfo.class);
+        mSharedFile = new File(fileInfo.getFilePath());
+    }
+
+    public HttpFileServer(int port, TransferData fileData, boolean needAuth)
+    {
+        super(port);
+        mSharedFileInfo = fileData;
+        FileInfo fileInfo = JSON.parseObject(fileData.getPayload(), FileInfo.class);
+        mSharedFile = new File(fileInfo.getFilePath());
+        this.needAuth = needAuth;
+    }
+
     @Override
     public Response serve(IHTTPSession session)
     {
         Map<String, String> header = session.getHeaders();
         Map<String, String> parms = session.getParms();
         String uri = session.getUri();
-        Log.d(TAG, "serve: " + uri);
-        return newFixedLengthResponse(Status.OK, "text/html", "HelloWorld");
+        Log.d(TAG, "serve: 服务器获得了：" + uri);
+        if ("/getInfo".equals(uri))
+            return newFixedLengthResponse(Status.OK, "text/json", JSON.toJSONString(mSharedFileInfo));
+        else if ("/getFile".equals(uri)) {
+            return serveFile(uri, header, mSharedFile, null);
+        }
+        return newFixedLengthResponse(Status.OK, "text/html", "Nothing here!");
     }
 
 

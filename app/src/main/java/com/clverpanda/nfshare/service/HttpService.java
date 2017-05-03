@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.clverpanda.nfshare.model.TransferData;
 import com.clverpanda.nfshare.webserver.HttpFileServer;
 
 import java.io.File;
@@ -18,7 +19,7 @@ import java.net.ServerSocket;
 
 public class HttpService extends Service
 {
-    public static final String HTTP_SHARE_FILEPATH = "HTTP_SHARE_FILEPATH";
+    public static final String HTTP_SHARE_FILEINFO = "HTTP_SHARE_FILEINFO";
     public static final String ACTION_SERVER_CREATED = "ACTION_SERVER_CREATED";
 
     public static final String TAG = "HttpService";
@@ -28,8 +29,7 @@ public class HttpService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        //String filePath2Supply = intent.getStringExtra(HTTP_SHARE_FILEPATH);
-        //mHttpServer = new HttpFileServer(8080, new File(filePath2Supply));
+        TransferData fileData = intent.getParcelableExtra(HTTP_SHARE_FILEINFO);
         int thePort = 8080;
         try {
             ServerSocket testSocket = new ServerSocket(0);
@@ -45,7 +45,7 @@ public class HttpService extends Service
         {
             try
             {
-                mHttpServer = new HttpFileServer(thePort);
+                mHttpServer = new HttpFileServer(thePort, fileData);
                 mHttpServer.start();
                 Log.d(TAG, "httpserver创建成功，端口号：" + thePort);
                 sendServerCreatedBroadcast(thePort);
