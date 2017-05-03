@@ -65,6 +65,7 @@
         </activity>
 
         <service android:name=".service.DownloadService" />
+        <service android:name=".service.HttpService" />
 
         <activity
             android:name=".WIFISendActivity"

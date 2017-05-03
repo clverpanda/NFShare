@@ -9,6 +9,7 @@ import com.clverpanda.nfshare.webserver.HttpFileServer;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ServerSocket;
 
 /**
  * Created by clverpanda on 2017/5/2 0002.
@@ -17,7 +18,8 @@ import java.io.IOException;
 
 public class HttpService extends Service
 {
-    public static final String HTTP_SHARE_FILEPATH = "http_share_filepath";
+    public static final String HTTP_SHARE_FILEPATH = "HTTP_SHARE_FILEPATH";
+    public static final String ACTION_SERVER_CREATED = "ACTION_SERVER_CREATED";
 
     public static final String TAG = "HttpService";
 
@@ -28,16 +30,39 @@ public class HttpService extends Service
     {
         //String filePath2Supply = intent.getStringExtra(HTTP_SHARE_FILEPATH);
         //mHttpServer = new HttpFileServer(8080, new File(filePath2Supply));
-        mHttpServer = new HttpFileServer(8080);
-        try
-        {
-            mHttpServer.start();
+        int thePort = 8080;
+        try {
+            ServerSocket testSocket = new ServerSocket(0);
+            thePort = testSocket.getLocalPort();
+            testSocket.close();
         }
-        catch (IOException ex)
+        catch (IOException e)
         {
-            Log.e(TAG, "onStartCommand: ", ex);
+            Log.e(TAG, "onStartCommand: ", e);
+        }
+
+        while(thePort <= 65535)
+        {
+            try
+            {
+                mHttpServer = new HttpFileServer(thePort);
+                mHttpServer.start();
+                Log.d(TAG, "httpserver创建成功，端口号：" + thePort);
+                sendServerCreatedBroadcast(thePort);
+                break;
+            } catch (IOException ex) {
+                thePort += 1;
+                Log.e(TAG, "httpserver创建失败，重试中...");
+            }
         }
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    protected void sendServerCreatedBroadcast(int port)
+    {
+        Intent intent = new Intent(HttpService.ACTION_SERVER_CREATED);
+        intent.putExtra("port", port);
+        sendBroadcast(intent);
     }
 
     @Override

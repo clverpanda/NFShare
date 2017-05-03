@@ -1,5 +1,7 @@
 package com.clverpanda.nfshare.webserver;
 
+import android.util.Log;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,6 +38,7 @@ import static org.nanohttpd.protocols.http.response.Response.newFixedLengthRespo
 
 public class HttpFileServer extends NanoHTTPD
 {
+    public static final String TAG = "HttpFileServer";
     private File mSharedFile;
 
     public HttpFileServer(int port)
@@ -55,6 +58,7 @@ public class HttpFileServer extends NanoHTTPD
         Map<String, String> header = session.getHeaders();
         Map<String, String> parms = session.getParms();
         String uri = session.getUri();
+        Log.d(TAG, "serve: " + uri);
         return newFixedLengthResponse(Status.OK, "text/html", "HelloWorld");
     }
 

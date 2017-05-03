@@ -184,7 +184,7 @@ public class ReceiveFrag extends Fragment
             public void onDnsSdTxtRecordAvailable(String fullDomain, Map<String, String> record, WifiP2pDevice device)
             {
                 Log.d(TAG, "DnsSdTxtRecord available -" + record.toString());
-                buddies.put(device.deviceAddress, record.get("name"));
+                buddies.put(device.deviceAddress, record.get("buddyname"));
             }
         };
 
@@ -193,7 +193,7 @@ public class ReceiveFrag extends Fragment
             public void onDnsSdServiceAvailable(String instanceName, String registrationType,
                                                 WifiP2pDevice resourceType)
             {
-                resourceType.deviceName = buddies
+                resourceType.secondaryDeviceType = buddies
                         .containsKey(resourceType.deviceAddress) ? buddies
                         .get(resourceType.deviceAddress) : resourceType.deviceName;
                 peers.add(resourceType);

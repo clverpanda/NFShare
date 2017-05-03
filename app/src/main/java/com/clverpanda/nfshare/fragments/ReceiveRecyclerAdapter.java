@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
@@ -47,6 +48,8 @@ public class ReceiveRecyclerAdapter extends RecyclerView.Adapter<ReceiveRecycler
 
         holder.tvDeviceName.setText(theDevice.deviceName);
         holder.tvDeviceMac.setText(theDevice.deviceAddress);
+        holder.tvFileType.setText(theDevice.secondaryDeviceType);
+        holder.tvFileType.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -69,6 +72,9 @@ public class ReceiveRecyclerAdapter extends RecyclerView.Adapter<ReceiveRecycler
         TextView tvDeviceName;
         @BindView(R.id.devices_mac)
         TextView tvDeviceMac;
+        @BindView(R.id.file_type)
+        TextView tvFileType;
+
         private RecyclerItemClickListener mListener;
 
         ReceiveViewHolder(View view, RecyclerItemClickListener listener)
