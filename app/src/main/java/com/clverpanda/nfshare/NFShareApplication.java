@@ -1,6 +1,8 @@
 package com.clverpanda.nfshare;
 
 import android.app.Application;
+import android.content.Context;
+import android.net.wifi.p2p.WifiP2pManager;
 
 import com.bilibili.boxing.BoxingCrop;
 import com.bilibili.boxing.BoxingMediaLoader;
@@ -40,6 +42,16 @@ public class NFShareApplication extends Application
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "NFShare-db");
         Database db = helper.getWritableDb();
         daoSession = new DaoMaster(db).newSession();
+    }
+
+    //终止时关闭p2p连接
+    @Override
+    public void onTerminate()
+    {
+        WifiP2pManager p2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        WifiP2pManager.Channel channel = p2pManager.initialize(this, getMainLooper(), null);
+        p2pManager.removeGroup(channel, null);
+        super.onTerminate();
     }
 
     public DaoSession getDaoSession() { return daoSession; }

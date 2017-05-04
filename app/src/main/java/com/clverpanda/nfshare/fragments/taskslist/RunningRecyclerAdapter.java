@@ -17,6 +17,7 @@ import com.clverpanda.nfshare.model.AppInfo;
 import com.clverpanda.nfshare.model.DataType;
 import com.clverpanda.nfshare.model.DownloadFileInfo;
 import com.clverpanda.nfshare.R;
+import com.clverpanda.nfshare.model.FileInfo;
 import com.clverpanda.nfshare.model.TaskStatus;
 import com.clverpanda.nfshare.service.DownloadService;
 
@@ -89,7 +90,7 @@ public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecycler
                         intent.setAction(DownloadService.ACTION_START);
                         DownloadFileInfo fileInfo = new DownloadFileInfo(theInfo.getId(), downloadUrl,
                                 fileName, 0, 0);
-                        intent.putExtra("fileinfo", fileInfo);
+                        intent.putExtra(DownloadService.DOWNLOAD_FILE_INFO, fileInfo);
                         mContext.startService(intent);
                     }
                 }
@@ -104,9 +105,26 @@ public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecycler
                         intent.setAction(DownloadService.ACTION_PAUSE);
                         DownloadFileInfo fileInfo = new DownloadFileInfo(theInfo.getId(), downloadUrl,
                                 fileName, 0, 0);
-                        intent.putExtra("fileinfo", fileInfo);
+                        intent.putExtra(DownloadService.DOWNLOAD_FILE_INFO, fileInfo);
                         mContext.startService(intent);
                     }
+                }
+            });
+        }
+        else if (theInfo.getType() == DataType.FILE)
+        {
+            FileInfo fileInfo = JSON.parseObject(theInfo.getDescription(), FileInfo.class);
+            final String downloadUrl = fileInfo.getDownloadUrl();
+            final String fileName = fileInfo.getFileName();
+            holder.imgbStart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mContext, DownloadService.class);
+                    intent.setAction(DownloadService.ACTION_START);
+                    DownloadFileInfo fileInfo = new DownloadFileInfo(theInfo.getId(), downloadUrl,
+                            fileName, 0, 0);
+                    intent.putExtra(DownloadService.DOWNLOAD_FILE_INFO, fileInfo);
+                    mContext.startService(intent);
                 }
             });
         }

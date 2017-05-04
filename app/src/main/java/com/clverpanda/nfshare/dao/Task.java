@@ -25,7 +25,7 @@ import java.util.Date;
 public class Task
 {
     @Id(autoincrement = true)
-    private long Id;
+    private Long Id;
 
     @NotNull
     private String Name;
@@ -73,8 +73,8 @@ public class Task
     @Generated(hash = 1469429066)
     private transient TaskDao myDao;
 
-    @Generated(hash = 2144104655)
-    public Task(long Id, @NotNull String Name, @NotNull String Description, @NotNull DataType Type,
+    @Generated(hash = 1252811447)
+    public Task(Long Id, @NotNull String Name, @NotNull String Description, @NotNull DataType Type,
             @NotNull TaskStatus Status, @NotNull java.util.Date receiveTime, Long deviceId, Long progressId) {
         this.Id = Id;
         this.Name = Name;

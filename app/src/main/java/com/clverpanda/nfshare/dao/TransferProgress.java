@@ -14,7 +14,7 @@ import org.greenrobot.greendao.DaoException;
 public class TransferProgress
 {
     @Id(autoincrement = true)
-    private long Id;
+    private Long Id;
 
     private Long transferredPosition;
 
@@ -37,8 +37,8 @@ public class TransferProgress
     @Generated(hash = 1083568804)
     private transient TransferProgressDao myDao;
 
-    @Generated(hash = 1452349281)
-    public TransferProgress(long Id, Long transferredPosition, Long endPosition, Long taskId) {
+    @Generated(hash = 587985618)
+    public TransferProgress(Long Id, Long transferredPosition, Long endPosition, Long taskId) {
         this.Id = Id;
         this.transferredPosition = transferredPosition;
         this.endPosition = endPosition;

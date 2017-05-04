@@ -52,6 +52,8 @@ public class DownloadService extends Service
     public static final String ACTION_PAUSED = "ACTION_PAUSED";
     public static final String ACTION_PAUSE_ALL = "ACTION_PAUSE_ALL";
     public static final String ACTION_FAILED = "ACTION_FAILED";
+
+    public static final String DOWNLOAD_FILE_INFO = "DOWNLOAD_FILE_INFO";
     //下载路径
     public static final String DOWNLOAD_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/";
 
@@ -67,7 +69,7 @@ public class DownloadService extends Service
         taskDao = daoSession.getTaskDao();
         if (ACTION_START.equals(intent.getAction()))
         {
-            DownloadFileInfo fileInfo = (DownloadFileInfo) intent.getSerializableExtra("fileinfo");
+            DownloadFileInfo fileInfo = intent.getParcelableExtra(DOWNLOAD_FILE_INFO);
             if (tasks.containsKey(fileInfo.getId()))
             {
                 if (!tasks.get(fileInfo.getId()).isPause)
@@ -79,7 +81,7 @@ public class DownloadService extends Service
         }
         else if (ACTION_PAUSE.equals(intent.getAction()))
         {
-            DownloadFileInfo fileInfo = (DownloadFileInfo) intent.getSerializableExtra("fileinfo");
+            DownloadFileInfo fileInfo = intent.getParcelableExtra(DOWNLOAD_FILE_INFO);
             Log.e(TAG, "onStartCommand:ACTION_PAUSE- " + fileInfo.toString());
             DownloadTask task = tasks.get(fileInfo.getId());
             if (task != null)

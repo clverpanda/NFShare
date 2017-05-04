@@ -19,7 +19,7 @@ import org.greenrobot.greendao.annotation.Generated;
 public class Device implements Parcelable
 {
     @Id(autoincrement = true)
-    private long Id;
+    private Long Id;
 
     @NotNull
     private String Name;
@@ -37,8 +37,8 @@ public class Device implements Parcelable
         PublicKey = publicKey;
     }
 
-    @Generated(hash = 529381642)
-    public Device(long Id, @NotNull String Name, @NotNull String WiFiMac,
+    @Generated(hash = 1333542263)
+    public Device(Long Id, @NotNull String Name, @NotNull String WiFiMac,
             String PublicKey) {
         this.Id = Id;
         this.Name = Name;
@@ -89,7 +89,7 @@ public class Device implements Parcelable
     @Override
     public void writeToParcel(Parcel dest, int flags)
     {
-        dest.writeLong(Id);
+        dest.writeSerializable(Id);
         dest.writeString(Name);
         dest.writeString(WiFiMac);
         dest.writeString(PublicKey);
@@ -103,7 +103,7 @@ public class Device implements Parcelable
         public Device createFromParcel(Parcel source)
         {
             Device device = new Device();
-            device.setId(source.readLong());
+            device.setId((Long) source.readSerializable());
             device.setName(source.readString());
             device.setWiFiMac(source.readString());
             device.setPublicKey(source.readString());

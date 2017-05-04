@@ -11,6 +11,7 @@ public class FileInfo
     private String filePath;
     private long space;
     private String hashStr;
+    private String downloadUrl;
 
     public FileInfo() {
     }
@@ -58,5 +59,13 @@ public class FileInfo
 
     public void setHashStr(String hashStr) {
         this.hashStr = hashStr;
+    }
+
+    public String getDownloadUrl() {
+        return downloadUrl;
+    }
+
+    public void setDownloadUrl(String downloadUrl) {
+        this.downloadUrl = downloadUrl;
     }
 }

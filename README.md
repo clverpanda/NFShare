@@ -18,7 +18,7 @@
 
 ### 功能
 - [x] NFC传输
-- [ ] WIFI DIRECT传输
+- [x] WIFI DIRECT传输
 - [ ] 传输加密
 - [x] 分享应用的下载
 

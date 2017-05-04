@@ -54,7 +54,7 @@ class DownloadTask
         TransferProgress threadInfo = taskDao.loadDeep(mFileInfo.getId()).getTransferProgress();
         if (threadInfo == null)
         {
-            threadInfo = new TransferProgress((long) 0, mFileInfo.getLength());
+            threadInfo = new TransferProgress((long) 0, mFileInfo.getLength() - 1);
             threadInfo.setTask(taskDao.load(mFileInfo.getId()));
         }
         new DownloadThread(threadInfo).start();

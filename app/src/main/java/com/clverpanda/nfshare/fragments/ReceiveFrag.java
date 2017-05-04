@@ -30,6 +30,11 @@ import com.clverpanda.nfshare.NFShareApplication;
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.WIFISendActivity;
 import com.clverpanda.nfshare.dao.DaoSession;
+import com.clverpanda.nfshare.dao.Device;
+import com.clverpanda.nfshare.dao.Task;
+import com.clverpanda.nfshare.model.DataType;
+import com.clverpanda.nfshare.model.FileInfo;
+import com.clverpanda.nfshare.model.TaskStatus;
 import com.clverpanda.nfshare.model.TransferData;
 import com.clverpanda.nfshare.receiver.WiFiReceiveBroadcastReceiver;
 import com.clverpanda.nfshare.widget.RecyclerItemClickListener;
@@ -41,6 +46,7 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -159,8 +165,13 @@ public class ReceiveFrag extends Fragment
                             String result = response.body().string();
                             Log.d(TAG, "run: " + result);
                             TransferData resultData = JSON.parseObject(result, TransferData.class);
+                            FileInfo fileInfo = JSON.parseObject(resultData.getPayload(), FileInfo.class);
+                            fileInfo.setDownloadUrl(fileUrl);
                             DaoSession daoSession = NFShareApplication.getInstance().getDaoSession();
-
+                            long deviceId = daoSession.getDeviceDao().insertOrReplace(resultData.getDevice());
+                            Task task2Add = new Task(fileInfo.getFileName(), JSON.toJSONString(fileInfo), resultData.getDataType(), TaskStatus.PAUSED,
+                                    new Date(), deviceId);
+                            daoSession.getTaskDao().insert(task2Add);
                         }
                     }
                     catch (IOException e)
@@ -185,6 +196,8 @@ public class ReceiveFrag extends Fragment
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = device2connect.deviceAddress;
         config.wps.setup = WpsInfo.PBC;
+        mManager.cancelConnect(mChannel, null);
+        mManager.removeGroup(mChannel, null);
 
         mManager.connect(mChannel, config, new WifiP2pManager.ActionListener()
         {
