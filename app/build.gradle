@@ -2,6 +2,14 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
 
 android {
+    //为了解决部分第三方库重复打包了META-INF的问题
+    packagingOptions{
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+    lintOptions {
+        abortOnError false
+    }
     signingConfigs {
     }
     compileSdkVersion 25
@@ -52,4 +60,14 @@ dependencies {
     compile 'org.greenrobot:greendao:3.2.2'
     compile 'com.hanks:htextview-base:0.1.1'
     compile 'com.hanks:htextview-evaporate:0.1.1'
+    // LeanCloud 基础包
+    compile ('cn.leancloud.android:avoscloud-sdk:v3.+')
+    // 推送与实时聊天需要的包
+    compile ('cn.leancloud.android:avoscloud-push:v3.+@aar'){transitive = true}
+    // LeanCloud 统计包
+    compile ('cn.leancloud.android:avoscloud-statistics:v3.+')
+    // LeanCloud 用户反馈包
+    compile ('cn.leancloud.android:avoscloud-feedback:v3.+@aar')
+    // Tencent对象存储sdk
+    compile 'com.tencent.cos:cos:4.3.2@aar'
 }

@@ -4,6 +4,11 @@ import android.app.Application;
 import android.content.Context;
 import android.net.wifi.p2p.WifiP2pManager;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVInstallation;
+import com.avos.avoscloud.AVOSCloud;
+import com.avos.avoscloud.PushService;
+import com.avos.avoscloud.SaveCallback;
 import com.bilibili.boxing.BoxingCrop;
 import com.bilibili.boxing.BoxingMediaLoader;
 import com.bilibili.boxing.loader.IBoxingMediaLoader;
@@ -31,6 +36,14 @@ public class NFShareApplication extends Application
     public void onCreate()
     {
         super.onCreate();
+
+        //TencenCloud Initialize
+        AVOSCloud.initialize(this, "4pg1MkOjOpccIENtzRijjjd3-9Nh9j0Va", "Sp4SdCvYaXtzbafMufLC5IzT");
+        //log开关
+        AVOSCloud.setDebugLogEnabled(true);
+
+        AVInstallation.getCurrentInstallation().saveInBackground();
+        PushService.setDefaultPushCallback(this, MainActivity.class);
 
         _instance = this;
 
