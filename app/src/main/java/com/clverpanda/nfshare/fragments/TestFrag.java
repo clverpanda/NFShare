@@ -4,12 +4,14 @@ package com.clverpanda.nfshare.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
 import com.clverpanda.nfshare.NFShareApplication;
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.WIFISendActivity;
@@ -18,13 +20,24 @@ import com.clverpanda.nfshare.dao.Device;
 import com.clverpanda.nfshare.dao.Task;
 import com.clverpanda.nfshare.model.DataType;
 import com.clverpanda.nfshare.model.TaskStatus;
+import com.clverpanda.nfshare.model.communicate.StartShareInfo;
+import com.clverpanda.nfshare.util.PropertiesGetter;
 import com.hanks.htextview.evaporate.EvaporateTextView;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 
 public class TestFrag extends Fragment {
@@ -33,6 +46,8 @@ public class TestFrag extends Fragment {
     Button button;
     @BindView(R.id.test_textView)
     EvaporateTextView tvTest;
+
+    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
 
 
@@ -74,6 +89,38 @@ public class TestFrag extends Fragment {
     void button3Clicked()
     {
         tvTest.animateText("asfsdfasdf");
+    }
+
+    @OnClick(R.id.btn_server_test)
+    void btnServerClicked()
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(300, TimeUnit.SECONDS)
+                        .build();
+                try {
+                    URL url = new URL(PropertiesGetter.getStartShareUrl(getContext()));
+                    StartShareInfo ssInfo = new StartShareInfo(DataType.FILE, "test", "127.0.0.1",
+                            80, getContext());
+                    RequestBody requestBody = RequestBody.create(JSON, com.alibaba.fastjson.JSON.toJSONString(ssInfo));
+                    Request request = new Request.Builder()
+                            .url(url)
+                            .post(requestBody)
+                            .build();
+                    Response response = client.newCall(request).execute();
+                    if (response.isSuccessful())
+                    {
+                        Log.i("GET FROM SERVER", response.body().string());
+                    }
+                }
+                catch (IOException e)
+                {
+                    Log.e("TEST", "error: connect to server");
+                }
+            }
+        }).start();
     }
 
 }

@@ -2,6 +2,7 @@ package com.clverpanda.nfshare.util;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.provider.Settings;
 
@@ -20,10 +21,12 @@ public class DeviceInfoGetter
 {
     private static DeviceInfoGetter deviceInfoGetter;
     private ContentResolver contentResolver;
+    private SharedPreferences spLeanCloud;
 
     private DeviceInfoGetter(Context context)
     {
         contentResolver = context.getContentResolver();
+        spLeanCloud = context.getSharedPreferences("leancloud", Context.MODE_PRIVATE);
     }
 
     public static DeviceInfoGetter getInstance(Context context)
@@ -71,5 +74,10 @@ public class DeviceInfoGetter
         if (result == null)
             result = Build.MODEL;
         return result;
+    }
+
+    public String getTencentInstallationId()
+    {
+        return spLeanCloud.getString("installationId", null);
     }
 }

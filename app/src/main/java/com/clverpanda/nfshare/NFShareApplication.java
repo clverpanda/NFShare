@@ -2,6 +2,7 @@ package com.clverpanda.nfshare;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.wifi.p2p.WifiP2pManager;
 
 import com.avos.avoscloud.AVException;
@@ -42,7 +43,19 @@ public class NFShareApplication extends Application
         //log开关
         AVOSCloud.setDebugLogEnabled(true);
 
-        AVInstallation.getCurrentInstallation().saveInBackground();
+        AVInstallation.getCurrentInstallation().saveInBackground(new SaveCallback() {
+            public void done(AVException e) {
+                if (e == null) {
+                    // 保存成功
+                    String installationId = AVInstallation.getCurrentInstallation().getInstallationId();
+                    //将获取的installationId存入sharedpreferences
+                    SharedPreferences sp = getSharedPreferences("leancloud", Context.MODE_PRIVATE);
+                    sp.edit().putString("installationId", installationId).apply();
+                } else {
+                    // 保存失败，输出错误信息
+                }
+            }
+        });
         PushService.setDefaultPushCallback(this, MainActivity.class);
 
         _instance = this;

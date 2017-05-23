@@ -51,7 +51,6 @@ dependencies {
     compile 'com.romainpiel.shimmer:library:1.4.0@aar'
     compile 'com.github.clans:fab:1.6.4'
     compile 'com.skyfishjy.ripplebackground:library:1.0.1'
-    compile 'com.alibaba:fastjson:1.1.56.android'
     compile 'com.squareup.okhttp3:okhttp:3.6.0'
     compile 'com.bilibili:boxing-impl:0.6.0'
     compile 'com.facebook.fresco:fresco:1.2.0'
