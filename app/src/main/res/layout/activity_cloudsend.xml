@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/send_layout"
+    tools:context="com.clverpanda.nfshare.CloudSendActivity">
+
+
+    <ProgressBar
+        android:id="@+id/send_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="35dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="@+id/wifi_animation"
+        app:layout_constraintRight_toRightOf="@+id/wifi_animation"
+        app:layout_constraintTop_toBottomOf="@+id/wifi_animation"
+        android:layout_marginStart="35dp"
+        android:layout_marginEnd="35dp"
+        android:visibility="invisible"/>
+
+    <com.skyfishjy.library.RippleBackground
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="375dp"
+        android:layout_height="361dp"
+        android:id="@+id/wifi_animation"
+        app:rb_color="#0099CC"
+        app:rb_radius="32dp"
+        app:rb_rippleAmount="4"
+        app:rb_duration="3000"
+        app:rb_scale="6"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp">
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_centerInParent="true"
+            android:id="@+id/centerImage"
+            android:src="@drawable/ic_wifi"/>
+
+
+    </com.skyfishjy.library.RippleBackground>
+
+
+    <com.hanks.htextview.evaporate.EvaporateTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:gravity="center"
+        android:paddingTop="8dp"
+        android:text="@string/drawer_item_resource"
+        android:textSize="14sp"
+        android:id="@+id/send_log"
+        app:layout_constraintBottom_toBottomOf="@+id/wifi_animation"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintLeft_toLeftOf="@+id/wifi_animation"
+        app:layout_constraintRight_toRightOf="@+id/wifi_animation" />
+
+    <TextView
+        android:id="@+id/textView_share"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/share_pin"
+        android:textSize="16sp"
+        android:layout_marginLeft="108dp"
+        app:layout_constraintLeft_toLeftOf="@+id/wifi_animation"
+        app:layout_constraintBottom_toBottomOf="@+id/wifi_animation"
+        android:layout_marginBottom="37dp"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/tv_share_pin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:text="0000"
+        android:textSize="35sp"
+        android:layout_marginBottom="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/send_log"
+        app:layout_constraintLeft_toRightOf="@+id/textView_share"
+        android:layout_marginLeft="17dp"
+        android:visibility="invisible"/>
+
+</android.support.constraint.ConstraintLayout>

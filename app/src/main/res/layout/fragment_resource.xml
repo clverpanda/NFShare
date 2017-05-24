@@ -114,14 +114,14 @@
             android:layout_marginBottom="25dp">
 
             <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/resource_share_menu_nfc"
+                android:id="@+id/resource_share_menu_cloud"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_nfc"
-                fab:fab_size="normal"
-                fab:fab_label="NFC"
+                android:src="@drawable/ic_cloud"
                 fab:fab_colorNormal="@color/colorAccent"
-                fab:fab_colorPressed="#e4d894" />
+                fab:fab_colorPressed="#e4d894"
+                fab:fab_label="云分享"
+                fab:fab_size="normal" />
 
             <com.github.clans.fab.FloatingActionButton
                 android:id="@+id/resource_share_menu_wifi"

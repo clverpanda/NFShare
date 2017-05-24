@@ -62,4 +62,14 @@
         android:text="服务器测试（添加）"
         app:layout_constraintLeft_toLeftOf="@+id/test_textView"
         app:layout_constraintTop_toBottomOf="@+id/test_textView" />
+
+    <Button
+        android:id="@+id/btn_server_get"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="8dp"
+        android:text="服务器测试（获取）"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_server_test"
+        app:layout_constraintLeft_toRightOf="@+id/btn_server_test" />
 </android.support.constraint.ConstraintLayout>

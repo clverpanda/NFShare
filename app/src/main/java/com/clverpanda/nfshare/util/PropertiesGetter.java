@@ -38,4 +38,9 @@ public class PropertiesGetter
     {
         return getServerUrl(context) + "share/";
     }
+
+    public static String getGetShareUrl(Context context)
+    {
+        return getServerUrl(context) + "get/";
+    }
 }

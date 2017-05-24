@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.clverpanda.nfshare.NFShareApplication;
@@ -20,12 +19,12 @@ import com.clverpanda.nfshare.dao.Device;
 import com.clverpanda.nfshare.dao.Task;
 import com.clverpanda.nfshare.model.DataType;
 import com.clverpanda.nfshare.model.TaskStatus;
+import com.clverpanda.nfshare.model.communicate.GetShareInfo;
 import com.clverpanda.nfshare.model.communicate.StartShareInfo;
 import com.clverpanda.nfshare.util.PropertiesGetter;
 import com.hanks.htextview.evaporate.EvaporateTextView;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +46,7 @@ public class TestFrag extends Fragment {
     @BindView(R.id.test_textView)
     EvaporateTextView tvTest;
 
-    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    public static final MediaType JSON_TYPE = MediaType.parse("application/json; charset=utf-8");
 
 
 
@@ -104,7 +103,38 @@ public class TestFrag extends Fragment {
                     URL url = new URL(PropertiesGetter.getStartShareUrl(getContext()));
                     StartShareInfo ssInfo = new StartShareInfo(DataType.FILE, "test", "127.0.0.1",
                             80, getContext());
-                    RequestBody requestBody = RequestBody.create(JSON, com.alibaba.fastjson.JSON.toJSONString(ssInfo));
+                    RequestBody requestBody = RequestBody.create(JSON_TYPE, JSON.toJSONString(ssInfo));
+                    Request request = new Request.Builder()
+                            .url(url)
+                            .post(requestBody)
+                            .build();
+                    Response response = client.newCall(request).execute();
+                    if (response.isSuccessful())
+                    {
+                        Log.i("GET FROM SERVER", response.body().string());
+                    }
+                }
+                catch (IOException e)
+                {
+                    Log.e("TEST", "error: connect to server");
+                }
+            }
+        }).start();
+    }
+
+    @OnClick(R.id.btn_server_get)
+    void btnServerGetClicked()
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(300, TimeUnit.SECONDS)
+                        .build();
+                try {
+                    URL url = new URL(PropertiesGetter.getGetShareUrl(getContext()));
+                    GetShareInfo gsInfo = new GetShareInfo(1196, getContext());
+                    RequestBody requestBody = RequestBody.create(JSON_TYPE, JSON.toJSONString(gsInfo));
                     Request request = new Request.Builder()
                             .url(url)
                             .post(requestBody)

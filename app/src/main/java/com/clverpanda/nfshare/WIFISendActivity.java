@@ -43,7 +43,7 @@ public class WIFISendActivity extends AppCompatActivity implements WifiP2pManage
     private BroadcastReceiver receiver = null;
     private boolean isWifiP2pEnabled = false;
 
-    private int mLocalPort = 8080;
+    protected int mLocalPort = 8080;
     private String mServiceName;
 
     @BindView(R.id.wifi_animation)
@@ -120,12 +120,12 @@ public class WIFISendActivity extends AppCompatActivity implements WifiP2pManage
     }
 
 
-    private void getINFO()
+    protected void getINFO()
     {
         dataToSend = getIntent().getParcelableExtra(DATA_INFO);
     }
 
-    private void addFilterAction()
+    protected void addFilterAction()
     {
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
@@ -133,7 +133,7 @@ public class WIFISendActivity extends AppCompatActivity implements WifiP2pManage
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
     }
 
-    private void addHttpFilterAction()
+    protected void addHttpFilterAction()
     {
         httpFilter.addAction(HttpService.ACTION_SERVER_CREATED);
     }
@@ -152,7 +152,7 @@ public class WIFISendActivity extends AppCompatActivity implements WifiP2pManage
         }
     }
 
-    private void startServiceRegistration()
+    protected void startServiceRegistration()
     {
         Map<String, String> record = new HashMap<>();
         record.put(KEY_PORT, String.valueOf(mLocalPort));

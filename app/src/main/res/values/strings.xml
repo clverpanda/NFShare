@@ -30,6 +30,7 @@
 
     <string name="receive_with_pin">通过分享码接收</string>
     <string name="receive_with_wifi">手动搜索接收</string>
+    <string name="share_pin">分享码：</string>
 
 
 </resources>

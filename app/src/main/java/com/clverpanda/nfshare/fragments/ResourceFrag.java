@@ -24,6 +24,7 @@ import com.bilibili.boxing.model.config.BoxingConfig;
 import com.bilibili.boxing.model.entity.BaseMedia;
 import com.bilibili.boxing.model.entity.impl.ImageMedia;
 import com.bilibili.boxing_impl.ui.BoxingActivity;
+import com.clverpanda.nfshare.CloudSendActivity;
 import com.clverpanda.nfshare.NFCSendActivity;
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.WIFISendActivity;
@@ -168,8 +169,8 @@ public class ResourceFrag extends Fragment
         }
     }
 
-    @OnClick(R.id.resource_share_menu_nfc)
-    void NFCShareClicked()
+    @OnClick(R.id.resource_share_menu_cloud)
+    void CloudShareClicked()
     {
         if (mSelectedFilePath == null || mSelectedFileType == null)
             Toast.makeText(getActivity(), "请先选择文件！", Toast.LENGTH_SHORT).show();
@@ -178,9 +179,9 @@ public class ResourceFrag extends Fragment
             DeviceInfoGetter deviceInfoGetter = DeviceInfoGetter.getInstance(getContext());
             File file = new File(mSelectedFilePath);
             FileInfo fileInfo = new FileInfo(FileUtil.getFileNameFromPath(mSelectedFilePath), mSelectedFilePath, file.getTotalSpace());
-            TransferData nfcData = new TransferData(mSelectedFileType, deviceInfoGetter.getDeviceInfo(), JSON.toJSONString(fileInfo));
-            Intent startIntent = new Intent(getContext(), NFCSendActivity.class);
-            startIntent.putExtra(NFCSendActivity.DATA_INFO, nfcData);
+            TransferData cloudData = new TransferData(mSelectedFileType, deviceInfoGetter.getDeviceInfo(), JSON.toJSONString(fileInfo));
+            Intent startIntent = new Intent(getContext(), CloudSendActivity.class);
+            startIntent.putExtra(CloudSendActivity.DATA_INFO, cloudData);
             startActivity(startIntent);
         }
     }
