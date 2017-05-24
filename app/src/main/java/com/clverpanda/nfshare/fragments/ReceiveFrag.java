@@ -76,6 +76,7 @@ public class ReceiveFrag extends Fragment
     protected RecyclerView recyclerView;
 
 
+    private boolean btnReceiveClicked = false;
     private WifiP2pManager mManager;
     private WifiP2pManager.Channel mChannel;
     private BroadcastReceiver receiver = null;
@@ -126,8 +127,19 @@ public class ReceiveFrag extends Fragment
     @OnClick(R.id.btn_start_search)
     void searchClicked()
     {
-        discoverService();
-        rippleBackground.startRippleAnimation();
+        if (!btnReceiveClicked)
+        {
+            btnReceiveClicked = true;
+            discoverService();
+            rippleBackground.startRippleAnimation();
+        }
+        else
+        {
+            btnReceiveClicked = false;
+            mManager.clearServiceRequests(mChannel, null);
+            mManager.cancelConnect(mChannel, null);
+            rippleBackground.stopRippleAnimation();
+        }
     }
 
     private void addFilterAction()
@@ -180,6 +192,7 @@ public class ReceiveFrag extends Fragment
                     }
                 }
             }).start();
+            Toast.makeText(getActivity(), "成功获取数据", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -205,6 +218,7 @@ public class ReceiveFrag extends Fragment
             public void onSuccess()
             {
                 mServerPort = Integer.parseInt(ports.get(device2connect.deviceAddress));
+                Toast.makeText(getActivity(), "已经连接到对方设备", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -292,6 +306,8 @@ public class ReceiveFrag extends Fragment
             @Override
             public void onFailure(int code) {
                 Log.e(TAG, "onFailure: discover services");
+                rippleBackground.stopRippleAnimation();
+                btnReceiveClicked = false;
             }
         });
     }
