@@ -33,7 +33,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:theme,android:label">
+        tools:replace="android:theme,android:label,android:icon">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"

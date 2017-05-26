@@ -4,6 +4,7 @@ package com.clverpanda.nfshare.fragments;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -26,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.clverpanda.nfshare.MainActivity;
 import com.clverpanda.nfshare.NFShareApplication;
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.WIFISendActivity;
@@ -37,7 +39,10 @@ import com.clverpanda.nfshare.model.FileInfo;
 import com.clverpanda.nfshare.model.TaskStatus;
 import com.clverpanda.nfshare.model.TransferData;
 import com.clverpanda.nfshare.receiver.WiFiReceiveBroadcastReceiver;
+import com.clverpanda.nfshare.tasks.AsyncResponse;
+import com.clverpanda.nfshare.tasks.ConnectServerAsyncTask;
 import com.clverpanda.nfshare.widget.RecyclerItemClickListener;
+import com.goodiebag.pinview.Pinview;
 import com.skyfishjy.library.RippleBackground;
 
 import java.io.IOException;
@@ -55,6 +60,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -74,6 +80,8 @@ public class ReceiveFrag extends Fragment
     protected RippleBackground rippleBackground;
     @BindView(R.id.receive_device_list)
     protected RecyclerView recyclerView;
+    @BindView(R.id.pinview)
+    protected Pinview pinview;
 
 
     private boolean btnReceiveClicked = false;
@@ -87,6 +95,8 @@ public class ReceiveFrag extends Fragment
     private int mServerPort = 0;
     private ReceiveRecyclerAdapter mAdapter;
     WifiP2pDnsSdServiceRequest serviceRequest = null;
+
+    SweetAlertDialog pDialog;
 
 
 
@@ -119,9 +129,32 @@ public class ReceiveFrag extends Fragment
 
         toolbar.setTitle(R.string.drawer_item_receive);
 
+        pDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
+        pinview.setPinViewEventListener(new Pinview.PinViewEventListener()
+        {
+            @Override
+            public void onDataEntered(Pinview pinview, boolean fromUser)
+            {
+                showPendingDialog();
+                connect2RemoteServer(Integer.parseInt(pinview.getValue()));
+            }
+        });
+
         return view;
     }
 
+    void showPendingDialog()
+    {
+        pDialog.getProgressHelper().setBarColor(R.color.colorAccent);
+        pDialog.setTitleText("连接中");
+        pDialog.setCancelable(false);
+        pDialog.show();
+    }
+
+    void connect2RemoteServer(int pin_code)
+    {
+
+    }
 
 
     @OnClick(R.id.btn_start_search)
@@ -160,39 +193,30 @@ public class ReceiveFrag extends Fragment
         final String fileUrl = rawUrl + "/getFile";
         if (info.groupFormed && !info.isGroupOwner)
         {
-            new Thread(new Runnable() {
+            ConnectServerAsyncTask connectWifiOwnerTask = new ConnectServerAsyncTask();
+            connectWifiOwnerTask.setOnAsyncResponse(new AsyncResponse<String>()
+            {
                 @Override
-                public void run()
+                public void onDataReceivedSuccess(String listData)
                 {
-                    OkHttpClient client = new OkHttpClient.Builder()
-                            .connectTimeout(3, TimeUnit.SECONDS)
-                            .build();
-                    try {
-                    URL url = new URL(infoUrl);
-                    Request request = new Request.Builder().url(url).build();
-                        Response response = client.newCall(request).execute();
-                        if (response.isSuccessful())
-                        {
-                            Log.d(TAG, "run: 服务器连接成功");
-                            String result = response.body().string();
-                            Log.d(TAG, "run: " + result);
-                            TransferData resultData = JSON.parseObject(result, TransferData.class);
-                            FileInfo fileInfo = JSON.parseObject(resultData.getPayload(), FileInfo.class);
-                            fileInfo.setDownloadUrl(fileUrl);
-                            DaoSession daoSession = NFShareApplication.getInstance().getDaoSession();
-                            long deviceId = daoSession.getDeviceDao().insertOrReplace(resultData.getDevice());
-                            Task task2Add = new Task(fileInfo.getFileName(), JSON.toJSONString(fileInfo), resultData.getDataType(), TaskStatus.PAUSED,
-                                    new Date(), deviceId);
-                            daoSession.getTaskDao().insert(task2Add);
-                        }
-                    }
-                    catch (IOException e)
-                    {
-                        Log.e(TAG, "run: ", e);
-                    }
+                    TransferData resultData = JSON.parseObject(listData, TransferData.class);
+                    FileInfo fileInfo = JSON.parseObject(resultData.getPayload(), FileInfo.class);
+                    fileInfo.setDownloadUrl(fileUrl);
+                    DaoSession daoSession = NFShareApplication.getInstance().getDaoSession();
+                    long deviceId = daoSession.getDeviceDao().insertOrReplace(resultData.getDevice());
+                    Task task2Add = new Task(fileInfo.getFileName(), JSON.toJSONString(fileInfo), resultData.getDataType(), TaskStatus.PAUSED,
+                            new Date(), deviceId);
+                    daoSession.getTaskDao().insert(task2Add);
+                    Toast.makeText(getActivity(), "任务已添加", Toast.LENGTH_SHORT).show();
+                    pDialog.dismissWithAnimation();
                 }
-            }).start();
-            Toast.makeText(getActivity(), "成功获取数据", Toast.LENGTH_SHORT).show();
+
+                @Override
+                public void onDataReceivedFailed() {
+
+                }
+            });
+            connectWifiOwnerTask.execute(infoUrl);
         }
     }
 
