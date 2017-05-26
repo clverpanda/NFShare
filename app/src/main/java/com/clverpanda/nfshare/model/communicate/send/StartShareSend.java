@@ -1,4 +1,4 @@
-package com.clverpanda.nfshare.model.communicate;
+package com.clverpanda.nfshare.model.communicate.send;
 
 import android.content.Context;
 
@@ -11,7 +11,7 @@ import com.clverpanda.nfshare.util.TokenConstructor;
  * It's the file for NFShare.
  */
 
-public class StartShareInfo
+public class StartShareSend
 {
     private String origin_phone;
     private String token;
@@ -21,12 +21,12 @@ public class StartShareInfo
     private int port;
     private String installation;
 
-    public StartShareInfo(DataType data_type, String related_data, String ip,
+    public StartShareSend(DataType data_type, String related_data,
                           int port, Context context)
     {
         this.data_type = data_type;
         this.related_data = related_data;
-        this.ip = ip;
+        this.ip = DeviceInfoGetter.getInstance(context).getWifiIpAddress();
         this.port = port;
         this.token = TokenConstructor.getToken();
         this.origin_phone = DeviceInfoGetter.getInstance(context).getMacAddr();

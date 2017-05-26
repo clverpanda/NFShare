@@ -158,7 +158,7 @@ public class ReceiveFrag extends Fragment
         String rawUrl = "http://" + ownerIP + ":" + mServerPort;
         final String infoUrl = rawUrl + "/getInfo";
         final String fileUrl = rawUrl + "/getFile";
-        if (info.groupFormed)
+        if (info.groupFormed && !info.isGroupOwner)
         {
             new Thread(new Runnable() {
                 @Override

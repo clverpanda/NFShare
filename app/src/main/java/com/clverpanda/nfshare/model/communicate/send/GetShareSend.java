@@ -1,4 +1,4 @@
-package com.clverpanda.nfshare.model.communicate;
+package com.clverpanda.nfshare.model.communicate.send;
 
 import android.content.Context;
 
@@ -9,15 +9,15 @@ import com.clverpanda.nfshare.util.DeviceInfoGetter;
  * It's the file for NFShare.
  */
 
-public class GetShareInfo
+public class GetShareSend
 {
     private int pin_code;
     private String installation;
 
-    public GetShareInfo() {
+    public GetShareSend() {
     }
 
-    public GetShareInfo(int pin_code, Context context)
+    public GetShareSend(int pin_code, Context context)
     {
         this.installation = DeviceInfoGetter.getInstance(context).getTencentInstallationId();
         this.pin_code = pin_code;

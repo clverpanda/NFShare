@@ -19,8 +19,8 @@ import com.clverpanda.nfshare.dao.Device;
 import com.clverpanda.nfshare.dao.Task;
 import com.clverpanda.nfshare.model.DataType;
 import com.clverpanda.nfshare.model.TaskStatus;
-import com.clverpanda.nfshare.model.communicate.GetShareInfo;
-import com.clverpanda.nfshare.model.communicate.StartShareInfo;
+import com.clverpanda.nfshare.model.communicate.send.GetShareSend;
+import com.clverpanda.nfshare.model.communicate.send.StartShareSend;
 import com.clverpanda.nfshare.util.PropertiesGetter;
 import com.hanks.htextview.evaporate.EvaporateTextView;
 
@@ -101,7 +101,7 @@ public class TestFrag extends Fragment {
                         .build();
                 try {
                     URL url = new URL(PropertiesGetter.getStartShareUrl(getContext()));
-                    StartShareInfo ssInfo = new StartShareInfo(DataType.FILE, "test", "127.0.0.1",
+                    StartShareSend ssInfo = new StartShareSend(DataType.FILE, "test",
                             80, getContext());
                     RequestBody requestBody = RequestBody.create(JSON_TYPE, JSON.toJSONString(ssInfo));
                     Request request = new Request.Builder()
@@ -133,7 +133,7 @@ public class TestFrag extends Fragment {
                         .build();
                 try {
                     URL url = new URL(PropertiesGetter.getGetShareUrl(getContext()));
-                    GetShareInfo gsInfo = new GetShareInfo(1196, getContext());
+                    GetShareSend gsInfo = new GetShareSend(1196, getContext());
                     RequestBody requestBody = RequestBody.create(JSON_TYPE, JSON.toJSONString(gsInfo));
                     Request request = new Request.Builder()
                             .url(url)

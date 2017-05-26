@@ -3,6 +3,10 @@ package com.clverpanda.nfshare.util;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.Settings;
 
@@ -22,11 +26,18 @@ public class DeviceInfoGetter
     private static DeviceInfoGetter deviceInfoGetter;
     private ContentResolver contentResolver;
     private SharedPreferences spLeanCloud;
+    private WifiManager wifiManager;
+    private ConnectivityManager connectivityManager;
+
 
     private DeviceInfoGetter(Context context)
     {
         contentResolver = context.getContentResolver();
         spLeanCloud = context.getSharedPreferences("leancloud", Context.MODE_PRIVATE);
+        wifiManager = (WifiManager) context.getApplicationContext()
+                .getSystemService(Context.WIFI_SERVICE);
+        connectivityManager = (ConnectivityManager) context.getApplicationContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
     public static DeviceInfoGetter getInstance(Context context)
@@ -79,5 +90,29 @@ public class DeviceInfoGetter
     public String getTencentInstallationId()
     {
         return spLeanCloud.getString("installationId", null);
+    }
+
+    public boolean isUsingWifi()
+    {
+        NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetInfo != null
+                && activeNetInfo.getType() == ConnectivityManager.TYPE_WIFI;
+    }
+
+    public String getWifiIpAddress()
+    {
+        if (isUsingWifi())
+        {
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            return intToIp(wifiInfo.getIpAddress());
+        }
+        else
+            return null;
+    }
+
+    private String intToIp(int i)
+    {
+        return (i & 0xFF) + "." + ((i >> 8) & 0xFF) + "." + ((i >> 16) & 0xFF)
+                + "." + (i >> 24 & 0xFF);
     }
 }

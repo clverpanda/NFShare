@@ -37,7 +37,7 @@ public class WIFISendActivity extends AppCompatActivity implements WifiP2pManage
     public static final String KEY_AVAILABLE = "available";
 
 
-    private TransferData dataToSend;
+    protected TransferData dataToSend;
     private WifiP2pManager mManager;
     private WifiP2pManager.Channel mChannel;
     private BroadcastReceiver receiver = null;
