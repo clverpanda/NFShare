@@ -43,4 +43,9 @@ public class PropertiesGetter
     {
         return getServerUrl(context) + "get/";
     }
+
+    public static String getConnErrCallbackUrl(Context context)
+    {
+        return getServerUrl(context) + "callback/conn_err/";
+    }
 }

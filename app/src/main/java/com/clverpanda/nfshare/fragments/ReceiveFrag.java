@@ -14,6 +14,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -38,17 +39,20 @@ import com.clverpanda.nfshare.model.DataType;
 import com.clverpanda.nfshare.model.FileInfo;
 import com.clverpanda.nfshare.model.TaskStatus;
 import com.clverpanda.nfshare.model.TransferData;
+import com.clverpanda.nfshare.model.communicate.receive.GetShareRec;
+import com.clverpanda.nfshare.model.communicate.send.GetShareSend;
 import com.clverpanda.nfshare.receiver.WiFiReceiveBroadcastReceiver;
 import com.clverpanda.nfshare.tasks.AsyncResponse;
 import com.clverpanda.nfshare.tasks.ConnectServerAsyncTask;
+import com.clverpanda.nfshare.tasks.PostGetShareAsyncTask;
+import com.clverpanda.nfshare.util.DeviceInfoGetter;
+import com.clverpanda.nfshare.util.PropertiesGetter;
 import com.clverpanda.nfshare.widget.RecyclerItemClickListener;
 import com.goodiebag.pinview.Pinview;
 import com.skyfishjy.library.RippleBackground;
 
+
 import java.io.IOException;
-import java.io.Reader;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -65,13 +69,14 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+
 import static android.os.Looper.getMainLooper;
 
 
 public class ReceiveFrag extends Fragment
-        implements WifiP2pManager.ConnectionInfoListener, RecyclerItemClickListener
+        implements WifiP2pManager.ConnectionInfoListener, RecyclerItemClickListener, WifiP2pManager.PeerListListener
 {
-    public static final String TAG = "ReceiveFrag";
+    private static final String TAG = "ReceiveFrag";
 
 
     @BindView(R.id.receive_toolbar)
@@ -97,6 +102,7 @@ public class ReceiveFrag extends Fragment
     WifiP2pDnsSdServiceRequest serviceRequest = null;
 
     SweetAlertDialog pDialog;
+    GetShareRec getShareRec = null;
 
 
 
@@ -105,7 +111,8 @@ public class ReceiveFrag extends Fragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             Bundle savedInstanceState)
+    {
         View view = inflater.inflate(R.layout.fragment_receive, container, false);
         ButterKnife.bind(this, view);
 
@@ -136,7 +143,7 @@ public class ReceiveFrag extends Fragment
             public void onDataEntered(Pinview pinview, boolean fromUser)
             {
                 showPendingDialog();
-                connect2RemoteServer(Integer.parseInt(pinview.getValue()));
+                tryGetFromServer(Integer.parseInt(pinview.getValue()));
             }
         });
 
@@ -145,15 +152,138 @@ public class ReceiveFrag extends Fragment
 
     void showPendingDialog()
     {
-        pDialog.getProgressHelper().setBarColor(R.color.colorAccent);
+        pDialog.getProgressHelper().setBarColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
         pDialog.setTitleText("连接中");
         pDialog.setCancelable(false);
         pDialog.show();
     }
 
-    void connect2RemoteServer(int pin_code)
+    private void tryGetFromServer(int pin_code)
     {
+        PostGetShareAsyncTask getShareFromServerTask = new PostGetShareAsyncTask(getContext());
+        getShareFromServerTask.setAsyncResponse(new AsyncResponse<GetShareRec>()
+        {
+            @Override
+            public void onDataReceivedSuccess(final GetShareRec listData)
+            {
+                getShareRec = listData;
+                if (DeviceInfoGetter.getInstance(getContext()).isUsingWifi() && listData.getIp() != null)
+                {
+                    mServerPort = listData.getPort();
+                    String LANInfoUrl = "http://" + listData.getIp() + ":" + listData.getPort() + "/getInfo";
+                    final String LANFileUrl = "http://" + listData.getIp() + ":" + listData.getPort() + "/getFile";
+                    ConnectServerAsyncTask tryConnectInLAN = new ConnectServerAsyncTask();
+                    tryConnectInLAN.setOnAsyncResponse(new AsyncResponse<TransferData>() {
+                        @Override
+                        public void onDataReceivedSuccess(TransferData resultData)
+                        {
+                            doneReceiveTask(resultData, LANFileUrl);
+                        }
+                        @Override
+                        public void onDataReceivedFailed()
+                        {
+                            tryGetFromWifiDirect();
+                        }
+                    });
+                    tryConnectInLAN.execute(LANInfoUrl);
+                }
+                else
+                    tryGetFromWifiDirect();
+            }
 
+            @Override
+            public void onDataReceivedFailed()
+            {
+                pDialog.cancel();
+                Toast.makeText(getContext(), "与服务器连接失败", Toast.LENGTH_SHORT).show();
+            }
+        });
+        getShareFromServerTask.execute(new GetShareSend(pin_code, getContext()));
+    }
+
+    private void tryGetFromWifiDirect()
+    {
+        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener()
+        {
+            @Override
+            public void onSuccess()
+            {
+                Log.d(TAG, "onSuccess: 开始wifidirect扫描");
+            }
+            @Override
+            public void onFailure(int reasonCode)
+            {
+                confirmReportConnErr2Server();
+            }
+        });
+    }
+
+
+    @Override
+    public void onPeersAvailable(WifiP2pDeviceList peerList)
+    {
+        peers.clear();
+        peers.addAll(peerList.getDeviceList());
+
+        if (peers.size() == 0) {
+            Log.d(TAG, "No devices found");
+            return;
+        }
+        if (getShareRec != null)
+        {
+            for (WifiP2pDevice item : peers)
+            {
+                if (item.deviceAddress.equals(getShareRec.getOrigin_phone()))
+                {
+                    connect(item);
+                    return;
+                }
+            }
+            reportConnErr2Server();
+        }
+    }
+
+    private void confirmReportConnErr2Server()
+    {
+        new SweetAlertDialog(this.getContext(), SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("无法连接至对方设备")
+                .setContentText("是否告知对方启用云传输")
+                .setCancelText("否")
+                .setConfirmText("是")
+                .showCancelButton(true)
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog)
+                    {
+                        reportConnErr2Server();
+                    }
+                })
+                .show();
+    }
+
+    private void reportConnErr2Server()
+    {
+        if (getShareRec == null) return;
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(3, TimeUnit.SECONDS)
+                .build();
+        try
+        {
+            URL url = new URL(PropertiesGetter.getConnErrCallbackUrl(getContext()) + getShareRec.getId());
+            Request request = new Request.Builder().url(url).build();
+            Response response = client.newCall(request).execute();
+            if (response.isSuccessful())
+            {
+                String result = response.body().string();
+                Log.d(TAG, "服务器：回调" + result);
+            }
+            else
+                Log.d(TAG, "服务器：回调失败");
+        }
+        catch (IOException e)
+        {
+            Log.e(TAG, "服务器：回调失败", e);
+        }
     }
 
 
@@ -175,12 +305,17 @@ public class ReceiveFrag extends Fragment
         }
     }
 
-    private void addFilterAction()
+    protected void doneReceiveTask(TransferData resultData, String fileUrl)
     {
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        FileInfo fileInfo = JSON.parseObject(resultData.getPayload(), FileInfo.class);
+        fileInfo.setDownloadUrl(fileUrl);
+        DaoSession daoSession = NFShareApplication.getInstance().getDaoSession();
+        long deviceId = daoSession.getDeviceDao().insertOrReplace(resultData.getDevice());
+        Task task2Add = new Task(fileInfo.getFileName(), JSON.toJSONString(fileInfo), resultData.getDataType(), TaskStatus.PAUSED,
+                new Date(), deviceId);
+        daoSession.getTaskDao().insert(task2Add);
+        Toast.makeText(getActivity(), "任务已添加", Toast.LENGTH_SHORT).show();
+        pDialog.cancel();
     }
 
     //连接到对等点
@@ -194,37 +329,31 @@ public class ReceiveFrag extends Fragment
         if (info.groupFormed && !info.isGroupOwner)
         {
             ConnectServerAsyncTask connectWifiOwnerTask = new ConnectServerAsyncTask();
-            connectWifiOwnerTask.setOnAsyncResponse(new AsyncResponse<String>()
+            connectWifiOwnerTask.setOnAsyncResponse(new AsyncResponse<TransferData>()
             {
                 @Override
-                public void onDataReceivedSuccess(String listData)
+                public void onDataReceivedSuccess(TransferData resultData)
                 {
-                    TransferData resultData = JSON.parseObject(listData, TransferData.class);
-                    FileInfo fileInfo = JSON.parseObject(resultData.getPayload(), FileInfo.class);
-                    fileInfo.setDownloadUrl(fileUrl);
-                    DaoSession daoSession = NFShareApplication.getInstance().getDaoSession();
-                    long deviceId = daoSession.getDeviceDao().insertOrReplace(resultData.getDevice());
-                    Task task2Add = new Task(fileInfo.getFileName(), JSON.toJSONString(fileInfo), resultData.getDataType(), TaskStatus.PAUSED,
-                            new Date(), deviceId);
-                    daoSession.getTaskDao().insert(task2Add);
-                    Toast.makeText(getActivity(), "任务已添加", Toast.LENGTH_SHORT).show();
-                    pDialog.dismissWithAnimation();
+                    doneReceiveTask(resultData, fileUrl);
                 }
 
                 @Override
-                public void onDataReceivedFailed() {
-
+                public void onDataReceivedFailed()
+                {
+                    mManager.removeGroup(mChannel, null);
+                    Toast.makeText(getActivity(), "无法从对方设备获取数据", Toast.LENGTH_SHORT).show();
+                    pDialog.cancel();
                 }
             });
             connectWifiOwnerTask.execute(infoUrl);
         }
     }
 
-
     @Override
     public void onItemClick(View v, int position)
     {
         WifiP2pDevice device = peers.get(position);
+        mServerPort = Integer.parseInt(ports.get(device.deviceAddress));
         connect(device);
     }
 
@@ -241,13 +370,14 @@ public class ReceiveFrag extends Fragment
             @Override
             public void onSuccess()
             {
-                mServerPort = Integer.parseInt(ports.get(device2connect.deviceAddress));
                 Toast.makeText(getActivity(), "已经连接到对方设备", Toast.LENGTH_SHORT).show();
             }
 
             @Override
-            public void onFailure(int reason) {
+            public void onFailure(int reason)
+            {
                 Toast.makeText(getActivity(), "连接失败，请重试", Toast.LENGTH_SHORT).show();
+                confirmReportConnErr2Server();
             }
         });
     }
@@ -336,4 +466,11 @@ public class ReceiveFrag extends Fragment
         });
     }
 
+    private void addFilterAction()
+    {
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+    }
 }

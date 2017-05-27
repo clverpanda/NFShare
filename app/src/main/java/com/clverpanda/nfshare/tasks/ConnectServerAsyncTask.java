@@ -27,23 +27,23 @@ import okhttp3.Response;
  * It's the file for NFShare.
  */
 
-public class ConnectServerAsyncTask extends AsyncTask<String, Void, String>
+public class ConnectServerAsyncTask extends AsyncTask<String, Void, TransferData>
 {
     public static final String TAG = "ConnectServerAsyncTask";
-    public AsyncResponse<String> asyncResponse;
+    private AsyncResponse<TransferData> asyncResponse;
 
     public ConnectServerAsyncTask()
     {
 
     }
 
-    public void setOnAsyncResponse(AsyncResponse<String> asyncResponse)
+    public void setOnAsyncResponse(AsyncResponse<TransferData> asyncResponse)
     {
         this.asyncResponse = asyncResponse;
     }
 
     @Override
-    protected String doInBackground(String... params)
+    protected TransferData doInBackground(String... params)
     {
         if (params.length <= 0) return null;
         String urlstr = params[0];
@@ -57,10 +57,10 @@ public class ConnectServerAsyncTask extends AsyncTask<String, Void, String>
             Response response = client.newCall(request).execute();
             if (response.isSuccessful())
             {
-                Log.d(TAG, "run: 服务器连接成功");
+                Log.d(TAG, "服务器：" + urlstr + "连接成功");
                 String result = response.body().string();
-                Log.d(TAG, "run: " + result);
-                return result;
+                Log.d(TAG, result);
+                return JSON.parseObject(result, TransferData.class);
             }
             else
                 return null;
@@ -73,7 +73,7 @@ public class ConnectServerAsyncTask extends AsyncTask<String, Void, String>
     }
 
     @Override
-    protected void onPostExecute(String result)
+    protected void onPostExecute(TransferData result)
     {
         if (result == null)
             asyncResponse.onDataReceivedFailed();

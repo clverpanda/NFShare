@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -151,6 +152,25 @@ public class TestFrag extends Fragment {
                 }
             }
         }).start();
+    }
+
+    @OnClick(R.id.button4)
+    void btnDialogTestClicked()
+    {
+        new SweetAlertDialog(this.getContext(), SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("无法连接至对方设备")
+                .setContentText("是否告知对方启用云传输")
+                .setCancelText("否")
+                .setConfirmText("是")
+                .showCancelButton(true)
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog)
+                    {
+
+                    }
+                })
+                .show();
     }
 
 }
