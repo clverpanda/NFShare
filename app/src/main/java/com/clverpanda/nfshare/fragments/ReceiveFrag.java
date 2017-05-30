@@ -45,6 +45,7 @@ import com.clverpanda.nfshare.receiver.WiFiReceiveBroadcastReceiver;
 import com.clverpanda.nfshare.tasks.AsyncResponse;
 import com.clverpanda.nfshare.tasks.ConnectServerAsyncTask;
 import com.clverpanda.nfshare.tasks.PostGetShareAsyncTask;
+import com.clverpanda.nfshare.util.DbHelper;
 import com.clverpanda.nfshare.util.DeviceInfoGetter;
 import com.clverpanda.nfshare.util.PropertiesGetter;
 import com.clverpanda.nfshare.widget.RecyclerItemClickListener;
@@ -136,7 +137,6 @@ public class ReceiveFrag extends Fragment
 
         toolbar.setTitle(R.string.drawer_item_receive);
 
-        pDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
         pinview.setPinViewEventListener(new Pinview.PinViewEventListener()
         {
             @Override
@@ -152,6 +152,7 @@ public class ReceiveFrag extends Fragment
 
     void showPendingDialog()
     {
+        pDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
         pDialog.getProgressHelper().setBarColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
         pDialog.setTitleText("连接中");
         pDialog.setCancelable(false);
@@ -169,6 +170,7 @@ public class ReceiveFrag extends Fragment
                 getShareRec = listData;
                 if (DeviceInfoGetter.getInstance(getContext()).isUsingWifi() && listData.getIp() != null)
                 {
+                    Log.d(TAG, "onDataReceivedSuccess: 云服务器连接成功");
                     mServerPort = listData.getPort();
                     String LANInfoUrl = "http://" + listData.getIp() + ":" + listData.getPort() + "/getInfo";
                     final String LANFileUrl = "http://" + listData.getIp() + ":" + listData.getPort() + "/getFile";
@@ -177,11 +179,13 @@ public class ReceiveFrag extends Fragment
                         @Override
                         public void onDataReceivedSuccess(TransferData resultData)
                         {
+                            Log.d(TAG, "onDataReceivedSuccess: 成功从对方手机获取数据");
                             doneReceiveTask(resultData, LANFileUrl);
                         }
                         @Override
                         public void onDataReceivedFailed()
                         {
+                            Log.e(TAG, "onDataReceivedFailed: 从对方手机获取数据失败");
                             tryGetFromWifiDirect();
                         }
                     });
@@ -195,7 +199,8 @@ public class ReceiveFrag extends Fragment
             public void onDataReceivedFailed()
             {
                 pDialog.cancel();
-                Toast.makeText(getContext(), "与服务器连接失败", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "onDataReceivedFailed: 云服务器连接失败");
+                Toast.makeText(getContext(), "与云服务器连接失败", Toast.LENGTH_SHORT).show();
             }
         });
         getShareFromServerTask.execute(new GetShareSend(pin_code, getContext()));
@@ -310,7 +315,7 @@ public class ReceiveFrag extends Fragment
         FileInfo fileInfo = JSON.parseObject(resultData.getPayload(), FileInfo.class);
         fileInfo.setDownloadUrl(fileUrl);
         DaoSession daoSession = NFShareApplication.getInstance().getDaoSession();
-        long deviceId = daoSession.getDeviceDao().insertOrReplace(resultData.getDevice());
+        long deviceId = DbHelper.getInstance().insertOrReplaceDevice(resultData.getDevice());
         Task task2Add = new Task(fileInfo.getFileName(), JSON.toJSONString(fileInfo), resultData.getDataType(), TaskStatus.PAUSED,
                 new Date(), deviceId);
         daoSession.getTaskDao().insert(task2Add);

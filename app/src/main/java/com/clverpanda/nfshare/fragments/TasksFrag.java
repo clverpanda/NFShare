@@ -1,8 +1,6 @@
 package com.clverpanda.nfshare.fragments;
 
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.design.widget.CoordinatorLayout;
@@ -17,22 +15,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.alibaba.fastjson.JSON;
-import com.clverpanda.nfshare.NFShareApplication;
-import com.clverpanda.nfshare.dao.DaoSession;
-import com.clverpanda.nfshare.dao.DeviceDao;
-import com.clverpanda.nfshare.dao.Task;
-import com.clverpanda.nfshare.dao.TaskDao;
-import com.clverpanda.nfshare.model.AppInfo;
-import com.clverpanda.nfshare.model.ContactInfo;
-import com.clverpanda.nfshare.model.DataType;
-import com.clverpanda.nfshare.model.TaskStatus;
-import com.clverpanda.nfshare.model.TransferData;
+
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.fragments.taskslist.TasksPagerAdapter;
-
-import java.util.Date;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -85,54 +70,6 @@ public class TasksFrag extends Fragment {
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setTabMode(TabLayout.MODE_FIXED);
         return view;
-    }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        processData();
-    }
-
-
-    protected void processData()
-    {
-        Bundle args = this.getArguments();
-        if (args == null) return;
-        String data = args.getString(DATA_INFO);
-        if (data != null)
-        {
-            TransferData NFCData = JSON.parseObject(data, TransferData.class);
-            DaoSession daoSession = ((NFShareApplication) getActivity().getApplication()).getDaoSession();
-            DeviceDao deviceDao = daoSession.getDeviceDao();
-            TaskDao taskDao = daoSession.getTaskDao();
-            long deviceId = deviceDao.insertOrReplace(NFCData.getDevice());
-            switch (NFCData.getDataType())
-            {
-                case APP:
-                    List<AppInfo> appInfo = JSON.parseArray(NFCData.getPayload(), AppInfo.class);
-                    for (AppInfo appInfoItem : appInfo)
-                    {
-                        Task task = new Task(appInfoItem.getAppName(), JSON.toJSONString(appInfoItem),
-                                DataType.APP, TaskStatus.PAUSED, new Date(), deviceId);
-                        taskDao.insert(task);
-                    }
-                    break;
-                case CONTACT:
-                    ContactInfo contactInfo = JSON.parseObject(NFCData.getPayload(), ContactInfo.class);
-                    Task task = new Task(contactInfo.getName(), JSON.toJSONString(contactInfo),
-                            DataType.CONTACT, TaskStatus.DONE, new Date(), deviceId);
-                    taskDao.insert(task);
-                    Intent addIntent = new Intent(Intent.ACTION_INSERT, Uri.withAppendedPath(Uri.parse("content://com.android.contacts"), "contacts"));
-                    addIntent.setType("vnd.android.cursor.dir/person");
-                    addIntent.setType("vnd.android.cursor.dir/contact");
-                    addIntent.setType("vnd.android.cursor.dir/raw_contact");
-                    addIntent.putExtra(ContactsContract.Intents.Insert.PHONE, contactInfo.getNumber());
-                    addIntent.putExtra(ContactsContract.Intents.Insert.NAME, contactInfo.getName());
-                    startActivity(addIntent);
-                    break;
-            }
-        }
     }
 
 }

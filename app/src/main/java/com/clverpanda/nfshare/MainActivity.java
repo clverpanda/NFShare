@@ -1,10 +1,12 @@
 package com.clverpanda.nfshare;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.provider.ContactsContract;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
@@ -15,12 +17,27 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
+import com.clverpanda.nfshare.dao.DaoSession;
+import com.clverpanda.nfshare.dao.Device;
+import com.clverpanda.nfshare.dao.DeviceDao;
+import com.clverpanda.nfshare.dao.Task;
+import com.clverpanda.nfshare.dao.TaskDao;
 import com.clverpanda.nfshare.fragments.ContentFrag;
 import com.clverpanda.nfshare.fragments.DevicesFrag;
 import com.clverpanda.nfshare.fragments.ReceiveFrag;
 import com.clverpanda.nfshare.fragments.ResourceFrag;
 import com.clverpanda.nfshare.fragments.TasksFrag;
 import com.clverpanda.nfshare.fragments.TestFrag;
+import com.clverpanda.nfshare.model.AppInfo;
+import com.clverpanda.nfshare.model.ContactInfo;
+import com.clverpanda.nfshare.model.DataType;
+import com.clverpanda.nfshare.model.TaskStatus;
+import com.clverpanda.nfshare.model.TransferData;
+import com.clverpanda.nfshare.util.DbHelper;
+
+import java.util.Date;
+import java.util.List;
 
 import butterknife.ButterKnife;
 
@@ -60,11 +77,11 @@ public class MainActivity extends AppCompatActivity
     public void onResume()
     {
         super.onResume();
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction()))
+        if (getIntent() != null && NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction()))
         {
-            String msg = processIntent(getIntent());
-            mFm.beginTransaction().replace(R.id.fragment_container, TasksFrag.newInstance(msg)).commit();
+            String receivedMsg = processIntent(getIntent());
             setIntent(null);
+            processData(receivedMsg);
         }
     }
 
@@ -75,6 +92,44 @@ public class MainActivity extends AppCompatActivity
                 NfcAdapter.EXTRA_NDEF_MESSAGES);
         NdefMessage msg = (NdefMessage) rawMsgs[0];
         return new String(msg.getRecords()[0].getPayload());
+    }
+
+    protected void processData(String receivedMsg)
+    {
+        if (receivedMsg != null)
+        {
+            TransferData NFCData = JSON.parseObject(receivedMsg, TransferData.class);
+            DaoSession daoSession = ((NFShareApplication) getApplication()).getDaoSession();
+            TaskDao taskDao = daoSession.getTaskDao();
+            Device device2Add = NFCData.getDevice();
+            long deviceId = DbHelper.getInstance().insertOrReplaceDevice(device2Add);
+            switch (NFCData.getDataType())
+            {
+                case APP:
+                    List<AppInfo> appInfo = JSON.parseArray(NFCData.getPayload(), AppInfo.class);
+                    for (AppInfo appInfoItem : appInfo)
+                    {
+                        Task task = new Task(appInfoItem.getAppName(), JSON.toJSONString(appInfoItem),
+                                DataType.APP, TaskStatus.PAUSED, new Date(), deviceId);
+                        taskDao.insert(task);
+                    }
+                    mFm.beginTransaction().replace(R.id.fragment_container, new TasksFrag()).commit();
+                    break;
+                case CONTACT:
+                    ContactInfo contactInfo = JSON.parseObject(NFCData.getPayload(), ContactInfo.class);
+                    Task task = new Task(contactInfo.getName(), JSON.toJSONString(contactInfo),
+                            DataType.CONTACT, TaskStatus.DONE, new Date(), deviceId);
+                    taskDao.insert(task);
+                    Intent addIntent = new Intent(Intent.ACTION_INSERT, Uri.withAppendedPath(Uri.parse("content://com.android.contacts"), "contacts"));
+                    addIntent.setType("vnd.android.cursor.dir/person");
+                    addIntent.setType("vnd.android.cursor.dir/contact");
+                    addIntent.setType("vnd.android.cursor.dir/raw_contact");
+                    addIntent.putExtra(ContactsContract.Intents.Insert.PHONE, contactInfo.getNumber());
+                    addIntent.putExtra(ContactsContract.Intents.Insert.NAME, contactInfo.getName());
+                    startActivity(addIntent);
+                    break;
+            }
+        }
     }
 
 
