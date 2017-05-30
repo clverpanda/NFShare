@@ -269,26 +269,35 @@ public class ReceiveFrag extends Fragment
     private void reportConnErr2Server()
     {
         if (getShareRec == null) return;
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(3, TimeUnit.SECONDS)
-                .build();
-        try
+        new Thread(new Runnable()
         {
-            URL url = new URL(PropertiesGetter.getConnErrCallbackUrl(getContext()) + getShareRec.getId());
-            Request request = new Request.Builder().url(url).build();
-            Response response = client.newCall(request).execute();
-            if (response.isSuccessful())
+            @Override
+            public void run()
             {
-                String result = response.body().string();
-                Log.d(TAG, "服务器：回调" + result);
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(3, TimeUnit.SECONDS)
+                        .build();
+                try
+                {
+                    URL url = new URL(PropertiesGetter.getConnErrCallbackUrl(getContext()) + getShareRec.getId());
+                    Request request = new Request.Builder().url(url).build();
+                    Response response = client.newCall(request).execute();
+                    if (response.isSuccessful())
+                    {
+                        String result = response.body().string();
+                        Log.d(TAG, "服务器：回调" + result);
+                    }
+                    else
+                        Log.d(TAG, "服务器：回调失败");
+                }
+                catch (IOException e)
+                {
+                    Log.e(TAG, "服务器：回调失败", e);
+                }
             }
-            else
-                Log.d(TAG, "服务器：回调失败");
-        }
-        catch (IOException e)
-        {
-            Log.e(TAG, "服务器：回调失败", e);
-        }
+        }).start();
+        Toast.makeText(getContext(), "无法找到对方，已向服务器汇报", Toast.LENGTH_SHORT).show();
+        pDialog.cancel();
     }
 
 

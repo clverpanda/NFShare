@@ -24,33 +24,29 @@ public class LoadDoneTasksAsyncTask extends AsyncTask<Void, Void, List<Task>>
 {
     private Context context;
     private RecyclerView recyclerView;
-    private Shimmer shimmer;
-    private ShimmerTextView shimmerTextView;
 
-    public LoadDoneTasksAsyncTask(Context context, RecyclerView recyclerView, Shimmer shimmer, ShimmerTextView shimmerTextView)
+
+    public LoadDoneTasksAsyncTask(Context context, RecyclerView recyclerView)
     {
         super();
         this.context = context;
         this.recyclerView = recyclerView;
-        this.shimmer = shimmer;
-        this.shimmerTextView = shimmerTextView;
     }
 
     @Override
     protected List<Task> doInBackground(Void... params)
     {
         DaoSession daoSession = NFShareApplication.getInstance().getDaoSession();
-        return daoSession.getTaskDao().queryBuilder().where(TaskDao.Properties.Status.eq(TaskStatus.DONE.getIndex())).list();
+        return daoSession.getTaskDao().queryBuilder()
+                .where(TaskDao.Properties.Status.eq(TaskStatus.DONE.getIndex()))
+                .orderDesc(TaskDao.Properties.Id)
+                .list();
     }
 
     @Override
     protected void onPostExecute(List<Task> result)
     {
         if (result != null)
-        {
-            shimmer.cancel();
-            shimmerTextView.setVisibility(View.GONE);
             recyclerView.setAdapter(new DoneRecyclerAdapter(context, result));
-        }
     }
 }

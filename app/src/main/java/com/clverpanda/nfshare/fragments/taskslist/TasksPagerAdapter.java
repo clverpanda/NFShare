@@ -6,6 +6,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
+import java.util.List;
+
 /**
  * Created by clverpanda on 2017/4/7 0007.
  * It's the file for NFShare.
@@ -13,24 +15,22 @@ import android.view.ViewGroup;
 
 public class TasksPagerAdapter extends FragmentPagerAdapter
 {
-    final int PAGE_COUNT = 2;
+    private final int PAGE_COUNT = 2;
     private String tabTitles[] = new String[] {"进行中", "已完成"};
-    private Context context;
     private Fragment mCurrentFragment;
+    private List<Fragment> mFragments;
 
-    public TasksPagerAdapter(FragmentManager fm, Context context)
+
+    public TasksPagerAdapter(FragmentManager fm, List<Fragment> fragments)
     {
         super(fm);
-        this.context = context;
+        mFragments = fragments;
     }
 
     @Override
     public Fragment getItem(int position)
     {
-        if (position == 0)
-            return new RunningTasksFrag();
-        else
-            return new DoneTasksFrag();
+        return mFragments.get(position);
     }
 
     @Override

@@ -26,6 +26,7 @@ import com.clverpanda.nfshare.NFShareApplication;
 import com.clverpanda.nfshare.dao.DaoSession;
 import com.clverpanda.nfshare.dao.Task;
 import com.clverpanda.nfshare.dao.TaskDao;
+import com.clverpanda.nfshare.fragments.TasksFrag;
 import com.clverpanda.nfshare.model.DownloadFileInfo;
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.model.TaskStatus;
@@ -147,6 +148,8 @@ public class RunningTasksFrag extends Fragment {
                         mContext,
                         fileinfo.getFileName() + "下载完成",
                         Toast.LENGTH_SHORT).show();
+                TasksFrag parentFrag = (TasksFrag) getParentFragment();
+                parentFrag.notifyDoneTasksRefresh();
             }
             else if (DownloadService.ACTION_STARTED.equals(intent.getAction()))
             {

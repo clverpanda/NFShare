@@ -17,14 +17,23 @@ import android.view.ViewGroup;
 
 
 import com.clverpanda.nfshare.R;
+import com.clverpanda.nfshare.fragments.taskslist.DoneTasksFrag;
+import com.clverpanda.nfshare.fragments.taskslist.RunningTasksFrag;
 import com.clverpanda.nfshare.fragments.taskslist.TasksPagerAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-public class TasksFrag extends Fragment {
+public class TasksFrag extends Fragment
+{
     public static final String DATA_INFO = "DATA_INFO";
+
+    TasksPagerAdapter mAdapter;
+    private List<Fragment> mListFragment = new ArrayList<>();
 
 
     @BindView(R.id.tasks_viewpager)
@@ -66,10 +75,22 @@ public class TasksFrag extends Fragment {
         toggle.syncState();
 
         toolbar.setTitle(R.string.drawer_item_tasks);
-        viewPager.setAdapter(new TasksPagerAdapter(getChildFragmentManager(), getContext()));
+
+        mListFragment.add(new RunningTasksFrag());
+        mListFragment.add(new DoneTasksFrag());
+
+        mAdapter = new TasksPagerAdapter(getChildFragmentManager(), mListFragment);
+        viewPager.setAdapter(mAdapter);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setTabMode(TabLayout.MODE_FIXED);
         return view;
     }
+
+    public void notifyDoneTasksRefresh()
+    {
+        DoneTasksFrag doneTasksFrag = (DoneTasksFrag) mListFragment.get(1);
+        doneTasksFrag.refreshData();
+    }
+
 
 }

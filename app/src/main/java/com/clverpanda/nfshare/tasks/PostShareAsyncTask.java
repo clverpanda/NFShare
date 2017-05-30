@@ -8,6 +8,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.clverpanda.nfshare.model.communicate.receive.StartShareRec;
 import com.clverpanda.nfshare.model.communicate.send.StartShareSend;
 import com.clverpanda.nfshare.util.PropertiesGetter;
@@ -47,13 +48,14 @@ public class PostShareAsyncTask extends AsyncTask<StartShareSend, Void, Integer>
     {
         if (params.length <= 0) return -1;
         OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(30, TimeUnit.SECONDS)
+                .connectTimeout(5, TimeUnit.SECONDS)
                 .build();
         try
         {
             URL url = new URL(PropertiesGetter.getStartShareUrl(context));
             StartShareSend ssInfo = params[0];
-            RequestBody requestBody = RequestBody.create(JSON_TYPE, JSON.toJSONString(ssInfo));
+            RequestBody requestBody = RequestBody.create(JSON_TYPE,
+                    JSON.toJSONString(ssInfo, SerializerFeature.WriteMapNullValue));
             Request request = new Request.Builder()
                     .url(url)
                     .post(requestBody)

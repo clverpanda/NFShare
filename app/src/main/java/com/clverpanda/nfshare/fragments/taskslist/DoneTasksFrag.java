@@ -13,8 +13,6 @@ import android.view.ViewGroup;
 
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.tasks.LoadDoneTasksAsyncTask;
-import com.romainpiel.shimmer.Shimmer;
-import com.romainpiel.shimmer.ShimmerTextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,10 +23,7 @@ public class DoneTasksFrag extends Fragment
 
     @BindView(R.id.done_tasks_recyclerView)
     RecyclerView recyclerView;
-    @BindView(R.id.text_loading)
-    ShimmerTextView shimmerTextView;
 
-    private Shimmer shimmer;
 
 
     public DoneTasksFrag() {
@@ -46,12 +41,7 @@ public class DoneTasksFrag extends Fragment
         layoutManager.setOrientation(OrientationHelper.VERTICAL);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        //载入动画
-        shimmer = new Shimmer();
-        shimmer.start(shimmerTextView);
-        LoadDoneTasksAsyncTask loadDoneTasksAsyncTask = new LoadDoneTasksAsyncTask(getContext(),
-                recyclerView, shimmer, shimmerTextView);
-        loadDoneTasksAsyncTask.execute();
+        refreshData();
 
         return view;
     }
@@ -60,6 +50,13 @@ public class DoneTasksFrag extends Fragment
     public void onResume()
     {
         super.onResume();
+    }
+
+    public void refreshData()
+    {
+        LoadDoneTasksAsyncTask loadDoneTasksAsyncTask = new LoadDoneTasksAsyncTask(getContext(),
+                recyclerView);
+        loadDoneTasksAsyncTask.execute();
     }
 
 }
