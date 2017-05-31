@@ -18,7 +18,7 @@ public class PropertiesGetter
         Properties props = new Properties();
         try
         {
-            InputStream in = context.getAssets().open("appConfig");
+            InputStream in = context.getAssets().open("appConfig.properties");
             props.load(in);
         } catch (Exception ex)
         {

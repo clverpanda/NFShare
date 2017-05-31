@@ -104,6 +104,7 @@
             android:name="com.avos.avoscloud.feedback.ThreadActivity" >
         </activity>
         <!-- 反馈组件 END -->
+
     </application>
 
 </manifest>

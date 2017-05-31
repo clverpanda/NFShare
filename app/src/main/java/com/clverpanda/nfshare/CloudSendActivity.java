@@ -11,13 +11,31 @@ import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.sdk.android.oss.ClientException;
+import com.alibaba.sdk.android.oss.OSS;
+import com.alibaba.sdk.android.oss.OSSClient;
+import com.alibaba.sdk.android.oss.ServiceException;
+import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
+import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
+import com.alibaba.sdk.android.oss.common.auth.OSSCredentialProvider;
+import com.alibaba.sdk.android.oss.common.auth.OSSPlainTextAKSKCredentialProvider;
+import com.alibaba.sdk.android.oss.internal.OSSAsyncTask;
+import com.alibaba.sdk.android.oss.model.PutObjectRequest;
+import com.alibaba.sdk.android.oss.model.PutObjectResult;
+import com.clverpanda.nfshare.model.FileInfo;
 import com.clverpanda.nfshare.model.TransferData;
+import com.clverpanda.nfshare.model.communicate.receive.StartShareRec;
 import com.clverpanda.nfshare.model.communicate.send.StartShareSend;
 import com.clverpanda.nfshare.receiver.CloudSendBroadcastReceiver;
-import com.clverpanda.nfshare.receiver.WiFiSendBroadcastReceiver;
+import com.clverpanda.nfshare.receiver.ConnUnavailableBroadcastReceiver;
 import com.clverpanda.nfshare.service.HttpService;
+import com.clverpanda.nfshare.tasks.AsyncResponse;
 import com.clverpanda.nfshare.tasks.PostShareAsyncTask;
 import com.hanks.htextview.evaporate.EvaporateTextView;
 import com.skyfishjy.library.RippleBackground;
@@ -27,6 +45,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
  * Created by clverpanda on 2017/5/24 0024.
@@ -44,9 +63,11 @@ public class CloudSendActivity extends AppCompatActivity implements WifiP2pManag
 
 
     protected TransferData dataToSend;
+    private StartShareRec startShareRec = null;
     private WifiP2pManager mManager;
     private WifiP2pManager.Channel mChannel;
     private BroadcastReceiver receiver = null;
+    private BroadcastReceiver msgPushReceiver = null;
     private boolean isWifiP2pEnabled = false;
 
     protected int mLocalPort = 8080;
@@ -60,10 +81,13 @@ public class CloudSendActivity extends AppCompatActivity implements WifiP2pManag
     TextView tvShareWord;
     @BindView(R.id.tv_share_pin)
     TextView tvSharePin;
+    @BindView(R.id.send_progress)
+    ProgressBar progressBar;
 
 
     private final IntentFilter intentFilter = new IntentFilter();
     private final IntentFilter httpFilter = new IntentFilter();
+    private final IntentFilter messagePushFilter = new IntentFilter();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -74,6 +98,7 @@ public class CloudSendActivity extends AppCompatActivity implements WifiP2pManag
 
         addFilterAction();
         addHttpFilterAction();
+        addMessagePushFilterAction();
 
         mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         mChannel = mManager.initialize(this, getMainLooper(), null);
@@ -87,8 +112,10 @@ public class CloudSendActivity extends AppCompatActivity implements WifiP2pManag
     {
         super.onResume();
         receiver = new CloudSendBroadcastReceiver(mManager, mChannel, this);
+        msgPushReceiver = new ConnUnavailableBroadcastReceiver(this);
         registerReceiver(receiver, intentFilter);
         registerReceiver(httpReceiver, httpFilter);
+        registerReceiver(msgPushReceiver, messagePushFilter);
         Intent intent = new Intent(this, HttpService.class);
         intent.putExtra(HttpService.HTTP_SHARE_FILEINFO, dataToSend);
         startService(intent);
@@ -103,6 +130,7 @@ public class CloudSendActivity extends AppCompatActivity implements WifiP2pManag
         super.onPause();
         unregisterReceiver(receiver);
         unregisterReceiver(httpReceiver);
+        unregisterReceiver(msgPushReceiver);
         mManager.clearLocalServices(mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess()
@@ -130,6 +158,78 @@ public class CloudSendActivity extends AppCompatActivity implements WifiP2pManag
         rippleBackground.stopRippleAnimation();
     }
 
+    public void confirmUseCloudUpdate(final int id)
+    {
+        final SweetAlertDialog theDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("对方无法连接到此设备")
+                .setContentText("是否启用云传输")
+                .setCancelText("否")
+                .setConfirmText("是")
+                .showCancelButton(true);
+        theDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sDialog)
+            {
+                sendFileToCloud(id);
+                theDialog.cancel();
+            }
+        });
+        theDialog.show();
+    }
+
+    private void sendFileToCloud(final int id)
+    {
+        if (startShareRec == null) return;
+        if (id == startShareRec.getId())
+        {
+            progressBar.setVisibility(View.VISIBLE);
+            String endpoint = "http://oss-cn-shanghai.aliyuncs.com";
+            OSSCredentialProvider credentialProvider = new OSSPlainTextAKSKCredentialProvider("LTAIJ5G4gu5tuOUX",
+                    "KMYapV4p7XoBjQ88k9RkbA2AnCwbLl");
+
+            OSS oss = new OSSClient(getApplicationContext(), endpoint, credentialProvider);
+            FileInfo fileInfo = JSON.parseObject(dataToSend.getPayload(), FileInfo.class);
+
+            // 构造上传请求
+            PutObjectRequest put = new PutObjectRequest("nfshare", fileInfo.getFileName(), fileInfo.getFilePath());
+
+            put.setProgressCallback(new OSSProgressCallback<PutObjectRequest>() {
+                @Override
+                public void onProgress(PutObjectRequest request, long currentSize, long totalSize)
+                {
+                    progressBar.setProgress((int) (currentSize / totalSize) * 100);
+                }
+            });
+            OSSAsyncTask task = oss.asyncPutObject(put, new OSSCompletedCallback<PutObjectRequest, PutObjectResult>() {
+                @Override
+                public void onSuccess(PutObjectRequest request, PutObjectResult result)
+                {
+                    Toast.makeText(getApplicationContext(), "文件已经上传至云端", Toast.LENGTH_SHORT).show();
+                    Log.d("PutObject", "UploadSuccess");
+                }
+
+                @Override
+                public void onFailure(PutObjectRequest request, ClientException clientExcepion, ServiceException serviceException)
+                {
+                    Toast.makeText(getApplicationContext(), "上传至云端失败", Toast.LENGTH_SHORT).show();
+                    // 请求异常
+                    if (clientExcepion != null) {
+                        // 本地异常如网络异常等
+                        clientExcepion.printStackTrace();
+                    }
+                    if (serviceException != null) {
+                        // 服务异常
+                        Log.e("ErrorCode", serviceException.getErrorCode());
+                        Log.e("RequestId", serviceException.getRequestId());
+                        Log.e("HostId", serviceException.getHostId());
+                        Log.e("RawMessage", serviceException.getRawMessage());
+                    }
+                }
+            });
+            task.waitUntilFinished();
+        }
+    }
+
 
     protected void getINFO()
     {
@@ -149,9 +249,15 @@ public class CloudSendActivity extends AppCompatActivity implements WifiP2pManag
         httpFilter.addAction(HttpService.ACTION_SERVER_CREATED);
     }
 
+    protected void addMessagePushFilterAction()
+    {
+        messagePushFilter.addAction(ConnUnavailableBroadcastReceiver.ACTION_CONN_UNAVAILABLE);
+    }
+
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
         this.isWifiP2pEnabled = isWifiP2pEnabled;
     }
+
 
     //连接到对等点
     @Override
@@ -230,6 +336,20 @@ public class CloudSendActivity extends AppCompatActivity implements WifiP2pManag
                 dataToSend.getPayload(), mLocalPort, getApplicationContext());
         PostShareAsyncTask postShareAsyncTask = new PostShareAsyncTask(getApplicationContext(),
                 tvShareWord, tvSharePin);
+        postShareAsyncTask.setAsyncResponse(new AsyncResponse<StartShareRec>()
+        {
+            @Override
+            public void onDataReceivedSuccess(StartShareRec listData)
+            {
+                CloudSendActivity.this.startShareRec = listData;
+            }
+
+            @Override
+            public void onDataReceivedFailed()
+            {
+
+            }
+        });
         postShareAsyncTask.execute(shareInfo);
     }
 

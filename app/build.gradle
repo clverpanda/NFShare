@@ -61,13 +61,12 @@ dependencies {
     compile 'com.hanks:htextview-base:0.1.1'
     compile 'com.hanks:htextview-evaporate:0.1.1'
     // LeanCloud 基础包
-    compile ('cn.leancloud.android:avoscloud-sdk:v3.+')
+    compile 'cn.leancloud.android:avoscloud-sdk:v3.+'
     // 推送与实时聊天需要的包
-    compile ('cn.leancloud.android:avoscloud-push:v3.+@aar'){transitive = true}
+    compile('cn.leancloud.android:avoscloud-push:v3.+@aar') { transitive = true }
     // LeanCloud 统计包
-    compile ('cn.leancloud.android:avoscloud-statistics:v3.+')
+    compile 'cn.leancloud.android:avoscloud-statistics:v3.+'
     // LeanCloud 用户反馈包
-    compile ('cn.leancloud.android:avoscloud-feedback:v3.+@aar')
-    // Tencent对象存储sdk
-    compile 'com.tencent.cos:cos:4.3.2@aar'
+    compile 'cn.leancloud.android:avoscloud-feedback:v3.+@aar'
+    compile 'com.aliyun.dpa:oss-android-sdk:2.3.0.1'
 }

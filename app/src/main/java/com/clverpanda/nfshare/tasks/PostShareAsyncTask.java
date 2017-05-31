@@ -28,7 +28,7 @@ import okhttp3.Response;
  * It's the file for NFShare.
  */
 
-public class PostShareAsyncTask extends AsyncTask<StartShareSend, Void, Integer>
+public class PostShareAsyncTask extends AsyncTask<StartShareSend, Void, StartShareRec>
 {
     public static final MediaType JSON_TYPE = MediaType.parse("application/json; charset=utf-8");
     private static final String TAG = "PostShareAsyncTask";
@@ -36,6 +36,9 @@ public class PostShareAsyncTask extends AsyncTask<StartShareSend, Void, Integer>
     private Context context;
     private TextView tvShareWord;
     private TextView tvSharePin;
+    private AsyncResponse<StartShareRec> asyncResponse;
+
+
     public PostShareAsyncTask(Context context, TextView tvShareWord, TextView tvSharePin)
     {
         this.context = context;
@@ -43,10 +46,15 @@ public class PostShareAsyncTask extends AsyncTask<StartShareSend, Void, Integer>
         this.tvSharePin = tvSharePin;
     }
 
-    @Override
-    protected Integer doInBackground(StartShareSend... params)
+    public void setAsyncResponse(AsyncResponse<StartShareRec> asyncResponse)
     {
-        if (params.length <= 0) return -1;
+        this.asyncResponse = asyncResponse;
+    }
+
+    @Override
+    protected StartShareRec doInBackground(StartShareSend... params)
+    {
+        if (params.length <= 0) return null;
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(5, TimeUnit.SECONDS)
                 .build();
@@ -65,31 +73,32 @@ public class PostShareAsyncTask extends AsyncTask<StartShareSend, Void, Integer>
             {
                 String serverResult = response.body().string();
                 Log.i(TAG, serverResult);
-                StartShareRec receivedData = JSON.parseObject(serverResult, StartShareRec.class);
-                return receivedData.getPin();
+                return JSON.parseObject(serverResult, StartShareRec.class);
             }
             else
-                return -1;
+                return null;
         }
         catch (IOException e)
         {
             Log.e(TAG, "error: connect to server");
-            return -1;
+            return null;
         }
     }
 
     @Override
-    protected void onPostExecute(Integer result)
+    protected void onPostExecute(StartShareRec result)
     {
-        if (result == -1)
+        if (result == null)
         {
             Toast.makeText(context, "连接服务器失败，请返回重试", Toast.LENGTH_SHORT).show();
+            asyncResponse.onDataReceivedFailed();
         }
         else
         {
             tvShareWord.setVisibility(View.VISIBLE);
-            tvSharePin.setText(String.valueOf(result));
+            tvSharePin.setText(String.valueOf(result.getPin()));
             tvSharePin.setVisibility(View.VISIBLE);
+            asyncResponse.onDataReceivedSuccess(result);
         }
     }
 }

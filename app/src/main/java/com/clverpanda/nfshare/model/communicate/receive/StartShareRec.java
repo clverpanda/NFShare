@@ -9,6 +9,7 @@ public class StartShareRec
 {
     private String status;
     private int pin;
+    private int id;
 
     public StartShareRec() {
     }
@@ -27,5 +28,13 @@ public class StartShareRec
 
     public void setPin(int pin) {
         this.pin = pin;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }
