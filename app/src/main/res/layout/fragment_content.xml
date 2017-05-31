@@ -60,16 +60,6 @@
             fab:fab_colorNormal="@color/colorAccent"
             fab:fab_colorPressed="#e4d894" />
 
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/content_share_menu_wifi"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_wifi"
-            fab:fab_size="normal"
-            fab:fab_label="WiFi Direct"
-            fab:fab_colorNormal="@color/colorAccent"
-            fab:fab_colorPressed="#e4d894" />
-
     </com.github.clans.fab.FloatingActionMenu>
 
 

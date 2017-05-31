@@ -34,6 +34,11 @@ public class PropertiesGetter
         return getProperties(context).getProperty("serverUrl");
     }
 
+    public static String getOSSUrl(Context context)
+    {
+        return getProperties(context).getProperty("OSSUrl");
+    }
+
     public static String getStartShareUrl(Context context)
     {
         return getServerUrl(context) + "share/";
@@ -47,5 +52,10 @@ public class PropertiesGetter
     public static String getConnErrCallbackUrl(Context context)
     {
         return getServerUrl(context) + "callback/conn_err/";
+    }
+
+    public static String getUploadDoneCallbackUrl(Context context)
+    {
+        return getServerUrl(context) + "callback/upload_done/";
     }
 }

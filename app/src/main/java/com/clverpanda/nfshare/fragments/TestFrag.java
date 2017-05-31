@@ -196,7 +196,7 @@ public class TestFrag extends Fragment {
         OSS oss = new OSSClient(getContext().getApplicationContext(), endpoint, credentialProvider);
 
         // 构造上传请求
-        PutObjectRequest put = new PutObjectRequest("nfshare", null, "/storage/emulated/0/Download/Screenshot_1495614835.png");
+        PutObjectRequest put = new PutObjectRequest("nfshare", "Screenshot_1495614835.png", "/storage/emulated/0/Download/Screenshot_1495614835.png");
 
         put.setProgressCallback(new OSSProgressCallback<PutObjectRequest>() {
             @Override

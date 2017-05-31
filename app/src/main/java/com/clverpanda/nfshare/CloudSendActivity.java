@@ -37,15 +37,22 @@ import com.clverpanda.nfshare.receiver.ConnUnavailableBroadcastReceiver;
 import com.clverpanda.nfshare.service.HttpService;
 import com.clverpanda.nfshare.tasks.AsyncResponse;
 import com.clverpanda.nfshare.tasks.PostShareAsyncTask;
+import com.clverpanda.nfshare.util.PropertiesGetter;
 import com.hanks.htextview.evaporate.EvaporateTextView;
 import com.skyfishjy.library.RippleBackground;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by clverpanda on 2017/5/24 0024.
@@ -206,6 +213,7 @@ public class CloudSendActivity extends AppCompatActivity implements WifiP2pManag
                 {
                     Toast.makeText(getApplicationContext(), "文件已经上传至云端", Toast.LENGTH_SHORT).show();
                     Log.d("PutObject", "UploadSuccess");
+                    reportUploadDone2Server(id);
                 }
 
                 @Override
@@ -230,6 +238,36 @@ public class CloudSendActivity extends AppCompatActivity implements WifiP2pManag
         }
     }
 
+    private void reportUploadDone2Server(final int id)
+    {
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(3, TimeUnit.SECONDS)
+                        .build();
+                try
+                {
+                    URL url = new URL(PropertiesGetter.getConnErrCallbackUrl(getApplicationContext()) + id);
+                    Request request = new Request.Builder().url(url).build();
+                    Response response = client.newCall(request).execute();
+                    if (response.isSuccessful())
+                    {
+                        String result = response.body().string();
+                        Log.d(TAG, "服务器：回调" + result);
+                    }
+                    else
+                        Log.d(TAG, "服务器：回调失败");
+                }
+                catch (IOException e)
+                {
+                    Log.e(TAG, "服务器：回调失败", e);
+                }
+            }
+        }).start();
+    }
 
     protected void getINFO()
     {

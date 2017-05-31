@@ -47,8 +47,6 @@ public class ContentFrag extends Fragment
     protected Toolbar toolbar;
     @BindView(R.id.content_share_menu_nfc)
     protected com.github.clans.fab.FloatingActionButton fabNfc;
-    @BindView(R.id.content_share_menu_wifi)
-    protected com.github.clans.fab.FloatingActionButton fabWifi;
 
 
 
@@ -74,7 +72,6 @@ public class ContentFrag extends Fragment
         toggle.syncState();
 
         setFabNfcClick();
-        setFabWifiClick();
         toolbar.setTitle(R.string.drawer_item_content);
         viewPager.setAdapter(new ContentPagerAdapter(getChildFragmentManager(), getContext()));
         tabLayout.setupWithViewPager(viewPager);
@@ -108,16 +105,6 @@ public class ContentFrag extends Fragment
                     startIntent.putExtra(NFCSendActivity.DATA_INFO, nfcData);
                     startActivity(startIntent);
                 }
-            }
-        });
-    }
-
-    private void setFabWifiClick()
-    {
-        fabWifi.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
             }
         });
     }

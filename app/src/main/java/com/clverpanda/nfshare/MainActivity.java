@@ -1,6 +1,8 @@
 package com.clverpanda.nfshare;
 
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
@@ -32,9 +34,12 @@ import com.clverpanda.nfshare.fragments.TestFrag;
 import com.clverpanda.nfshare.model.AppInfo;
 import com.clverpanda.nfshare.model.ContactInfo;
 import com.clverpanda.nfshare.model.DataType;
+import com.clverpanda.nfshare.model.FileInfo;
 import com.clverpanda.nfshare.model.TaskStatus;
 import com.clverpanda.nfshare.model.TransferData;
+import com.clverpanda.nfshare.receiver.UploadDoneBroadcastReceiver;
 import com.clverpanda.nfshare.util.DbHelper;
+import com.clverpanda.nfshare.util.PropertiesGetter;
 
 import java.util.Date;
 import java.util.List;
@@ -47,6 +52,9 @@ public class MainActivity extends AppCompatActivity
 
     FragmentManager mFm;
     NfcAdapter mNfcAdapter;
+    private final IntentFilter messagePushFilter = new IntentFilter();
+    private BroadcastReceiver msgPushReceiver = null;
+
 
 
     @Override
@@ -61,6 +69,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         mFm = getSupportFragmentManager();
+        messagePushFilter.addAction(UploadDoneBroadcastReceiver.ACTION_UPLOAD_DONE);
+        msgPushReceiver = new UploadDoneBroadcastReceiver(this);
 
         //Fragment
         mFm.beginTransaction().replace(R.id.fragment_container, new ReceiveFrag()).commit();
@@ -77,6 +87,7 @@ public class MainActivity extends AppCompatActivity
     public void onResume()
     {
         super.onResume();
+        registerReceiver(msgPushReceiver, messagePushFilter);
         if (getIntent() != null && NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction()))
         {
             String receivedMsg = processIntent(getIntent());
@@ -85,6 +96,18 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void addTaskFromMessage(String task_desc)
+    {
+        FileInfo fileInfo = JSON.parseObject(task_desc, FileInfo.class);
+        fileInfo.setDownloadUrl(PropertiesGetter.getOSSUrl(getApplicationContext()) + fileInfo.getFileName());
+        DaoSession daoSession = NFShareApplication.getInstance().getDaoSession();
+        Device cloudDevice = new Device("云服务器", "CLOUD", null);
+        long deviceId = DbHelper.getInstance().insertOrReplaceDevice(cloudDevice);
+        Task task2Add = new Task(fileInfo.getFileName(), JSON.toJSONString(fileInfo), DataType.FILE, TaskStatus.PAUSED,
+                new Date(), deviceId);
+        daoSession.getTaskDao().insert(task2Add);
+        Toast.makeText(getApplicationContext(), "从云端获得任务" + fileInfo.getFileName(), Toast.LENGTH_SHORT).show();
+    }
 
     protected String processIntent(Intent intent)
     {
@@ -215,6 +238,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onNewIntent(Intent intent) {
         setIntent(intent);
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        unregisterReceiver(msgPushReceiver);
     }
 
 
