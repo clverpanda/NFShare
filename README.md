@@ -5,6 +5,10 @@
 
 ## 依赖
 - ButterKnife
+- GreenDao
+- fresco
+- okhttp
+- leancloud
 
 ## 进度
 
@@ -19,7 +23,7 @@
 ### 功能
 - [x] NFC传输
 - [x] WIFI DIRECT传输
-- [ ] 传输加密
+- [x] 云传输
 - [x] 分享应用的下载
 
 
