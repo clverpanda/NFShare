@@ -167,6 +167,8 @@ public class CloudSendActivity extends AppCompatActivity implements WifiP2pManag
 
     public void confirmUseCloudUpdate(final int id)
     {
+        if (startShareRec == null) return;
+        if (id != startShareRec.getId()) return;
         final SweetAlertDialog theDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText("对方无法连接到此设备")
                 .setContentText("是否启用云传输")
@@ -212,6 +214,7 @@ public class CloudSendActivity extends AppCompatActivity implements WifiP2pManag
                 public void onSuccess(PutObjectRequest request, PutObjectResult result)
                 {
                     Toast.makeText(getApplicationContext(), "文件已经上传至云端", Toast.LENGTH_SHORT).show();
+                    tvLog.animateText("文件已上传到云端");
                     Log.d("PutObject", "UploadSuccess");
                     reportUploadDone2Server(id);
                 }
@@ -234,7 +237,7 @@ public class CloudSendActivity extends AppCompatActivity implements WifiP2pManag
                     }
                 }
             });
-            task.waitUntilFinished();
+            //task.waitUntilFinished();
         }
     }
 
@@ -250,7 +253,7 @@ public class CloudSendActivity extends AppCompatActivity implements WifiP2pManag
                         .build();
                 try
                 {
-                    URL url = new URL(PropertiesGetter.getConnErrCallbackUrl(getApplicationContext()) + id);
+                    URL url = new URL(PropertiesGetter.getUploadDoneCallbackUrl(getApplicationContext()) + id);
                     Request request = new Request.Builder().url(url).build();
                     Response response = client.newCall(request).execute();
                     if (response.isSuccessful())

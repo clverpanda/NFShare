@@ -234,7 +234,7 @@ public class ReceiveFrag extends Fragment
             Log.d(TAG, "No devices found");
             return;
         }
-        if (getShareRec != null)
+        if (getShareRec != null && peers.size() > 0)
         {
             for (WifiP2pDevice item : peers)
             {
@@ -304,6 +304,7 @@ public class ReceiveFrag extends Fragment
     @OnClick(R.id.btn_start_search)
     void searchClicked()
     {
+        getShareRec = null;
         if (!btnReceiveClicked)
         {
             btnReceiveClicked = true;
