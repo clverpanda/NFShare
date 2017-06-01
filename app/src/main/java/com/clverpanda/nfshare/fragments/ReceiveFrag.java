@@ -4,7 +4,6 @@ package com.clverpanda.nfshare.fragments;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -13,6 +12,8 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -28,14 +29,11 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.clverpanda.nfshare.MainActivity;
 import com.clverpanda.nfshare.NFShareApplication;
 import com.clverpanda.nfshare.R;
 import com.clverpanda.nfshare.WIFISendActivity;
 import com.clverpanda.nfshare.dao.DaoSession;
-import com.clverpanda.nfshare.dao.Device;
 import com.clverpanda.nfshare.dao.Task;
-import com.clverpanda.nfshare.model.DataType;
 import com.clverpanda.nfshare.model.FileInfo;
 import com.clverpanda.nfshare.model.TaskStatus;
 import com.clverpanda.nfshare.model.TransferData;
@@ -60,6 +58,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -105,7 +105,34 @@ public class ReceiveFrag extends Fragment
     SweetAlertDialog pDialog;
     GetShareRec getShareRec = null;
 
+    private static final int REPORT_ERR2SERVER_DONE = 1024;
+    private boolean isGetFromWifiDirect = false;
+    private Timer timer = new Timer();
+    private TimerTask getFromWifiOverTimeTask = new TimerTask()
+    {
+        @Override
+        public void run()
+        {
+            if (!isGetFromWifiDirect)
+            {
+                mManager.stopPeerDiscovery(mChannel, null);
+                reportConnErr2Server();
+                Message message = new Message();
+                message.what = REPORT_ERR2SERVER_DONE;
+                handler.sendMessage(message);
+            }
+        }
+    };
 
+
+    Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            if (msg.what == REPORT_ERR2SERVER_DONE)
+            {
+                reportConnErr2ServerDone();
+            }
+        }
+    };
 
     public ReceiveFrag() { }
 
@@ -208,6 +235,7 @@ public class ReceiveFrag extends Fragment
 
     private void tryGetFromWifiDirect()
     {
+        isGetFromWifiDirect = false;
         mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener()
         {
             @Override
@@ -221,6 +249,7 @@ public class ReceiveFrag extends Fragment
                 confirmReportConnErr2Server();
             }
         });
+        timer.schedule(getFromWifiOverTimeTask, 10000);
     }
 
 
@@ -240,6 +269,7 @@ public class ReceiveFrag extends Fragment
             {
                 if (item.deviceAddress.equals(getShareRec.getOrigin_phone()))
                 {
+                    isGetFromWifiDirect = true;
                     connect(item);
                     return;
                 }
@@ -289,13 +319,20 @@ public class ReceiveFrag extends Fragment
                     }
                     else
                         Log.d(TAG, "服务器：回调失败");
+                    getShareRec = null;
                 }
                 catch (IOException e)
                 {
                     Log.e(TAG, "服务器：回调失败", e);
+                    getShareRec = null;
                 }
             }
         }).start();
+        reportConnErr2ServerDone();
+    }
+
+    private void reportConnErr2ServerDone()
+    {
         Toast.makeText(getContext(), "无法找到对方，已向服务器汇报", Toast.LENGTH_SHORT).show();
         pDialog.cancel();
     }
