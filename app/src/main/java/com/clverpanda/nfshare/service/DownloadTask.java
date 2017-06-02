@@ -49,13 +49,17 @@ class DownloadTask
         transferProgressDao = daoSession.getTransferProgressDao();
     }
 
-    public void download()
+    void download()
     {
-        TransferProgress threadInfo = taskDao.loadDeep(mFileInfo.getId()).getTransferProgress();
+        Task task2Download = taskDao.loadDeep(mFileInfo.getId());
+        TransferProgress threadInfo = task2Download.getTransferProgress();
         if (threadInfo == null)
         {
             threadInfo = new TransferProgress((long) 0, mFileInfo.getLength() - 1);
             threadInfo.setTask(taskDao.load(mFileInfo.getId()));
+            transferProgressDao.insert(threadInfo);
+            task2Download.setTransferProgress(threadInfo);
+            task2Download.update();
         }
         new DownloadThread(threadInfo).start();
     }
@@ -77,7 +81,7 @@ class DownloadTask
                 .connectTimeout(3, TimeUnit.SECONDS)
                 .build();
 
-        public DownloadThread(TransferProgress threadInfo) {
+        DownloadThread(TransferProgress threadInfo) {
             this.threadInfo = threadInfo;
         }
 
@@ -85,10 +89,6 @@ class DownloadTask
         public void run()
         {
             Log.e("isExists==", transferProgressDao.hasKey(threadInfo) + "");
-            if (!transferProgressDao.hasKey(threadInfo))
-            {
-                transferProgressDao.insert(threadInfo);
-            }
             RandomAccessFile raf;
             InputStream is;
             try {

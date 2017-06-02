@@ -267,7 +267,7 @@ public class ReceiveFrag extends Fragment
         {
             for (WifiP2pDevice item : peers)
             {
-                if (item.deviceAddress.equals(getShareRec.getOrigin_phone()))
+                if (item.deviceAddress.equalsIgnoreCase(getShareRec.getOrigin_phone()))
                 {
                     isGetFromWifiDirect = true;
                     connect(item);

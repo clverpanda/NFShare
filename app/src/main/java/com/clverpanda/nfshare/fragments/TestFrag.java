@@ -33,6 +33,7 @@ import com.clverpanda.nfshare.model.DataType;
 import com.clverpanda.nfshare.model.TaskStatus;
 import com.clverpanda.nfshare.model.communicate.send.GetShareSend;
 import com.clverpanda.nfshare.model.communicate.send.StartShareSend;
+import com.clverpanda.nfshare.util.DbHelper;
 import com.clverpanda.nfshare.util.PropertiesGetter;
 import com.hanks.htextview.evaporate.EvaporateTextView;
 
@@ -81,7 +82,7 @@ public class TestFrag extends Fragment {
             {
                 DaoSession daoSession = NFShareApplication.getInstance().getDaoSession();
                 Device device = new Device("测试机", "11:11:11:11:11", "");
-                long deviceId = daoSession.getDeviceDao().insert(device);
+                long deviceId = DbHelper.getInstance().insertOrReplaceDevice(device);
                 Task taskInfo = new Task("下载测试", "{\"appName\":\"百度地图\",\"appVersion\":\"9.7.5\",\"pkgName\":\"com.baidu.BaiduMap\"}",
                         DataType.APP, TaskStatus.PAUSED, new Date(), deviceId);
                 daoSession.getTaskDao().insert(taskInfo);
