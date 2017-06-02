@@ -280,25 +280,27 @@ public class ReceiveFrag extends Fragment
 
     private void confirmReportConnErr2Server()
     {
-        new SweetAlertDialog(this.getContext(), SweetAlertDialog.WARNING_TYPE)
+        final SweetAlertDialog confirmConnErrDialog = new SweetAlertDialog(this.getContext(), SweetAlertDialog.WARNING_TYPE)
                 .setTitleText("无法连接至对方设备")
                 .setContentText("是否告知对方启用云传输")
                 .setCancelText("否")
                 .setConfirmText("是")
-                .showCancelButton(true)
-                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                .showCancelButton(true);
+        confirmConnErrDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override
                     public void onClick(SweetAlertDialog sDialog)
                     {
                         reportConnErr2Server();
+                        confirmConnErrDialog.cancel();
                     }
-                })
-                .show();
+                });
+        confirmConnErrDialog.show();
     }
 
     private void reportConnErr2Server()
     {
         if (getShareRec == null) return;
+        isGetFromWifiDirect = true;
         new Thread(new Runnable()
         {
             @Override
@@ -367,7 +369,7 @@ public class ReceiveFrag extends Fragment
                 new Date(), deviceId);
         daoSession.getTaskDao().insert(task2Add);
         Toast.makeText(getActivity(), "任务已添加", Toast.LENGTH_SHORT).show();
-        pDialog.cancel();
+        if (pDialog != null) pDialog.cancel();
     }
 
     //连接到对等点

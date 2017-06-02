@@ -75,50 +75,28 @@ public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecycler
             holder.imgbStart.setVisibility(View.INVISIBLE);
             holder.imgbPause.setVisibility(View.INVISIBLE);
         }
+        String sDownloadUrl = null;
+        String sFileName = null;
         if (theInfo.getType() == DataType.APP)
         {
             AppInfo appInfo = JSON.parseObject(theInfo.getDescription(), AppInfo.class);
-            final String downloadUrl = "http://www.wandoujia.com/apps/" + appInfo.getPkgName() + "/download";
-            final String fileName = appInfo.getAppName() + ".apk";
-            holder.imgbStart.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v)
-                {
-                    if (theInfo.getStatus() == TaskStatus.PAUSED)
-                    {
-                        Intent intent = new Intent(mContext, DownloadService.class);
-                        intent.setAction(DownloadService.ACTION_START);
-                        DownloadFileInfo fileInfo = new DownloadFileInfo(theInfo.getId(), downloadUrl,
-                                fileName, 0, 0);
-                        intent.putExtra(DownloadService.DOWNLOAD_FILE_INFO, fileInfo);
-                        mContext.startService(intent);
-                    }
-                }
-            });
-            holder.imgbPause.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    if (theInfo.getStatus() == TaskStatus.RUNNING) {
-                        Intent intent = new Intent(mContext, DownloadService.class);
-                        intent.setAction(DownloadService.ACTION_PAUSE);
-                        DownloadFileInfo fileInfo = new DownloadFileInfo(theInfo.getId(), downloadUrl,
-                                fileName, 0, 0);
-                        intent.putExtra(DownloadService.DOWNLOAD_FILE_INFO, fileInfo);
-                        mContext.startService(intent);
-                    }
-                }
-            });
+            sDownloadUrl = "http://www.wandoujia.com/apps/" + appInfo.getPkgName() + "/download";
+            sFileName = appInfo.getAppName() + ".apk";
         }
         else if (theInfo.getType() == DataType.FILE)
         {
             FileInfo fileInfo = JSON.parseObject(theInfo.getDescription(), FileInfo.class);
-            final String downloadUrl = fileInfo.getDownloadUrl();
-            final String fileName = fileInfo.getFileName();
-            holder.imgbStart.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            sDownloadUrl = fileInfo.getDownloadUrl();
+            sFileName = fileInfo.getFileName();
+        }
+        final String downloadUrl = sDownloadUrl;
+        final String fileName = sFileName;
+        holder.imgbStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                if (theInfo.getStatus() == TaskStatus.PAUSED)
+                {
                     Intent intent = new Intent(mContext, DownloadService.class);
                     intent.setAction(DownloadService.ACTION_START);
                     DownloadFileInfo fileInfo = new DownloadFileInfo(theInfo.getId(), downloadUrl,
@@ -126,8 +104,23 @@ public class RunningRecyclerAdapter extends RecyclerView.Adapter<RunningRecycler
                     intent.putExtra(DownloadService.DOWNLOAD_FILE_INFO, fileInfo);
                     mContext.startService(intent);
                 }
-            });
-        }
+            }
+        });
+        holder.imgbPause.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (theInfo.getStatus() == TaskStatus.RUNNING) {
+                    Intent intent = new Intent(mContext, DownloadService.class);
+                    intent.setAction(DownloadService.ACTION_PAUSE);
+                    DownloadFileInfo fileInfo = new DownloadFileInfo(theInfo.getId(), downloadUrl,
+                            fileName, 0, 0);
+                    intent.putExtra(DownloadService.DOWNLOAD_FILE_INFO, fileInfo);
+                    mContext.startService(intent);
+                }
+            }
+        });
     }
 
     @Override

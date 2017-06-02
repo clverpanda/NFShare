@@ -9,6 +9,8 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -68,6 +70,8 @@ public class CloudSendActivity extends AppCompatActivity implements WifiP2pManag
     public static final String KEY_NAME = "buddyname";
     public static final String KEY_AVAILABLE = "available";
 
+    private static final int UPLOAD_TO_CLOUD_DONE = 2048;
+
 
     protected TransferData dataToSend;
     private StartShareRec startShareRec = null;
@@ -95,6 +99,15 @@ public class CloudSendActivity extends AppCompatActivity implements WifiP2pManag
     private final IntentFilter intentFilter = new IntentFilter();
     private final IntentFilter httpFilter = new IntentFilter();
     private final IntentFilter messagePushFilter = new IntentFilter();
+
+    Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            if (msg.what == UPLOAD_TO_CLOUD_DONE)
+            {
+                tvLog.animateText("成功上传到云端");
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -213,8 +226,9 @@ public class CloudSendActivity extends AppCompatActivity implements WifiP2pManag
                 @Override
                 public void onSuccess(PutObjectRequest request, PutObjectResult result)
                 {
-                    Toast.makeText(getApplicationContext(), "文件已经上传至云端", Toast.LENGTH_SHORT).show();
-                    tvLog.animateText("文件已上传到云端");
+                    Message message = new Message();
+                    message.what = UPLOAD_TO_CLOUD_DONE;
+                    handler.sendMessage(message);
                     Log.d("PutObject", "UploadSuccess");
                     reportUploadDone2Server(id);
                 }

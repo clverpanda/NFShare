@@ -72,7 +72,7 @@ public class PostGetShareAsyncTask extends AsyncTask<GetShareSend, Void, GetShar
         }
         catch (IOException e)
         {
-            Log.e(TAG, "error: connect to get_share");
+            Log.e(TAG, "error: connect to get_share", e);
             return null;
         }
     }
