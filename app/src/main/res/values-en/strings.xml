@@ -21,4 +21,5 @@
     <string name="receive_with_wifi">Receive by search</string>
     <string name="no_contact_permission">NO CONTACT PERMISSION</string>
     <string name="nfc_notify">Approach to another device</string>
+    <string name="share_pin">PIN:</string>
 </resources>
