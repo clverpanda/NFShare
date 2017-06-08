@@ -108,7 +108,9 @@ public class ReceiveFrag extends Fragment
     private static final int REPORT_ERR2SERVER_DONE = 1024;
     private boolean isGetFromWifiDirect = false;
     private Timer timer = new Timer();
-    private TimerTask getFromWifiOverTimeTask = new TimerTask()
+    private TimerTask getFromWifiOverTimeTask;
+
+    private class OverTimeTask extends TimerTask
     {
         @Override
         public void run()
@@ -122,7 +124,7 @@ public class ReceiveFrag extends Fragment
                 handler.sendMessage(message);
             }
         }
-    };
+    }
 
 
     Handler handler = new Handler() {
@@ -249,6 +251,7 @@ public class ReceiveFrag extends Fragment
                 confirmReportConnErr2Server();
             }
         });
+        getFromWifiOverTimeTask = new OverTimeTask();
         timer.schedule(getFromWifiOverTimeTask, 10000);
     }
 
@@ -330,6 +333,7 @@ public class ReceiveFrag extends Fragment
                 }
             }
         }).start();
+        mManager.stopPeerDiscovery(mChannel, null);
         reportConnErr2ServerDone();
     }
 
