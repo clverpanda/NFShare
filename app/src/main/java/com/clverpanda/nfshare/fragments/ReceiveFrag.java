@@ -95,6 +95,7 @@ public class ReceiveFrag extends Fragment
     private WifiP2pManager.Channel mChannel;
     private BroadcastReceiver receiver = null;
     private boolean isWifiP2pEnabled = false;
+    private boolean isTryWifiDirect = false;
     private final IntentFilter intentFilter = new IntentFilter();
     private List<WifiP2pDevice> peers = new ArrayList<>();
 
@@ -190,6 +191,7 @@ public class ReceiveFrag extends Fragment
 
     private void tryGetFromServer(int pin_code)
     {
+        isTryWifiDirect = false;
         PostGetShareAsyncTask getShareFromServerTask = new PostGetShareAsyncTask(getContext());
         getShareFromServerTask.setAsyncResponse(new AsyncResponse<GetShareRec>()
         {
@@ -197,10 +199,10 @@ public class ReceiveFrag extends Fragment
             public void onDataReceivedSuccess(final GetShareRec listData)
             {
                 getShareRec = listData;
+                mServerPort = listData.getPort();
                 if (DeviceInfoGetter.getInstance(getContext()).isUsingWifi() && listData.getIp() != null)
                 {
                     Log.d(TAG, "onDataReceivedSuccess: 云服务器连接成功");
-                    mServerPort = listData.getPort();
                     String LANInfoUrl = "http://" + listData.getIp() + ":" + listData.getPort() + "/getInfo";
                     final String LANFileUrl = "http://" + listData.getIp() + ":" + listData.getPort() + "/getFile";
                     ConnectServerAsyncTask tryConnectInLAN = new ConnectServerAsyncTask();
@@ -266,13 +268,19 @@ public class ReceiveFrag extends Fragment
             Log.d(TAG, "No devices found");
             return;
         }
-        if (getShareRec != null && peers.size() > 0)
+        if (!isTryWifiDirect && getShareRec != null && peers.size() > 0)
         {
             for (WifiP2pDevice item : peers)
             {
-                if (item.deviceAddress.equalsIgnoreCase(getShareRec.getOrigin_phone()))
+                Log.e(TAG, "onPeersAvailable: " + item.deviceAddress);
+                Log.e(TAG, "onPeersAvailable: " + getShareRec.getOrigin_phone());
+                String tempStr = item.deviceAddress.substring(3);
+                String tempStr1 = getShareRec.getOrigin_phone().substring(3);
+                if (tempStr.equalsIgnoreCase(tempStr1))
                 {
+                    isTryWifiDirect = true;
                     isGetFromWifiDirect = true;
+                    pDialog.cancel();
                     connect(item);
                     return;
                 }
@@ -334,7 +342,9 @@ public class ReceiveFrag extends Fragment
             }
         }).start();
         mManager.stopPeerDiscovery(mChannel, null);
-        reportConnErr2ServerDone();
+        Message message = new Message();
+        message.what = REPORT_ERR2SERVER_DONE;
+        handler.sendMessage(message);
     }
 
     private void reportConnErr2ServerDone()
@@ -417,6 +427,7 @@ public class ReceiveFrag extends Fragment
 
     public void connect(final WifiP2pDevice device2connect)
     {
+        Log.e(TAG, "connect: start");
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = device2connect.deviceAddress;
         config.wps.setup = WpsInfo.PBC;
@@ -428,12 +439,14 @@ public class ReceiveFrag extends Fragment
             @Override
             public void onSuccess()
             {
+                Log.e(TAG, "onSuccess: connect");
                 Toast.makeText(getActivity(), "已经连接到对方设备", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int reason)
             {
+                Log.e(TAG, "onFailure: connect");
                 Toast.makeText(getActivity(), "连接失败，请重试", Toast.LENGTH_SHORT).show();
                 confirmReportConnErr2Server();
             }
